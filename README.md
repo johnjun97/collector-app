@@ -18,3 +18,15 @@ If you are developing a production application, we recommend using TypeScript wi
 # Local testing 
 
 npm run dev
+
+# local network testing
+
+npm run dev -- --host
+
+# Setup 
+
+Frontend: React + Vite
+Hosting: Vercel
+Git: Github
+Database: Supabase
+Backend/API: Vercel
