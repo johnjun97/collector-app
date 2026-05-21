@@ -1,13 +1,27 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 import './Login.css'
-import { FaEye, FaEyeSlash} from "react-icons/fa"
-
+import { FaEye, FaEyeSlash } from "react-icons/fa"
+import { useNavigate } from 'react-router-dom'
 
 export default function Login() {
+  const navigate = useNavigate()
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data } = await supabase.auth.getUser()
+
+      if (data.user) {
+        navigate("/home")
+      }
+    }
+
+    checkUser()
+  }, [])
 
   const handleLogin = async () => {
     const { error } = await supabase.auth.signInWithPassword({
@@ -18,13 +32,14 @@ export default function Login() {
     if (error) {
       alert(error.message)
     } else {
-      alert('Login success')
+      // alert('Login success')
+      navigate("/home")
     }
   }
   return (
     <div className="login-container">
       <div className="login-form">
-        <h1>Login</h1>
+        <h1 className="login-title">Login</h1>
 
         <div className="form-content">
 
@@ -55,7 +70,11 @@ export default function Login() {
           </div>
 
           {/* buttons */}
-          <button className="login-button">Login</button>
+          <button
+            className="login-button"
+            onClick={handleLogin}>
+            Login
+          </button>
 
           {/* Forgot Password */}
           <div className="forgot-password">
@@ -65,7 +84,7 @@ export default function Login() {
 
             <p >
               Don't have an account?{" "}
-              <span>
+              <span onClick={() => navigate("/register")}>
                 Register
               </span>
             </p>
