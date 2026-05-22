@@ -7,6 +7,11 @@ export default function Home() {
 
   const [user, setUser] = useState(null)
 
+  // Listen for auth changes
+  // supabase.auth.onAuthStateChange((event) => {
+  //   console.log(event)
+  // })
+
   useEffect(() => {
     const getUser = async () => {
       const { data } = await supabase.auth.getUser()
@@ -19,8 +24,7 @@ export default function Home() {
   return (
     <div style={{ padding: "20px" }}>
       <h1>Home Page</h1>
-      <p>Welcome, {user ? user.email : "Guest"}</p>
-      {/* <p>Hi {user}, Welcome to my app</p> */}
+      <p>Welcome, {user?.user_metadata?.displayName || user?.email}</p>
 
       <button
         onClick={async () => {

@@ -11,6 +11,8 @@ export default function Login() {
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
 
+
+  // Check if user is already logged in || in recovery flow
   useEffect(() => {
     const checkUser = async () => {
       const { data } = await supabase.auth.getUser()
@@ -78,7 +80,7 @@ export default function Login() {
 
           {/* Forgot Password */}
           <div className="forgot-password">
-            <button>
+            <button onClick={() => navigate("/ForgotPassword")}>
               Forgot Password
             </button>
 

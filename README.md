@@ -30,3 +30,4 @@ Hosting: Vercel
 Git: Github
 Database: Supabase
 Backend/API: Vercel
+SMTP: Brevo
