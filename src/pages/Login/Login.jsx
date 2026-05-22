@@ -18,7 +18,7 @@ export default function Login() {
       const { data } = await supabase.auth.getUser()
 
       if (data.user) {
-        navigate("/home")
+        navigate("/Home")
       }
     }
 
@@ -35,7 +35,7 @@ export default function Login() {
       alert(error.message)
     } else {
       // alert('Login success')
-      navigate("/home")
+      navigate("/Home")
     }
   }
   return (
