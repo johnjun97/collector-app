@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import Login from './pages/login/Login.jsx'
-import Home from './pages/home/home.jsx'
+import Home from './pages/home/Home.jsx'
 import Register from './pages/register/Register.jsx'
 import ProtectedRoute from './routes/ProtectedRoute.jsx'
 import ForgotPassword from './pages/forgot-password/ForgotPassword.jsx'
