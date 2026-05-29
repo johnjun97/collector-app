@@ -40,14 +40,7 @@ export default function App() {
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="/login" element={<Login />} />
       <Route path="/Register" element={<Register />} />
-      <Route
-        path="/Home"
-        element={
-          <ProtectedRoute session={session}>
-            <Home />
-          </ProtectedRoute>
-        }
-      />
+      <Route path="/Home" element={<ProtectedRoute session={session}><Home /></ProtectedRoute>} />
       <Route path="/ForgotPassword" element={<ForgotPassword />} />
       <Route path="/ResetPassword" element={<ResetPassword />} />
     </Routes>
