@@ -1,76 +1,45 @@
 .register-container {
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .form-content {
-    display: flex;
-    flex-direction: column;
-    gap: 12px
+  display: flex;
+  flex-direction: column;
+  gap: 12px
 }
 
 .register-title {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.field {
-    width: 100%;
-    height: 38px;
-    padding: 8px;
-    padding-right: 35px;
-    box-sizing: border-box;
-}
-
-.register-button {
-    width: 100%;
-    height: 38px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    cursor: pointer;
-    border-radius: 8px;
-}
-
-/* .container {
-  max-width: 360px;
-  margin: 80px auto;
-  padding: 24px;
-  border: 1px solid #ddd;
-  border-radius: 12px;
-  font-family: Arial, sans-serif;
-}
-
-h1 {
   text-align: center;
   margin-bottom: 20px;
 }
 
-input {
+.field {
   width: 100%;
-  padding: 10px;
-  margin-bottom: 12px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  outline: none;
+  height: 38px;
+  padding: 8px;
+  padding-right: 35px;
+  box-sizing: border-box;
 }
 
-input:focus {
-  border-color: #4f46e5;
-}
-
-button {
+.register-button {
   width: 100%;
-  padding: 10px;
-  background: #4f46e5;
+  height: 38px;
+  background-color: #007bff;
   color: white;
   border: none;
-  border-radius: 8px;
   cursor: pointer;
+  border-radius: 8px;
 }
 
-button:hover {
-  background: #4338ca;
-} */
+.back-button {
+  width: 100%;
+  height: 38px;
+  background-color: transparent;
+  color: #007bff;
+  border: 1px solid #007bff;
+  cursor: pointer;
+  border-radius: 8px;
+}

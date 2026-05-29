@@ -1,9 +1,11 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabaseClient'
 import './Register.css'
 
 export default function Register() {
   const [email, setEmail] = useState('')
+  const navigate = useNavigate()
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [displayName, setDisplayName] = useState('')
@@ -67,6 +69,10 @@ export default function Register() {
 
         <button className="register-button" onClick={handleRegister}>
           Register
+        </button>
+
+        <button className="back-button" onClick={() => navigate("/login")}>
+          back to login
         </button>
       </div>
     </div>

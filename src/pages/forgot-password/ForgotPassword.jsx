@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabaseClient'
+import './ForgotPassword.css'
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('')
@@ -18,17 +19,25 @@ export default function ForgotPassword() {
   }
 
   return (
-    <div>
-      <h1>Forgot Password</h1>
+    <div className="forgot-password-container">
+      <div className="forgot-password-form">
+        <h1 className="forgot-password-title">Forgot Password</h1>
 
-      <input
-        placeholder="Enter email"
-        onChange={(e) => setEmail(e.target.value)}
-      />
+        <div className="form-content">
+          <input className="field"
+            placeholder="Enter email"
+            onChange={(e) => setEmail(e.target.value)}
+          />
 
-      <button onClick={handleReset}>
-        Send reset email
-      </button>
+          <button className="reset-button" onClick={handleReset}>
+            Send reset email
+          </button>
+
+          <button className="back-button" onClick={() => navigate("/login")}>
+            back to login
+          </button>
+        </div>
+      </div>
     </div>
   )
 }
