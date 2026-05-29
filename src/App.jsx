@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
-import Login from './pages/Login/Login.jsx'
-import Home from './pages/Home/home.jsx'
-import Register from './pages/Register/register.jsx'
+import Login from './pages/login/Login.jsx'
+import Home from './pages/home/home.jsx'
+import Register from './pages/register/register.jsx'
 import ProtectedRoute from './routes/ProtectedRoute.jsx'
-import ForgotPassword from './pages/ForgotPassword/ForgotPassword.jsx'
-import ResetPassword from './pages/ResetPassword/ResetPassword.jsx'
+import ForgotPassword from './pages/forgot-password/ForgotPassword.jsx'
+import ResetPassword from './pages/reset-password/ResetPassword.jsx'
 import { supabase } from './lib/supabaseClient'
 import { useAuthListener } from './auth/useAuthListener'
 
@@ -40,7 +40,7 @@ export default function App() {
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="/login" element={<Login />} />
       <Route path="/Register" element={<Register />} />
-      <Route path="/Home" element={<ProtectedRoute session={session}><Home /></ProtectedRoute>} />
+      <Route path="/home" element={<ProtectedRoute session={session}><Home /></ProtectedRoute>} />
       <Route path="/ForgotPassword" element={<ForgotPassword />} />
       <Route path="/ResetPassword" element={<ResetPassword />} />
     </Routes>
