@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
-import './Login.css'
 import { FaEye, FaEyeSlash } from "react-icons/fa"
 import { useNavigate } from 'react-router-dom'
+import './Login.css'
 
 export default function Login() {
   const navigate = useNavigate()
