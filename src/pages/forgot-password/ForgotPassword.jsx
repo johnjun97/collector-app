@@ -25,16 +25,16 @@ export default function ForgotPassword() {
 
         <div className="form-content">
           <input className="field"
-            placeholder="Enter email"
+            placeholder="Enter Email"
             onChange={(e) => setEmail(e.target.value)}
           />
 
           <button className="reset-button" onClick={handleReset}>
-            Send reset email
+            Send Reset Email
           </button>
 
           <button className="back-button" onClick={() => navigate("/login")}>
-            back to login
+            Back to Login
           </button>
         </div>
       </div>

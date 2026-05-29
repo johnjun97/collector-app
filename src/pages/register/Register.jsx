@@ -42,7 +42,7 @@ export default function Register() {
         <h1 className="register-title">Register</h1>
 
         <input
-          placeholder="email"
+          placeholder="Email"
           className="field"
           onChange={(e) => setEmail(e.target.value)}
         />
@@ -50,7 +50,7 @@ export default function Register() {
         <input
           type="password"
           className="field"
-          placeholder="password"
+          placeholder="Password"
           onChange={(e) => setPassword(e.target.value)}
         />
 
@@ -72,7 +72,7 @@ export default function Register() {
         </button>
 
         <button className="back-button" onClick={() => navigate("/login")}>
-          back to login
+          Back to Login
         </button>
       </div>
     </div>

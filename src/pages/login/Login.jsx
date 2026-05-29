@@ -49,7 +49,7 @@ export default function Login() {
           <input
             className="field"
             type="email"
-            placeholder="email"
+            placeholder="Email"
             onChange={(e) => setEmail(e.target.value)}
           />
 
@@ -57,7 +57,7 @@ export default function Login() {
           <div className="password-wrapper">
             <input
               type={showPassword ? "text" : "password"}
-              placeholder="password"
+              placeholder="Password"
               onChange={(e) => setPassword(e.target.value)}
               className="field"
             />
