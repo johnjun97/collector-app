@@ -25,7 +25,9 @@ export default function Login() {
     checkUser()
   }, [])
 
-  const handleLogin = async () => {
+  const handleLogin = async (e) => {
+    e.preventDefault() //stops the page from refreshing So React can handle login like call supabase, stay on same page, navigate manually
+  
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password
@@ -43,7 +45,8 @@ export default function Login() {
       <div className="login-form">
         <h1 className="login-title">Login</h1>
 
-        <div className="form-content">
+        {/* <div className="form-content"> */}
+        <form className="form-content" onSubmit={handleLogin}>
 
           {/* email */}
           <input
@@ -72,27 +75,25 @@ export default function Login() {
           </div>
 
           {/* buttons */}
-          <button
-            className="login-button"
-            onClick={handleLogin}>
+          <button className="login-button" type="submit">
             Login
           </button>
+        </form>
 
-          {/* Forgot Password */}
-          <div className="forgot-password">
-            <button onClick={() => navigate("/ForgotPassword")}>
-              Forgot Password
-            </button>
+        {/* Forgot Password */}
+        <div className="forgot-password">
+          <button onClick={() => navigate("/ForgotPassword")}>
+            Forgot Password
+          </button>
 
-            <p >
-              Don't have an account?{" "}
-              <span onClick={() => navigate("/Register")}>
-                Register
-              </span>
-            </p>
-          </div>
-
+          <p >
+            Don't have an account?{" "}
+            <span onClick={() => navigate("/Register")}>
+              Register
+            </span>
+          </p>
         </div>
+
       </div>
     </div>
   )
