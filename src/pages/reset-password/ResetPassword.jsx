@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 import { useNavigate } from 'react-router-dom'
+import './ResetPassword.css'
 
 export default function ResetPassword() {
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const navigate = useNavigate()
 
   const handleUpdatePassword = async () => {
@@ -22,18 +24,28 @@ export default function ResetPassword() {
   }
 
   return (
-    <div>
-      <h1>Reset Password</h1>
+    <div className="reset-password-container">
+      <div className="reset-password-form">
 
-      <input
-        type="password"
-        placeholder="New password"
-        onChange={(e) => setPassword(e.target.value)}
-      />
+        <h1 className="reset-password-title">Reset Password</h1>
 
-      <button onClick={handleUpdatePassword}>
-        Update Password
-      </button>
+        <input className="reset-password-field"
+          type="password"
+          placeholder="New password"
+          onChange={(e) => setPassword(e.target.value)}
+        />
+
+        <input className="reset-password-field"
+          type="password"
+          placeholder="Confirm Password"
+          onChange={(e) => setConfirmPassword(e.target.value)}
+        />
+
+
+        <button className="update-button" onClick={handleUpdatePassword}>
+          Update Password
+        </button>
+      </div>
     </div>
   )
 }

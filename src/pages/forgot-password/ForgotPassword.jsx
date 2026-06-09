@@ -13,7 +13,7 @@ export default function ForgotPassword() {
     if (error) {
       alert(error.message)
     } else {
-      alert("Reset email sent")
+      alert("Reset email sent, Please check your inbox or spam folder")
       navigate("/login")
     }
   }
