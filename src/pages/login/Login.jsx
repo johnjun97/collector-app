@@ -27,7 +27,7 @@ export default function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault() //stops the page from refreshing So React can handle login like call supabase, stay on same page, navigate manually
-  
+
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password
@@ -52,6 +52,8 @@ export default function Login() {
           <input
             className="field"
             type="email"
+            name="email"
+            autoComplete="email"
             placeholder="Email"
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -60,12 +62,13 @@ export default function Login() {
           <div className="password-wrapper">
             <input
               type={showPassword ? "text" : "password"}
+              name="password"
+              autoComplete="current-password"
               placeholder="Password"
               onChange={(e) => setPassword(e.target.value)}
               className="field"
             />
 
-            {/* eye */}
             <span
               onClick={() => setShowPassword(prev => !prev)}
               className="eye-icon"
@@ -94,7 +97,7 @@ export default function Login() {
           </p>
         </div>
 
-      </div>
-    </div>
+      </div >
+    </div >
   )
 }
