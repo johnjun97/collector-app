@@ -8,11 +8,17 @@ export default function ResetPassword() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const navigate = useNavigate()
 
+  const [loading, setLoading] = useState(false)
+
   const handleUpdatePassword = async () => {
+
     if (password !== confirmPassword) {
       alert("Passwords do not match")
+      setLoading(false)
       return
     }
+
+    setLoading(true)
 
     const { error } = await supabase.auth.updateUser({
       password: password
@@ -20,10 +26,12 @@ export default function ResetPassword() {
 
     if (error) {
       alert(error.message)
+      setLoading(false)
       return
     }
 
     alert("Password updated successfully")
+    setLoading(false)
     await supabase.auth.signOut()
     navigate("/login")
   }
@@ -35,20 +43,23 @@ export default function ResetPassword() {
         <h1 className="reset-password-title">Reset Password</h1>
 
         <input className="reset-password-field"
+          disabled={loading}
           type="password"
           placeholder="New password"
           onChange={(e) => setPassword(e.target.value)}
         />
 
         <input className="reset-password-field"
+          disabled={loading}
           type="password"
           placeholder="Confirm Password"
           onChange={(e) => setConfirmPassword(e.target.value)}
         />
 
-
-        <button className="update-button" onClick={handleUpdatePassword}>
-          Update Password
+        <button className="update-button"
+          disabled={loading || !password || !confirmPassword}
+          onClick={handleUpdatePassword}>
+          {loading ? "Updating..." : "Update Password"}
         </button>
       </div>
     </div>
