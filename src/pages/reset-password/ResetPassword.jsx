@@ -46,14 +46,12 @@ export default function ResetPassword() {
         <h1 className="reset-password-title">Reset Password</h1>
 
         <div className="password-field-container new-password-field">
-
           <input className="reset-password-field"
             disabled={loading}
             type={showPassword ? "text" : "password"}
             placeholder="New password"
             onChange={(e) => setPassword(e.target.value)}
           />
-
           <span
             onClick={() => setShowPassword(prev => !prev)}
             className="eye-icon"
