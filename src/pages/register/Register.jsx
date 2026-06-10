@@ -10,9 +10,14 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [displayName, setDisplayName] = useState('')
 
+  const [loading, setLoading] = useState(false)
+
   const handleRegister = async () => {
+    setLoading(true)
+
     if (password !== confirmPassword) {
       alert("Passwords do not match")
+      setLoading(false)
       return
     }
 
@@ -30,25 +35,29 @@ export default function Register() {
 
     if (error) {
       alert(error.message)
+      setLoading(false)
       return
     }
 
     alert("Check your email to confirm account")
+    setLoading(false)
   }
 
   return (
     <div className="register-container">
-      <div className="form-content">
+      <div className={`form-content ${loading ? "loading" : ""}`}>
         <h1 className="register-title">Register</h1>
 
         <input
           placeholder="Email"
+          disabled={loading}
           className="field"
           onChange={(e) => setEmail(e.target.value)}
         />
 
         <input
           type="password"
+          disabled={loading}
           className="field"
           placeholder="Password"
           onChange={(e) => setPassword(e.target.value)}
@@ -56,6 +65,7 @@ export default function Register() {
 
         <input
           type="password"
+          disabled={loading}
           className="field"
           placeholder="Confirm Password"
           onChange={(e) => setConfirmPassword(e.target.value)}
@@ -63,15 +73,20 @@ export default function Register() {
 
         <input
           placeholder="Display Name (optional)"
+          disabled={loading}
           className="field"
           onChange={(e) => setDisplayName(e.target.value)}
         />
 
-        <button className="register-button" onClick={handleRegister}>
-          Register
+        <button
+          className="register-button"
+          onClick={handleRegister}
+          disabled={loading || !email || !password || !confirmPassword}
+        >
+          {loading ? "Registering..." : "Register"}
         </button>
 
-        <button className="back-button" onClick={() => navigate("/login")}>
+        <button className="back-button" onClick={() => navigate("/login")} disabled={loading}>
           Back to Login
         </button>
       </div>
