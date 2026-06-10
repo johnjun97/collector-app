@@ -7,6 +7,15 @@
 
 .login-form {
     width: 250px;
+    position: relative;
+}
+
+.login-form.loading::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.6);
+  pointer-events: all;
 }
 
 .login-title {

@@ -11,6 +11,8 @@ export default function Login() {
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
 
+  const [loading, setLoading] = useState(false)
+
 
   // Check if user is already logged in || in recovery flow
   useEffect(() => {
@@ -27,6 +29,8 @@ export default function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault() //stops the page from refreshing So React can handle login like call supabase, stay on same page, navigate manually
+
+    setLoading(true)
 
     const { error } = await supabase.auth.signInWithPassword({
       email,
@@ -46,11 +50,15 @@ export default function Login() {
         <h1 className="login-title">Login</h1>
 
         {/* <div className="form-content"> */}
-        <form className="form-content" onSubmit={handleLogin}>
+        <form
+          className={`form-content ${loading ? "loading" : ""}`}
+          onSubmit={handleLogin}
+        >
 
           {/* email */}
           <input
             className="field"
+            disabled={loading}
             type="email"
             name="email"
             autoComplete="email"
@@ -62,6 +70,7 @@ export default function Login() {
           <div className="password-wrapper">
             <input
               type={showPassword ? "text" : "password"}
+              disabled={loading}
               name="password"
               autoComplete="current-password"
               placeholder="Password"
@@ -78,8 +87,11 @@ export default function Login() {
           </div>
 
           {/* buttons */}
-          <button className="login-button" type="submit">
-            Login
+          <button 
+          className="login-button" 
+          type="submit" 
+          disabled={loading}>
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 
