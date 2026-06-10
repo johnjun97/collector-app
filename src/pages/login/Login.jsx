@@ -36,6 +36,8 @@ export default function Login() {
       email,
       password
     })
+    
+    setLoading(false)
 
     if (error) {
       alert(error.message)

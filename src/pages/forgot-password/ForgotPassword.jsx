@@ -7,8 +7,15 @@ export default function ForgotPassword() {
   const [email, setEmail] = useState('')
   const navigate = useNavigate()
 
+  const [loading, setLoading] = useState(false)
+
   const handleReset = async () => {
+
+    setLoading(true)
+
     const { error } = await supabase.auth.resetPasswordForEmail(email)
+
+    setLoading(false)
 
     if (error) {
       alert(error.message)
@@ -23,17 +30,24 @@ export default function ForgotPassword() {
       <div className="forgot-password-form">
         <h1 className="forgot-password-title">Forgot Password</h1>
 
-        <div className="form-content">
+        <div className={`form-content ${loading ? "loading" : ""}`}>
           <input className="field"
+            disabled={loading}
+            type="email"
             placeholder="Enter Email"
             onChange={(e) => setEmail(e.target.value)}
           />
 
-          <button className="reset-button" onClick={handleReset}>
-            Send Reset Email
+          <button
+            className="reset-button"
+            onClick={handleReset}
+            disabled={loading}>
+            {loading ? "Sending..." : "Send Reset Email"}
           </button>
 
-          <button className="back-button" onClick={() => navigate("/login")}>
+          <button className="back-button"
+            disabled={loading}
+            onClick={() => navigate("/login")}>
             Back to Login
           </button>
         </div>

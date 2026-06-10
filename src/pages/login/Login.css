@@ -61,6 +61,11 @@
     border-radius: 8px;
 }
 
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .forgot-password {
     text-align: center;
     margin-top: 10px
