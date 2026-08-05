@@ -8,6 +8,8 @@ import ForgotPassword from './pages/forgot-password/ForgotPassword.jsx'
 import ResetPassword from './pages/reset-password/ResetPassword.jsx'
 import { supabase } from './lib/supabaseClient'
 import { useAuthListener } from './auth/useAuthListener'
+import Books from './pages/books/Books.jsx'
+import NewBook from './pages/books/NewBook/NewBook'
 
 export default function App() {
   useAuthListener()
@@ -30,7 +32,7 @@ export default function App() {
       setSession(session)
 
       if (event === "PASSWORD_RECOVERY") {
-        window.location.href = "/ResetPassword"
+        window.location.href = "/resetPassword"
       }
     })
 
@@ -45,8 +47,10 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/Register" element={<Register />} />
       <Route path="/home" element={<ProtectedRoute session={session}><Home /></ProtectedRoute>} />
-      <Route path="/ForgotPassword" element={<ForgotPassword />} />
-      <Route path="/ResetPassword" element={<ResetPassword />} />
+      <Route path="/forgotPassword" element={<ForgotPassword />} />
+      <Route path="/resetPassword" element={<ResetPassword />} />
+      <Route path="/books" element={<Books />} />
+      <Route path="/books/new" element={<NewBook />} />
     </Routes>
   )
 }

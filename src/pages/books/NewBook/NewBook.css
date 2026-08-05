@@ -1,0 +1,49 @@
+.new-book-page {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+.new-book-header {
+    margin-bottom: 24px;
+}
+
+.new-book-header h1 {
+    margin: 0;
+}
+
+.new-book-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-field label {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.form-field input,
+.form-field select {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.form-actions button {
+    padding: 10px 16px;
+    cursor: pointer;
+}

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
 import './Navbar.css'
 
-export default function Navbar() {
+export default function Navbar({ section = '收藏' }) {
     const navigate = useNavigate()
     const [menuOpen, setMenuOpen] = useState(false)
 
@@ -16,7 +16,7 @@ export default function Navbar() {
         <nav className="navbar">
             <div className="navbar-left">
                 <div className="navbar-brand">
-                    Collector
+                    {section}
                 </div>
 
                 <div className={`navbar-links ${menuOpen ? 'open' : ''}`}>
@@ -24,49 +24,49 @@ export default function Navbar() {
                         navigate('/home')
                         setMenuOpen(false)
                     }}>
-                        Home
+                        首页
                     </button>
 
                     <button onClick={() => {
                         navigate('/books')
                         setMenuOpen(false)
                     }}>
-                        Books
+                        书籍
                     </button>
 
                     <button onClick={() => {
                         navigate('/musics')
                         setMenuOpen(false)
                     }}>
-                        Music
+                        音乐
                     </button>
 
                     <button onClick={() => {
                         navigate('/video')
                         setMenuOpen(false)
                     }}>
-                        Video
-                    </button>
-
-                    <button onClick={() => {
-                        navigate('/figures')
-                        setMenuOpen(false)
-                    }}>
-                        Figures
+                        影音
                     </button>
 
                     <button onClick={() => {
                         navigate('/games')
                         setMenuOpen(false)
                     }}>
-                        Games
+                        游戏
+                    </button>
+
+                    <button onClick={() => {
+                        navigate('/figures')
+                        setMenuOpen(false)
+                    }}>
+                        模型
                     </button>
 
                     <button
                         className="mobile-logout"
                         onClick={handleLogout}
                     >
-                        Logout
+                        登出
                     </button>
                 </div>
             </div>
@@ -82,9 +82,8 @@ export default function Navbar() {
                 className="navbar-logout desktop-logout"
                 onClick={handleLogout}
             >
-                Logout
+                登出
             </button>
         </nav>
     )
-
 }
