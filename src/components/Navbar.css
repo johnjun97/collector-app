@@ -52,23 +52,62 @@
   border-radius: 6px;
 }
 
+.menu-toggle {
+  display: none;
+  border: none;
+  background: none;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.mobile-logout {
+  display: none;
+}
+
 @media (max-width: 768px) {
-    .navbar {
-        flex-wrap: wrap;
-    }
+  .navbar {
+    height: 60px;
+    padding: 0 16px;
+  }
 
-    .navbar-left {
-        width: 100%;
-        justify-content: space-between;
-    }
+  .navbar-left {
+    gap: 0;
+  }
 
-    .navbar-links {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-    }
+  .navbar-links {
+    display: none;
+    position: absolute;
+    top: 60px;
+    left: 0;
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 8px 0;
+    background: white;
+    border-bottom: 1px solid #ddd;
+  }
 
-    .navbar-logout {
-        width: 100%;
-    }
+  .navbar-links.open {
+    display: flex;
+  }
+
+  .navbar-links button {
+    width: 100%;
+    text-align: left;
+    padding: 14px 20px;
+  }
+
+  .menu-toggle {
+    display: block;
+  }
+
+  .desktop-logout {
+    display: none;
+  }
+
+  .mobile-logout {
+    display: block;
+    color: red;
+  }
 }
