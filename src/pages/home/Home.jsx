@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
-import { useNavigate } from 'react-router-dom'
+import Navbar from '../../components/Navbar'
 
 export default function Home() {
-  const navigate = useNavigate()
 
   const [user, setUser] = useState(null)
 
@@ -17,19 +16,13 @@ export default function Home() {
   }, [])
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Home Page</h1>
-      <p>Welcome, {user?.user_metadata?.displayName || user?.email}</p>
+    <>
+      <Navbar />
 
-      <button
-        onClick={async () => {
-          await supabase.auth.signOut()
-          setUser(null)
-          navigate("/login")
-        }}
-      >
-        Logout
-      </button>
-    </div>
+      <div style={{ padding: "20px" }}>
+        <h1>Home Page</h1>
+        <p>Welcome, {user?.user_metadata?.displayName || user?.email}</p>
+      </div>
+    </>
   )
 }
