@@ -27,7 +27,7 @@ export default function App() {
     const {
       data: { subscription }
     } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session) setSession(session)
+      setSession(session)
 
       if (event === "PASSWORD_RECOVERY") {
         window.location.href = "/ResetPassword"

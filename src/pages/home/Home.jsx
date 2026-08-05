@@ -7,11 +7,6 @@ export default function Home() {
 
   const [user, setUser] = useState(null)
 
-  // Listen for auth changes
-  // supabase.auth.onAuthStateChange((event) => {
-  //   console.log(event)
-  // })
-
   useEffect(() => {
     const getUser = async () => {
       const { data } = await supabase.auth.getUser()
