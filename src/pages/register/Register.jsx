@@ -43,8 +43,11 @@ export default function Register() {
       return
     }
 
-    alert("Check your email to confirm account")
+    alert(
+      "If this email is new → check your email\nIf already registered → please login"
+    )
     setLoading(false)
+    navigate("/login")
   }
 
   return (
