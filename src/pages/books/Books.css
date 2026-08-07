@@ -24,3 +24,27 @@
 .add-book-button:hover {
     opacity: 0.8;
 }
+
+.books-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+}
+
+.book-card {
+    padding: 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: white;
+}
+
+.book-card h2 {
+    margin: 0 0 10px;
+    font-size: 18px;
+}
+
+.book-card p {
+    margin: 4px 0;
+    color: #555;
+}
