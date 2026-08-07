@@ -28,39 +28,62 @@ export default function Books() {
                     return
                 }
 
-                // console.log('Current user ID:', user.id)
-
-                const { data, error } = await supabase
+                const { data: userBooks, error: userBooksError } = await supabase
                     .from('user_books')
                     .select(`
-                    book:books(*)
-                `)
+                book:books(*)
+            `)
                     .eq('user_id', user.id)
 
-                if (error) {
-                    throw error
+                if (userBooksError) {
+                    throw userBooksError
                 }
 
-                // console.log('user_books data:', data)
-                // console.log('user_books error:', error)
-
-                const ownedBooks = data
+                const ownedBooks = userBooks
                     .map((item) => item.book)
                     .filter(Boolean)
 
-                const latestBooks = Object.values(
-                    ownedBooks.reduce((acc, book) => {
-                        const existing = acc[book.title]
+                if (ownedBooks.length === 0) {
+                    setBooks([])
+                    return
+                }
 
-                        if (!existing || book.volume > existing.volume) {
-                            acc[book.title] = book
-                        }
+                const titles = [...new Set(
+                    ownedBooks.map((book) => book.title)
+                )]
 
-                        return acc
-                    }, {})
-                )
+                const { data: allBooks, error: allBooksError } = await supabase
+                    .from('books')
+                    .select('*')
+                    .in('title', titles)
 
-                setBooks(latestBooks)
+                if (allBooksError) {
+                    throw allBooksError
+                }
+
+                const booksByTitle = titles.map((title) => {
+                    const titleBooks = allBooks.filter(
+                        (book) => book.title === title
+                    )
+
+                    const ownedVolumes = ownedBooks
+                        .filter((book) => book.title === title)
+                        .map((book) => Number(book.volume))
+
+                    const latestBook = [...titleBooks].sort(
+                        (a, b) => Number(b.volume) - Number(a.volume)
+                    )[0]
+
+                    const latestVolume = Number(latestBook.volume)
+
+                    return {
+                        ...latestBook,
+                        allVolumes: titleBooks,
+                        ownedVolumes
+                    }
+                })
+
+                setBooks(booksByTitle)
 
             } catch (error) {
                 debugError('Error loading books:', error)
@@ -101,7 +124,26 @@ export default function Books() {
                                 onClick={() => navigate(`/books/${book.id}/edit`)}
                             >
                                 <h2>{book.title}</h2>
-                                <p>Latest Volume: {book.volume}</p>
+
+                                <div className="volume-indicators">
+                                    {Array.from(
+                                        { length: Number(book.volume) },
+                                        (_, index) => {
+                                            const volumeNumber = index + 1
+                                            const owned = book.ownedVolumes.includes(volumeNumber)
+
+                                            return (
+                                                <span
+                                                    key={volumeNumber}
+                                                    className={`volume-indicator ${owned ? 'owned' : ''}`}
+                                                >
+                                                    {volumeNumber}
+                                                </span>
+                                            )
+                                        }
+                                    )}
+                                </div>
+
                                 <p>Author: {book.author || 'Unknown'}</p>
                             </div>
                         ))}
