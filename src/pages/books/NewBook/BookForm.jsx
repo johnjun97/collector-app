@@ -10,7 +10,7 @@ export default function BookForm({ onSubmit, onCancel }) {
         subcategory: '漫画',
         title: '',
         volume: '',
-        edition: '',
+        edition: '普通版',
         author: '',
         publisher: '',
         isbn: '',
