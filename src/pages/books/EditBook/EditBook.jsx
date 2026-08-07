@@ -4,6 +4,7 @@ import { supabase } from '../../../lib/supabaseClient'
 import { debugError } from '../../../lib/debug'
 import Navbar from '../../../components/Navbar'
 import './EditBook.css'
+import Loading from '../../../components/Loading.jsx'
 
 
 export default function EditBook() {
@@ -143,7 +144,7 @@ export default function EditBook() {
     }
 
     if (loading) {
-        return <p>Loading...</p>
+        return <Loading text="正在加载" />
     }
 
     if (!book) {
