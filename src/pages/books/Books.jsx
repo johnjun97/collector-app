@@ -23,7 +23,19 @@ export default function Books() {
                 return
             }
 
-            setBooks(data)
+            const latestBooks = Object.values(
+                data.reduce((acc, book) => {
+                    const existing = acc[book.title]
+
+                    if (!existing || book.volume > existing.volume) {
+                        acc[book.title] = book
+                    }
+
+                    return acc
+                }, {})
+            )
+
+            setBooks(latestBooks)
             setLoading(false)
         }
 
@@ -55,7 +67,7 @@ export default function Books() {
                         {books.map((book) => (
                             <div key={book.id} className="book-card">
                                 <h2>{book.title}</h2>
-                                <p>Volume: {book.volume}</p>
+                                <p>Latest Volume: {book.volume}</p>
                                 <p>Author: {book.author || 'Unknown'}</p>
                             </div>
                         ))}
