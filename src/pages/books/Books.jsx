@@ -13,30 +13,60 @@ export default function Books() {
 
     useEffect(() => {
         const getBooks = async () => {
-            const { data, error } = await supabase
-                .from('books')
-                .select('*')
-                .order('title')
+            try {
+                const {
+                    data: { user },
+                    error: userError
+                } = await supabase.auth.getUser()
 
-            if (error) {
+                if (userError) {
+                    throw userError
+                }
+
+                if (!user) {
+                    setBooks([])
+                    return
+                }
+
+                // console.log('Current user ID:', user.id)
+
+                const { data, error } = await supabase
+                    .from('user_books')
+                    .select(`
+                    book:books(*)
+                `)
+                    .eq('user_id', user.id)
+
+                if (error) {
+                    throw error
+                }
+
+                // console.log('user_books data:', data)
+                // console.log('user_books error:', error)
+
+                const ownedBooks = data
+                    .map((item) => item.book)
+                    .filter(Boolean)
+
+                const latestBooks = Object.values(
+                    ownedBooks.reduce((acc, book) => {
+                        const existing = acc[book.title]
+
+                        if (!existing || book.volume > existing.volume) {
+                            acc[book.title] = book
+                        }
+
+                        return acc
+                    }, {})
+                )
+
+                setBooks(latestBooks)
+
+            } catch (error) {
                 debugError('Error loading books:', error)
-                return
+            } finally {
+                setLoading(false)
             }
-
-            const latestBooks = Object.values(
-                data.reduce((acc, book) => {
-                    const existing = acc[book.title]
-
-                    if (!existing || book.volume > existing.volume) {
-                        acc[book.title] = book
-                    }
-
-                    return acc
-                }, {})
-            )
-
-            setBooks(latestBooks)
-            setLoading(false)
         }
 
         getBooks()
