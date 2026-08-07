@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../../lib/supabaseClient'
 import { debugError } from '../../../lib/debug'
 import Navbar from '../../../components/Navbar'
-import BookForm from '../components/BookForm'
+import BookForm from "./BookForm";
 import './NewBook.css'
 
 export default function NewBook() {
