@@ -95,7 +95,11 @@ export default function Books() {
                 ) : (
                     <div className="books-list">
                         {books.map((book) => (
-                            <div key={book.id} className="book-card">
+                            <div
+                                key={book.id}
+                                className="book-card"
+                                onClick={() => navigate(`/books/${book.id}/edit`)}
+                            >
                                 <h2>{book.title}</h2>
                                 <p>Latest Volume: {book.volume}</p>
                                 <p>Author: {book.author || 'Unknown'}</p>

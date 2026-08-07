@@ -9,7 +9,8 @@ import ResetPassword from './pages/reset-password/ResetPassword.jsx'
 import { supabase } from './lib/supabaseClient'
 import { useAuthListener } from './auth/useAuthListener'
 import Books from './pages/books/Books.jsx'
-import NewBook from './pages/books/NewBook/NewBook'
+import NewBook from './pages/books/NewBook/NewBook.jsx'
+import EditBook from './pages/books/EditBook/EditBook.jsx'
 
 export default function App() {
   useAuthListener()
@@ -39,19 +40,22 @@ export default function App() {
     return () => subscription.unsubscribe()
   }, [])
 
-  if (loading) return <div>Loading...</div>
+  if (loading) return <p>Loading...</p>
 
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="/login" element={<Login />} />
       <Route path="/Register" element={<Register />} />
-      <Route path="/home" element={<ProtectedRoute session={session}><Home /></ProtectedRoute>} />
       <Route path="/forgotPassword" element={<ForgotPassword />} />
       <Route path="/resetPassword" element={<ResetPassword />} />
-      <Route path="/books" element={<Books />} />
-      <Route path="/books/new" element={<NewBook />} />
+
+      <Route path="/home" element={<ProtectedRoute session={session}><Home /></ProtectedRoute>} />
+      <Route path="/books" element={<ProtectedRoute session={session}><Books /></ProtectedRoute>} />
+      <Route path="/books/new" element={<ProtectedRoute session={session}><NewBook /></ProtectedRoute>} />
+      <Route path="/books/:id/edit" element={<ProtectedRoute session={session}><EditBook /></ProtectedRoute>} />
     </Routes>
   )
+
 }
 
