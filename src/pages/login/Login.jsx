@@ -49,7 +49,7 @@ export default function Login() {
   return (
     <div className="login-container">
       <div className="login-form">
-        <h1 className="login-title">Login</h1>
+        <h1 className="login-title">Collector-App</h1>
 
         {/* <div className="form-content"> */}
         <form
