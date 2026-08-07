@@ -24,16 +24,14 @@
     max-width: fit-content;
     flex: 0 0 auto;
     margin-left: auto;
-    border: none;
-    background: none;
-    padding: 0;
+    padding: 8px 16px;
     cursor: pointer;
-    font-size: 14px;
 }
 
-.back-button:hover {
+.new-book-header .back-button:hover {
     text-decoration: underline;
 }
+
 
 .new-book-form {
     display: flex;

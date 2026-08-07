@@ -1,10 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import OpenCC from 'opencc-js'
 import './BookForm.css'
 
 const converter = OpenCC.Converter({ from: 'tw', to: 'cn' })
 
-export default function BookForm({ onSubmit, onCancel }) {
+export default function BookForm({ initialData, onSubmit, onCancel }) {
 
     const [form, setForm] = useState({
         subcategory: '漫画',
@@ -21,6 +21,23 @@ export default function BookForm({ onSubmit, onCancel }) {
 
     const [ownsBook, setOwnsBook] = useState(false)
     const [saving, setSaving] = useState(false)
+
+    useEffect(() => {
+        if (!initialData) return
+
+        setForm({
+            subcategory: initialData.subcategory || '漫画',
+            title: initialData.title || '',
+            volume: initialData.volume || '',
+            edition: initialData.edition || '普通版',
+            author: initialData.author || '',
+            publisher: initialData.publisher || '',
+            isbn: initialData.isbn || '',
+            releaseDate: initialData.release_date || '',
+            purchasedDate: initialData.purchased_date || '',
+            purchasedPrice: initialData.purchased_price || '',
+        })
+    }, [initialData])
 
     const handleChange = (e) => {
         const value = converter(e.target.value)

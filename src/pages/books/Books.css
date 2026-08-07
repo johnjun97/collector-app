@@ -37,6 +37,7 @@
     border: 1px solid #ddd;
     border-radius: 8px;
     background: white;
+    cursor: pointer;
 }
 
 .book-card h2 {

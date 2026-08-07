@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../../lib/supabaseClient'
 import { debugError } from '../../../lib/debug'
 import Navbar from '../../../components/Navbar'
-import BookForm from './BookForm'
+import BookForm from '../components/BookForm'
 import './NewBook.css'
 
 export default function NewBook() {
@@ -97,7 +97,7 @@ export default function NewBook() {
                         className="back-button"
                         onClick={() => navigate('/books')}
                     >
-                        ← 返回
+                        返回
                     </button>
                 </div>
 

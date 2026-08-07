@@ -1,0 +1,45 @@
+.edit-book-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+.edit-book-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.edit-book-header h1 {
+    margin: 0;
+}
+
+.edit-book-form-container {
+    width: 100%;
+}
+
+.edit-book-header .back-button {
+    display: inline-block;
+    width: fit-content;
+    max-width: fit-content;
+    flex: 0 0 auto;
+    margin-left: auto;
+    padding: 8px 16px;
+    cursor: pointer;
+}
+
+.edit-book-header .back-button:hover {
+    text-decoration: underline;
+}
+
+.volume-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.volume-buttons button {
+    padding: 8px 14px;
+    cursor: pointer;
+}
