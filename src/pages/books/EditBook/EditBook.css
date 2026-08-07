@@ -48,6 +48,13 @@
     cursor: pointer;
 }
 
+.volume-buttons button.active {
+    background: #e8f0fe;
+    color: #1a73e8;
+    border-color: #1a73e8;
+    font-weight: 600;
+}
+
 .loading-container {
     min-height: 100vh;
     display: flex;

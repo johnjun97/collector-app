@@ -2,6 +2,7 @@ import React from 'react'
 
 export default function BookForm({
     book,
+    userBookLoading,
     volumes,
     ownsBook,
     setOwnsBook,
@@ -79,97 +80,106 @@ export default function BookForm({
 
                 <div className="volume-buttons">
                     {volumes.map((volume) => (
-                        <button
-                            key={volume.id}
-                            type="button"
-                            onClick={() => {
-                                setBook(volume)
-                                getUserBook(volume.id)
-                            }}
-                        >
-                            {volume.volume}
-                        </button>
+<button
+    key={volume.id}
+    type="button"
+    className={String(book.volume) === String(volume.volume) ? 'active' : ''}
+    onClick={() => {
+        setBook(volume)
+        getUserBook(volume.id)
+    }}
+>
+    {volume.volume}
+</button>
                     ))}
                 </div>
             </div>
 
-            <div className="form-field">
-                <label className="checkbox-label">
-                    <input
-                        type="checkbox"
-                        checked={ownsBook}
-                        onChange={(e) => setOwnsBook(e.target.checked)}
-                    />
-                    入手
-                </label>
-            </div>
-
-            {ownsBook && (
+            {userBookLoading ? (
+                <div className="form-field">
+                    <span>加载中...</span>
+                </div>
+            ) : (
                 <>
                     <div className="form-field">
-                        <label htmlFor="purchasedDate">购买日期</label>
+                        <label className="checkbox-label">
+                            <input
+                                type="checkbox"
+                                checked={ownsBook}
+                                onChange={(e) => setOwnsBook(e.target.checked)}
+                            />
+                            入手
+                        </label>
+                    </div>
+
+                    {ownsBook && (
+                        <>
+                            <div className="form-field">
+                                <label htmlFor="purchasedDate">购买日期</label>
+
+                                <input
+                                    id="purchasedDate"
+                                    type="date"
+                                    value={purchasedDate}
+                                    onChange={(e) => setPurchasedDate(e.target.value)}
+                                />
+                            </div>
+
+                            <div className="form-field">
+                                <label htmlFor="purchasedPrice">购买价格</label>
+
+                                <input
+                                    id="purchasedPrice"
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    value={purchasedPrice}
+                                    onChange={(e) => setPurchasedPrice(e.target.value)}
+                                />
+                            </div>
+                        </>
+                    )}
+
+                    <div className="form-field">
+                        <label htmlFor="isbn">ISBN</label>
 
                         <input
-                            id="purchasedDate"
-                            type="date"
-                            value={purchasedDate}
-                            onChange={(e) => setPurchasedDate(e.target.value)}
+                            id="isbn"
+                            name="isbn"
+                            type="text"
+                            value={book.isbn || ''}
+                            onChange={handleChange}
                         />
                     </div>
 
                     <div className="form-field">
-                        <label htmlFor="purchasedPrice">购买价格</label>
+                        <label htmlFor="release_date">发售日期</label>
 
                         <input
-                            id="purchasedPrice"
-                            type="number"
-                            step="0.01"
-                            min="0"
-                            value={purchasedPrice}
-                            onChange={(e) => setPurchasedPrice(e.target.value)}
+                            id="release_date"
+                            name="release_date"
+                            type="date"
+                            value={book.release_date || ''}
+                            onChange={handleChange}
                         />
+                    </div>
+
+                    <div className="form-actions">
+
+                        <button
+                            type="button"
+                            onClick={() => navigate('/books')}
+                        >
+                            取消
+                        </button>
+
+                        <button type="submit" disabled={saving}>
+                            {saving ? '保存中...' : '保存'}
+                        </button>
+
                     </div>
                 </>
             )}
-
-            <div className="form-field">
-                <label htmlFor="isbn">ISBN</label>
-
-                <input
-                    id="isbn"
-                    name="isbn"
-                    type="text"
-                    value={book.isbn || ''}
-                    onChange={handleChange}
-                />
-            </div>
-
-            <div className="form-field">
-                <label htmlFor="release_date">发售日期</label>
-
-                <input
-                    id="release_date"
-                    name="release_date"
-                    type="date"
-                    value={book.release_date || ''}
-                    onChange={handleChange}
-                />
-            </div>
-
-            <div className="form-actions">
-
-                <button
-                    type="button"
-                    onClick={() => navigate('/books')}
-                >
-                    取消
-                </button>
-
-                <button type="submit" disabled={saving}>
-                    {saving ? '保存中...' : '保存'}
-                </button>
-
-            </div>
 
         </form>
     )

@@ -20,6 +20,7 @@ export default function EditBook() {
     const [purchasedPrice, setPurchasedPrice] = useState('')
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
+    const [userBookLoading, setUserBookLoading] = useState(false)
 
     useEffect(() => {
         const getBook = async () => {
@@ -63,6 +64,8 @@ export default function EditBook() {
     }, [id])
 
     const getUserBook = async (bookId) => {
+        setUserBookLoading(true)
+
         try {
             const {
                 data: { user },
@@ -75,6 +78,9 @@ export default function EditBook() {
 
             if (!user) {
                 setUserBook(null)
+                setOwnsBook(false)
+                setPurchasedDate('')
+                setPurchasedPrice('')
                 return
             }
 
@@ -96,6 +102,8 @@ export default function EditBook() {
 
         } catch (error) {
             debugError('Error loading user book:', error)
+        } finally {
+            setUserBookLoading(false)
         }
     }
 
@@ -174,6 +182,7 @@ export default function EditBook() {
 
                 <BookForm
                     book={book}
+                    userBookLoading={userBookLoading}
                     volumes={volumes}
                     ownsBook={ownsBook}
                     setOwnsBook={setOwnsBook}
