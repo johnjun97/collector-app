@@ -1,4 +1,7 @@
 import { useState } from 'react'
+import OpenCC from 'opencc-js'
+
+const converter = OpenCC.Converter({ from: 'tw', to: 'cn' })
 
 export default function BookForm({ onSubmit, onCancel }) {
 
@@ -19,12 +22,12 @@ export default function BookForm({ onSubmit, onCancel }) {
     const [saving, setSaving] = useState(false)
 
     const handleChange = (e) => {
-        const { id, value } = e.target
+        const value = converter(e.target.value)
 
-        setForm((prev) => ({
-            ...prev,
-            [id]: value,
-        }))
+        setForm({
+            ...form,
+            [e.target.name]: value
+        })
     }
 
     const handleSubmit = async (e) => {
@@ -68,6 +71,7 @@ export default function BookForm({ onSubmit, onCancel }) {
                 <label htmlFor="title">书名</label>
                 <input
                     id="title"
+                    name="title"
                     type="text"
                     placeholder="请输入书名"
                     value={form.title}
@@ -79,6 +83,7 @@ export default function BookForm({ onSubmit, onCancel }) {
                 <label htmlFor="volume">集数</label>
                 <input
                     id="volume"
+                    name="volume"
                     type="text"
                     placeholder="例如：1、2、3、全"
                     value={form.volume}
@@ -90,6 +95,7 @@ export default function BookForm({ onSubmit, onCancel }) {
                 <label htmlFor="edition">版本</label>
                 <input
                     id="edition"
+                    name="edition"
                     type="text"
                     placeholder="例如：普通版、限定版、特装版"
                     value={form.edition}
@@ -101,6 +107,7 @@ export default function BookForm({ onSubmit, onCancel }) {
                 <label htmlFor="author">作者</label>
                 <input
                     id="author"
+                    name="author"
                     type="text"
                     placeholder="请输入作者"
                     value={form.author}
@@ -112,6 +119,7 @@ export default function BookForm({ onSubmit, onCancel }) {
                 <label htmlFor="publisher">出版社</label>
                 <input
                     id="publisher"
+                    name="publisher"
                     type="text"
                     placeholder="请输入出版社"
                     value={form.publisher}
@@ -123,6 +131,7 @@ export default function BookForm({ onSubmit, onCancel }) {
                 <label htmlFor="isbn">ISBN</label>
                 <input
                     id="isbn"
+                    name="isbn"
                     type="text"
                     placeholder="请输入 ISBN"
                     value={form.isbn}
@@ -134,6 +143,7 @@ export default function BookForm({ onSubmit, onCancel }) {
                 <label htmlFor="releaseDate">发售日期</label>
                 <input
                     id="releaseDate"
+                    name="releaseDate"
                     type="date"
                     value={form.releaseDate}
                     onChange={handleChange}
@@ -144,6 +154,8 @@ export default function BookForm({ onSubmit, onCancel }) {
                 <label htmlFor="purchasedDate">购买日期</label>
                 <input
                     id="purchasedDate"
+                    name="purchasedDate"
+                    type="date"
                     type="date"
                     value={form.purchasedDate}
                     onChange={handleChange}
@@ -154,6 +166,7 @@ export default function BookForm({ onSubmit, onCancel }) {
                 <label htmlFor="purchasedPrice">购买价格</label>
                 <input
                     id="purchasedPrice"
+                    name="purchasedPrice"
                     type="number"
                     step="0.01"
                     min="0"
