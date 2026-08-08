@@ -88,3 +88,11 @@ gap: 12px;
 .volume-buttons button.owned:hover {
     background: #ccefd2;
 }
+
+.volume-buttons.batch-edit-active {
+    opacity: 0.45;
+}
+
+.volume-buttons.batch-edit-active button {
+    cursor: not-allowed;
+}
