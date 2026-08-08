@@ -113,6 +113,11 @@ export default function BookForm({
                                 onClick={() => handleVolumeChange(volume)}
                             >
                                 {volume.volume}
+                                {volume.edition && volume.edition !== '普通版' && (
+                                    <span className="volume-edition">
+                                        {' '}({volume.edition})
+                                    </span>
+                                )}
                             </button>
                         ))}
                     </div>
