@@ -131,42 +131,42 @@ export default function BookForm({
             </div>
 
             <div className="form-field">
-                <label htmlFor="volume">集数</label>
+    <div className="volume-field-header">
+        <label>集数</label>
 
-                <div className="volume-input-row">
-                    {!showBatchAdd && (
-                        <input
-                            id="volume"
-                            name="volume"
-                            type="text"
-                            placeholder="例如：1、2、3、全"
-                            value={form.volume}
-                            onChange={handleChange}
-                        />
-                    )}
+        <button
+            type="button"
+            className={`batch-add-button ${showBatchAdd ? 'active' : ''}`}
+            onClick={() => {
+                setShowBatchAdd(!showBatchAdd)
 
-                    <button
-                        type="button"
-                        className={`batch-add-button ${showBatchAdd ? 'active' : ''}`}
-                        onClick={() => {
-                            setShowBatchAdd(!showBatchAdd)
+                if (showBatchAdd) {
+                    setBatchVolumes([])
+                }
+            }}
+        >
+            {showBatchAdd ? '关闭批量添加' : '批量添加'}
+        </button>
+    </div>
 
-                            if (showBatchAdd) {
-                                setBatchVolumes([])
-                            }
-                        }}
-                    >
-                        {showBatchAdd ? '关闭批量添加' : '批量添加'}
-                    </button>
-                </div>
+    {!showBatchAdd && (
+        <input
+            id="volume"
+            name="volume"
+            type="text"
+            placeholder="例如：1、2、3、全"
+            value={form.volume}
+            onChange={handleChange}
+        />
+    )}
 
-                {showBatchAdd && (
-                    <BatchAddVolumes
-                        existingVolumes={[]}
-                        onChange={setBatchVolumes}
-                    />
-                )}
-            </div>
+    {showBatchAdd && (
+        <BatchAddVolumes
+            existingVolumes={[]}
+            onChange={setBatchVolumes}
+        />
+    )}
+</div>
 
             <div className="ownership-field">
                 <label>

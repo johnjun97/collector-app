@@ -14,6 +14,7 @@ export default function EditBook() {
     const [book, setBook] = useState(null)
     const [series, setSeries] = useState(null)
     const [volumes, setVolumes] = useState([])
+    const [batchVolumes, setBatchVolumes] = useState([])
 
     const [ownsBook, setOwnsBook] = useState(false)
     const [purchasedDate, setPurchasedDate] = useState('')
@@ -78,39 +79,39 @@ export default function EditBook() {
                 )
 
                 const {
-    data: { user }
-} = await supabase.auth.getUser()
+                    data: { user }
+                } = await supabase.auth.getUser()
 
-let volumesWithOwnership = sortedVolumes
+                let volumesWithOwnership = sortedVolumes
 
-if (user) {
-    const { data: userBooks, error: userBooksError } =
-        await supabase
-            .from('user_books')
-            .select('book_id')
-            .eq('user_id', user.id)
-            .in(
-                'book_id',
-                sortedVolumes.map((volume) => volume.id)
-            )
+                if (user) {
+                    const { data: userBooks, error: userBooksError } =
+                        await supabase
+                            .from('user_books')
+                            .select('book_id')
+                            .eq('user_id', user.id)
+                            .in(
+                                'book_id',
+                                sortedVolumes.map((volume) => volume.id)
+                            )
 
-    if (userBooksError) {
-        throw userBooksError
-    }
+                    if (userBooksError) {
+                        throw userBooksError
+                    }
 
-    const ownedBookIds = new Set(
-        userBooks.map((userBook) => userBook.book_id)
-    )
+                    const ownedBookIds = new Set(
+                        userBooks.map((userBook) => userBook.book_id)
+                    )
 
-    volumesWithOwnership = sortedVolumes.map((volume) => ({
-        ...volume,
-        isOwned: ownedBookIds.has(volume.id)
-    }))
-}
+                    volumesWithOwnership = sortedVolumes.map((volume) => ({
+                        ...volume,
+                        isOwned: ownedBookIds.has(volume.id)
+                    }))
+                }
 
-setVolumes(volumesWithOwnership)
+                setVolumes(volumesWithOwnership)
 
-await getUserBook(currentBook.id)
+                await getUserBook(currentBook.id)
 
             } catch (error) {
                 debugError('Error loading book:', error)
@@ -197,6 +198,133 @@ await getUserBook(currentBook.id)
         setSaving(true)
 
         try {
+            // Add batch volumes
+            // Handle batch edit
+            if (batchVolumes.length > 0) {
+                // Get all books in this series
+                const { data: existingBooks, error: existingBooksError } =
+                    await supabase
+                        .from('books')
+                        .select('*')
+                        .eq('series_id', series.id)
+
+                if (existingBooksError) {
+                    throw existingBooksError
+                }
+
+                // Get current user
+                const {
+                    data: { user },
+                    error: userError
+                } = await supabase.auth.getUser()
+
+                if (userError) {
+                    throw userError
+                }
+
+                if (!user) {
+                    throw new Error('User is not logged in')
+                }
+
+                // Process each selected volume
+                for (const volume of batchVolumes) {
+                    const volumeValue = String(volume)
+
+                    let targetBook = existingBooks.find(
+                        (item) => String(item.volume) === volumeValue
+                    )
+
+                    // Create book if it doesn't exist
+                    if (!targetBook) {
+                        const { data: newBook, error: insertError } =
+                            await supabase
+                                .from('books')
+                                .insert({
+                                    series_id: series.id,
+                                    volume: volumeValue,
+                                    edition: book.edition || '普通版',
+                                })
+                                .select()
+                                .single()
+
+                        if (insertError) {
+                            throw insertError
+                        }
+
+                        targetBook = newBook
+                    }
+
+                    if (ownsBook) {
+                        const {
+                            data: existingUserBook,
+                            error: existingUserBookError
+                        } = await supabase
+                            .from('user_books')
+                            .select('*')
+                            .eq('user_id', user.id)
+                            .eq('book_id', targetBook.id)
+                            .maybeSingle()
+
+                        if (existingUserBookError) {
+                            throw existingUserBookError
+                        }
+
+                        if (existingUserBook) {
+                            const updates = {}
+
+                            if (purchasedDate) {
+                                updates.purchased_date = purchasedDate
+                            }
+
+                            if (purchasedPrice) {
+                                updates.purchased_price = purchasedPrice
+                            }
+
+                            if (Object.keys(updates).length > 0) {
+                                const { error: updateUserBookError } =
+                                    await supabase
+                                        .from('user_books')
+                                        .update(updates)
+                                        .eq('user_id', user.id)
+                                        .eq('book_id', targetBook.id)
+
+                                if (updateUserBookError) {
+                                    throw updateUserBookError
+                                }
+                            }
+
+                        } else {
+                            const { error: insertUserBookError } =
+                                await supabase
+                                    .from('user_books')
+                                    .insert({
+                                        user_id: user.id,
+                                        book_id: targetBook.id,
+                                        purchased_date: purchasedDate || null,
+                                        purchased_price: purchasedPrice || null,
+                                    })
+
+                            if (insertUserBookError) {
+                                throw insertUserBookError
+                            }
+                        }
+
+                    } else {
+                        // Remove ownership for this volume
+                        const { error: deleteUserBookError } =
+                            await supabase
+                                .from('user_books')
+                                .delete()
+                                .eq('user_id', user.id)
+                                .eq('book_id', targetBook.id)
+
+                        if (deleteUserBookError) {
+                            throw deleteUserBookError
+                        }
+                    }
+                }
+            }
+
             // Update series information
             const {
                 error: seriesError
@@ -235,43 +363,48 @@ await getUserBook(currentBook.id)
                 throw bookError
             }
 
-            // Update ownership
-            const {
-                data: { user }
-            } = await supabase.auth.getUser()
+            // Update ownership for single-book edit only
+            if (batchVolumes.length === 0) {
 
-            if (!user) {
-                throw new Error('User is not logged in')
-            }
+                const {
+                    data: { user }
+                } = await supabase.auth.getUser()
 
-            if (ownsBook) {
-                const { error: userBookError } = await supabase
-                    .from('user_books')
-                    .upsert(
-                        {
-                            user_id: user.id,
-                            book_id: book.id,
-                            purchased_date: purchasedDate || null,
-                            purchased_price: purchasedPrice || null,
-                        },
-                        {
-                            onConflict: 'user_id,book_id'
-                        }
-                    )
-
-                if (userBookError) {
-                    throw userBookError
+                if (!user) {
+                    throw new Error('User is not logged in')
                 }
 
-            } else {
-                const { error: deleteUserBookError } = await supabase
-                    .from('user_books')
-                    .delete()
-                    .eq('user_id', user.id)
-                    .eq('book_id', book.id)
+                if (ownsBook) {
 
-                if (deleteUserBookError) {
-                    throw deleteUserBookError
+                    const { error: userBookError } = await supabase
+                        .from('user_books')
+                        .upsert(
+                            {
+                                user_id: user.id,
+                                book_id: book.id,
+                                purchased_date: purchasedDate || null,
+                                purchased_price: purchasedPrice || null,
+                            },
+                            {
+                                onConflict: 'user_id,book_id'
+                            }
+                        )
+
+                    if (userBookError) {
+                        throw userBookError
+                    }
+
+                } else {
+
+                    const { error: deleteUserBookError } = await supabase
+                        .from('user_books')
+                        .delete()
+                        .eq('user_id', user.id)
+                        .eq('book_id', book.id)
+
+                    if (deleteUserBookError) {
+                        throw deleteUserBookError
+                    }
                 }
             }
 
@@ -316,8 +449,10 @@ await getUserBook(currentBook.id)
                 </div>
 
                 <BookForm
+                    setBatchVolumes={setBatchVolumes}
                     series={series}
                     book={book}
+                    batchVolumes={batchVolumes}
                     volumes={volumes}
                     ownsBook={ownsBook}
                     setOwnsBook={setOwnsBook}

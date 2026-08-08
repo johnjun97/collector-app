@@ -34,14 +34,16 @@
     margin-bottom: 16px;
 }
 
-.volume-input-row {
+.volume-field-header {
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: space-between;
+    margin-bottom: 6px;
 }
 
-.volume-input-row input {
-    flex: 1;
+.volume-field-header label {
+    font-size: 14px;
+    font-weight: 500;
 }
 
 .batch-add-button {

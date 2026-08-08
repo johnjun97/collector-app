@@ -1,7 +1,11 @@
 import React from 'react'
 import './editBookForm.css'
+import BatchAddVolumes from '../components/BatchAddVolumes'
+
 
 export default function BookForm({
+    batchVolumes,
+    setBatchVolumes,
     series,
     book,
     userBookLoading,
@@ -19,6 +23,7 @@ export default function BookForm({
     handleSubmit,
     navigate
 }) {
+    const [showBatchAdd, setShowBatchAdd] = React.useState(false)
     return (
         <form onSubmit={handleSubmit}>
 
@@ -66,27 +71,66 @@ export default function BookForm({
             </div>
 
             <div className="form-field">
-                <label>集数</label>
+                <div className="volume-field-header">
+                    <label>集数</label>
 
-                <div className="volume-buttons">
-                    {volumes.map((volume) => (
+                    <div className="batch-add-wrapper">
                         <button
-                            key={volume.id}
                             type="button"
-   className={[
-    book.id === volume.id ? 'active' : '',
-    volume.isOwned ? 'owned' : ''
-].join(' ')}
-                            onClick={() => handleVolumeChange(volume)}
+                            className="batch-add-button"
+                            onClick={() => {
+                                setShowBatchAdd(!showBatchAdd)
+
+                                if (showBatchAdd) {
+                                    setBatchVolumes([])
+                                }
+                            }}
                         >
-                            {volume.volume}
+                            {showBatchAdd ? '关闭批量编辑' : '批量编辑'}
                         </button>
-                    ))}
+
+                        <span className="batch-add-help">
+                            !
+                            <span className="batch-add-tooltip">
+                                购买日期和购买价格如有填写，
+                                将应用于所有批量编辑的集数。
+                                留空则不会修改已有集数的相关资料。
+                            </span>
+                        </span>
+                    </div>
                 </div>
+
+                {!showBatchAdd && (
+                    <div className="volume-buttons">
+                        {volumes.map((volume) => (
+                            <button
+                                key={volume.id}
+                                type="button"
+                                className={[
+                                    book.id === volume.id ? 'active' : '',
+                                    volume.isOwned ? 'owned' : ''
+                                ].join(' ')}
+                                onClick={() => handleVolumeChange(volume)}
+                            >
+                                {volume.volume}
+                            </button>
+                        ))}
+                    </div>
+                )}
+
+                {showBatchAdd && (
+                    <>
+                        <BatchAddVolumes
+                            existingVolumes={volumes}
+                            excludeExisting={false}
+                            onChange={setBatchVolumes}
+                        />
+                    </>
+                )}
             </div>
 
             {userBookLoading ? (
-                <div className="form-field">
+                <div className="form-field" >
                     <span>加载中...</span>
                 </div>
             ) : (
@@ -140,18 +184,6 @@ export default function BookForm({
                             </div>
                         </>
                     )}
-
-                    <div className="form-field">
-                        <label htmlFor="volume">集数</label>
-
-                        <input
-                            id="volume"
-                            name="volume"
-                            type="text"
-                            value={book.volume || ''}
-                            onChange={handleBookChange}
-                        />
-                    </div>
 
                     <div className="form-field">
                         <label htmlFor="edition">版本</label>
@@ -222,8 +254,9 @@ export default function BookForm({
                     </div>
 
                 </>
-            )}
+            )
+            }
 
-        </form>
+        </form >
     )
 }

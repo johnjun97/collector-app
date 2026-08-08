@@ -2,7 +2,8 @@ import { useState } from 'react'
 
 export default function BatchAddVolumes({
     existingVolumes = [],
-    onChange
+    onChange,
+    excludeExisting = true
 }) {
     const [fromVolume, setFromVolume] = useState('')
     const [toVolume, setToVolume] = useState('')
@@ -21,7 +22,7 @@ export default function BatchAddVolumes({
         }
 
         const existing = existingVolumes.map((volume) =>
-            String(volume)
+            String(volume.volume)
         )
 
         const volumes = []
@@ -29,7 +30,7 @@ export default function BatchAddVolumes({
         for (let i = start; i <= end; i++) {
             const volume = String(i)
 
-            if (!existing.includes(volume)) {
+            if (!excludeExisting || !existing.includes(volume)) {
                 volumes.push(volume)
             }
         }
