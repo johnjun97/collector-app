@@ -9,6 +9,155 @@ export default function NewBook() {
 
     const navigate = useNavigate()
 
+    const handleBatchAdd = async (volumes, form, ownsBook) => {
+        try {
+            const title = form.title.trim()
+
+            if (!title) {
+                throw new Error('请输入书名')
+            }
+
+            if (!volumes || volumes.length === 0) {
+                throw new Error('请输入集数')
+            }
+
+            // 1. Find or create the series
+            const { data: existingSeries, error: seriesFindError } =
+                await supabase
+                    .from('book_series')
+                    .select('*')
+                    .eq('title', title)
+                    .maybeSingle()
+
+            if (seriesFindError) {
+                throw seriesFindError
+            }
+
+            let series
+
+            if (existingSeries) {
+                series = existingSeries
+            } else {
+                const { data: newSeries, error: seriesInsertError } =
+                    await supabase
+                        .from('book_series')
+                        .insert({
+                            title,
+                            author: form.author.trim() || null,
+                            subcategory: form.subcategory || '漫画',
+                        })
+                        .select()
+                        .single()
+
+                if (seriesInsertError) {
+                    throw seriesInsertError
+                }
+
+                series = newSeries
+            }
+
+            // 2. Get current user if these books should be owned
+            let user = null
+
+            if (ownsBook) {
+                const {
+                    data: { user: currentUser },
+                    error: userError
+                } = await supabase.auth.getUser()
+
+                if (userError) {
+                    throw userError
+                }
+
+                if (!currentUser) {
+                    throw new Error('User is not logged in')
+                }
+
+                user = currentUser
+            }
+
+            // 3. Process each volume
+            for (const volume of volumes) {
+                const volumeValue = String(volume).trim()
+                const edition = form.edition || '普通版'
+                const publisher = form.publisher.trim() || null
+
+                // Find existing book by series + volume + edition
+                const { data: existingBook, error: findError } =
+                    await supabase
+                        .from('books')
+                        .select('*')
+                        .eq('series_id', series.id)
+                        .eq('volume', volumeValue)
+                        .eq('edition', edition)
+                        .maybeSingle()
+
+                if (findError) {
+                    throw findError
+                }
+
+                let book
+
+                if (existingBook) {
+                    // Reuse existing book
+                    book = existingBook
+                } else {
+                    // Create new book
+                    const { data: newBook, error: insertError } =
+                        await supabase
+                            .from('books')
+                            .insert({
+                                series_id: series.id,
+                                volume: volumeValue,
+                                edition,
+                                publisher,
+                                isbn: null,
+                                release_date: null,
+                            })
+                            .select()
+                            .single()
+
+                    if (insertError) {
+                        throw insertError
+                    }
+
+                    book = newBook
+                }
+
+                // 4. Add ownership if required
+                if (user) {
+                    const { error: userBookError } =
+                        await supabase
+                            .from('user_books')
+                            .upsert(
+                                {
+                                    user_id: user.id,
+                                    book_id: book.id,
+                                    purchased_date: form.purchasedDate || null,
+                                    purchased_price: form.purchasedPrice || null,
+                                },
+                                {
+                                    onConflict: 'user_id,book_id'
+                                }
+                            )
+
+                    if (userBookError) {
+                        throw userBookError
+                    }
+                }
+            }
+
+            navigate('/books')
+
+        } catch (error) {
+            debugError('Error batch adding books:', error)
+
+            alert(error.message || '批量添加失败，请稍后再试')
+
+            throw error
+        }
+    }
+
     const handleSubmit = async (form, ownsBook) => {
 
         try {
@@ -66,7 +215,6 @@ export default function NewBook() {
                 .eq('series_id', series.id)
                 .eq('volume', form.volume.trim())
                 .eq('edition', form.edition || '普通版')
-                .eq('publisher', form.publisher.trim() || null)
                 .maybeSingle()
 
             if (bookFindError) {
@@ -168,6 +316,7 @@ export default function NewBook() {
 
                     <BookForm
                         onSubmit={handleSubmit}
+                        onBatchAdd={handleBatchAdd}
                         onCancel={() => navigate('/books')}
                     />
 

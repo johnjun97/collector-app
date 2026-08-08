@@ -1,10 +1,17 @@
 import { useEffect, useState } from 'react'
 import OpenCC from 'opencc-js'
+import BatchAddVolumes from '../components/BatchAddVolumes'
 import './BookForm.css'
+
 
 const converter = OpenCC.Converter({ from: 'tw', to: 'cn' })
 
-export default function BookForm({ initialData, onSubmit, onCancel }) {
+export default function BookForm({
+    initialData,
+    onSubmit,
+    onBatchAdd,
+    onCancel
+}) {
 
     const [form, setForm] = useState({
         subcategory: '漫画',
@@ -21,6 +28,8 @@ export default function BookForm({ initialData, onSubmit, onCancel }) {
 
     const [ownsBook, setOwnsBook] = useState(false)
     const [saving, setSaving] = useState(false)
+    const [showBatchAdd, setShowBatchAdd] = useState(false)
+    const [batchVolumes, setBatchVolumes] = useState([])
 
     useEffect(() => {
         if (!initialData) return
@@ -56,10 +65,33 @@ export default function BookForm({ initialData, onSubmit, onCancel }) {
             return
         }
 
+        if (showBatchAdd) {
+            if (batchVolumes.length === 0) {
+                alert('请输入有效的集数范围')
+                return
+            }
+        } else {
+            if (!form.volume.trim()) {
+                alert('请输入集数')
+                return
+            }
+        }
+
         setSaving(true)
 
         try {
-            await onSubmit(form, ownsBook)
+            if (showBatchAdd) {
+                await onBatchAdd(
+                    batchVolumes,
+                    form,
+                    ownsBook
+                )
+            } else {
+                await onSubmit(
+                    form,
+                    ownsBook
+                )
+            }
         } finally {
             setSaving(false)
         }
@@ -71,11 +103,11 @@ export default function BookForm({ initialData, onSubmit, onCancel }) {
             <div className="form-field">
                 <label htmlFor="subcategory">类型</label>
                 <select
-    id="subcategory"
-    name="subcategory"
-    value={form.subcategory}
-    onChange={handleChange}
->
+                    id="subcategory"
+                    name="subcategory"
+                    value={form.subcategory}
+                    onChange={handleChange}
+                >
                     <option value="漫画">漫画</option>
                     <option value="小说">小说</option>
                     <option value="画集">画集</option>
@@ -100,17 +132,43 @@ export default function BookForm({ initialData, onSubmit, onCancel }) {
 
             <div className="form-field">
                 <label htmlFor="volume">集数</label>
-                <input
-                    id="volume"
-                    name="volume"
-                    type="text"
-                    placeholder="例如：1、2、3、全"
-                    value={form.volume}
-                    onChange={handleChange}
-                />
+
+                <div className="volume-input-row">
+                    {!showBatchAdd && (
+                        <input
+                            id="volume"
+                            name="volume"
+                            type="text"
+                            placeholder="例如：1、2、3、全"
+                            value={form.volume}
+                            onChange={handleChange}
+                        />
+                    )}
+
+                    <button
+                        type="button"
+                        className={`batch-add-button ${showBatchAdd ? 'active' : ''}`}
+                        onClick={() => {
+                            setShowBatchAdd(!showBatchAdd)
+
+                            if (showBatchAdd) {
+                                setBatchVolumes([])
+                            }
+                        }}
+                    >
+                        {showBatchAdd ? '关闭批量添加' : '批量添加'}
+                    </button>
+                </div>
+
+                {showBatchAdd && (
+                    <BatchAddVolumes
+                        existingVolumes={[]}
+                        onChange={setBatchVolumes}
+                    />
+                )}
             </div>
 
-            <div className="form-field">
+            <div className="ownership-field">
                 <label>
                     <input
                         type="checkbox"
