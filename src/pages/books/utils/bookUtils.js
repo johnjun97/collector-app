@@ -115,6 +115,12 @@ export function buildBooksBySeries(addedBooks, allBooks, seriesIds) {
             const latestBook =
                 sortedVolumes[sortedVolumes.length - 1]
 
+            const latestUserBookUpdatedAt = Math.max(
+                ...addedSeriesBooks.map((book) =>
+                    new Date(book.userBookUpdatedAt || 0).getTime()
+                )
+            )
+
             return {
                 id: series.id,
                 title: series.title,
@@ -126,22 +132,11 @@ export function buildBooksBySeries(addedBooks, allBooks, seriesIds) {
                 ownedBookIds,
                 addedVolumes,
                 latestBook,
+                latestUserBookUpdatedAt,
             }
         })
         .filter(Boolean)
         .sort((a, b) => {
-            const aDate = Math.max(
-                ...a.allVolumes
-                    .filter((book) => !book.isPlaceholder)
-                    .map((book) => new Date(book.updated_at).getTime())
-            )
-
-            const bDate = Math.max(
-                ...b.allVolumes
-                    .filter((book) => !book.isPlaceholder)
-                    .map((book) => new Date(book.updated_at).getTime())
-            )
-
-            return bDate - aDate
+            return b.latestUserBookUpdatedAt - a.latestUserBookUpdatedAt
         })
 }
