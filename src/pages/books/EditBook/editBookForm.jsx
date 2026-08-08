@@ -149,6 +149,18 @@ export default function BookForm({
                         </label>
                     </div>
 
+                    <div className="form-field">
+                        <label htmlFor="edition">版本</label>
+
+                        <input
+                            id="edition"
+                            name="edition"
+                            type="text"
+                            value={book.edition || '普通版'}
+                            onChange={handleBookChange}
+                        />
+                    </div>
+
                     {ownsBook && (
                         <>
                             <div className="form-field">
@@ -184,18 +196,6 @@ export default function BookForm({
                             </div>
                         </>
                     )}
-
-                    <div className="form-field">
-                        <label htmlFor="edition">版本</label>
-
-                        <input
-                            id="edition"
-                            name="edition"
-                            type="text"
-                            value={book.edition || '普通版'}
-                            onChange={handleBookChange}
-                        />
-                    </div>
 
                     <div className="form-field">
                         <label htmlFor="publisher">出版社</label>
