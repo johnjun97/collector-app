@@ -86,3 +86,34 @@
 .batch-volume-separator {
     padding-bottom: 10px;
 }
+
+.series-input-wrapper {
+    position: relative;
+}
+
+.series-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    background: white;
+    border: 1px solid #ccc;
+    border-top: none;
+    max-height: 240px;
+    overflow-y: auto;
+}
+
+.series-suggestions button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    border: none;
+    background: white;
+    text-align: left;
+    cursor: pointer;
+}
+
+.series-suggestions button:hover {
+    background: #f5f5f5;
+}

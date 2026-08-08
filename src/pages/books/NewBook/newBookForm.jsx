@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { supabase } from '../../../lib/supabaseClient'
 import OpenCC from 'opencc-js'
 import BatchAddVolumes from '../components/BatchAddVolumes'
 import './newBookForm.css'
@@ -30,6 +31,9 @@ export default function BookForm({
     const [saving, setSaving] = useState(false)
     const [showBatchAdd, setShowBatchAdd] = useState(false)
     const [batchVolumes, setBatchVolumes] = useState([])
+    const [seriesSuggestions, setSeriesSuggestions] = useState([])
+    const [showSeriesSuggestions, setShowSeriesSuggestions] = useState(false)
+    const seriesInputRef = useRef(null)
 
     useEffect(() => {
         if (!initialData) return
@@ -55,6 +59,51 @@ export default function BookForm({
             ...form,
             [e.target.name]: value
         })
+    }
+
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (
+                seriesInputRef.current &&
+                !seriesInputRef.current.contains(e.target)
+            ) {
+                setShowSeriesSuggestions(false)
+            }
+        }
+
+        document.addEventListener('mousedown', handleClickOutside)
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside)
+        }
+    }, [])
+
+    const loadSeriesSuggestions = async (value = '') => {
+        const { data, error } = await supabase
+            .from('book_series')
+            .select('title')
+            .ilike('title', `%${value}%`)
+            .order('title')
+            .limit(10)
+
+        if (error) {
+            console.error('Error searching book series:', error)
+            return
+        }
+
+        setSeriesSuggestions(data || [])
+        setShowSeriesSuggestions(true)
+    }
+
+    const handleTitleChange = async (e) => {
+        const value = converter(e.target.value)
+
+        setForm({
+            ...form,
+            title: value
+        })
+
+        await loadSeriesSuggestions(value)
     }
 
     const handleSubmit = async (e) => {
@@ -120,53 +169,80 @@ export default function BookForm({
 
             <div className="form-field">
                 <label htmlFor="title">书名</label>
-                <input
-                    id="title"
-                    name="title"
-                    type="text"
-                    placeholder="请输入书名"
-                    value={form.title}
-                    onChange={handleChange}
-                />
+
+                <div
+                    className="series-input-wrapper"
+                    ref={seriesInputRef}
+                >
+                    <input
+                        id="title"
+                        name="title"
+                        type="text"
+                        placeholder="请输入书名"
+                        value={form.title}
+                        onChange={handleTitleChange}
+                        onFocus={() => loadSeriesSuggestions(form.title)}
+                    />
+
+                    {showSeriesSuggestions && seriesSuggestions.length > 0 && (
+                        <div className="series-suggestions">
+                            {seriesSuggestions.map((series) => (
+                                <button
+                                    key={series.title}
+                                    type="button"
+                                    onClick={() => {
+                                        setForm({
+                                            ...form,
+                                            title: series.title
+                                        })
+                                        setShowSeriesSuggestions(false)
+                                    }}
+                                >
+                                    {series.title}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
 
             <div className="form-field">
-    <div className="volume-field-header">
-        <label>集数</label>
+                <div className="volume-field-header">
+                    <label>集数</label>
 
-        <button
-            type="button"
-            className={`batch-add-button ${showBatchAdd ? 'active' : ''}`}
-            onClick={() => {
-                setShowBatchAdd(!showBatchAdd)
+                    <button
+                        type="button"
+                        className={`batch-add-button ${showBatchAdd ? 'active' : ''}`}
+                        onClick={() => {
+                            setShowBatchAdd(!showBatchAdd)
 
-                if (showBatchAdd) {
-                    setBatchVolumes([])
-                }
-            }}
-        >
-            {showBatchAdd ? '关闭批量添加' : '批量添加'}
-        </button>
-    </div>
+                            if (showBatchAdd) {
+                                setBatchVolumes([])
+                            }
+                        }}
+                    >
+                        {showBatchAdd ? '关闭批量添加' : '批量添加'}
+                    </button>
+                </div>
 
-    {!showBatchAdd && (
-        <input
-            id="volume"
-            name="volume"
-            type="text"
-            placeholder="例如：1、2、3、全"
-            value={form.volume}
-            onChange={handleChange}
-        />
-    )}
+                {!showBatchAdd && (
+                    <input
+                        id="volume"
+                        name="volume"
+                        type="text"
+                        placeholder="例如：1、2、3、全"
+                        value={form.volume}
+                        onChange={handleChange}
+                    />
+                )}
 
-    {showBatchAdd && (
-        <BatchAddVolumes
-            existingVolumes={[]}
-            onChange={setBatchVolumes}
-        />
-    )}
-</div>
+                {showBatchAdd && (
+                    <BatchAddVolumes
+                        existingVolumes={[]}
+                        onChange={setBatchVolumes}
+                    />
+                )}
+            </div>
 
             <div className="ownership-field">
                 <label>
