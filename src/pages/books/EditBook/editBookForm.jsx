@@ -1,4 +1,6 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { supabase } from '../../../lib/supabaseClient'
+import SuggestionInput from '../components/SuggestionInput'
 import './editBookForm.css'
 
 export default function BookForm({
@@ -28,6 +30,81 @@ export default function BookForm({
 
     const [showOwnershipBatchEdit, setShowOwnershipBatchEdit] =
         React.useState(false)
+
+    const [suggestions, setSuggestions] = useState({
+        title: [],
+        edition: [],
+        author: [],
+        publisher: [],
+    })
+
+    const loadSuggestions = async () => {
+        const { data, error } = await supabase
+            .from('books')
+            .select(`
+            edition,
+            publisher,
+            updated_at,
+            series:book_series (
+                title,
+                author,
+                updated_at
+            )
+        `)
+
+        if (error) {
+            console.error('Error loading book suggestions:', error)
+            return
+        }
+
+        const getSuggestions = (getValue) => {
+            const latestByValue = new Map()
+
+            for (const book of data || []) {
+                const value = getValue(book)
+
+                if (!value) continue
+
+                const bookDate = new Date(book.updated_at).getTime()
+                const seriesDate = new Date(
+                    book.series?.updated_at || 0
+                ).getTime()
+
+                const latestDate = Math.max(bookDate, seriesDate)
+                const existing = latestByValue.get(value)
+
+                if (!existing || latestDate > existing.date) {
+                    latestByValue.set(value, {
+                        value,
+                        date: latestDate,
+                    })
+                }
+            }
+
+            return [...latestByValue.values()]
+                .sort((a, b) => b.date - a.date)
+                .map((item) => item.value)
+        }
+
+        setSuggestions({
+            title: getSuggestions(
+                (book) => book.series?.title
+            ),
+            author: getSuggestions(
+                (book) => book.series?.author
+            ),
+            edition: getSuggestions(
+                (book) => book.edition
+            ),
+            publisher: getSuggestions(
+                (book) => book.publisher
+            ),
+        })
+    }
+
+    useEffect(() => {
+        loadSuggestions()
+    }, [])
 
     return (
         <form
@@ -60,29 +137,25 @@ export default function BookForm({
                 </select>
             </div>
 
-            <div className="form-field">
-                <label htmlFor="title">书名</label>
+            <SuggestionInput
+                id="title"
+                name="title"
+                label="书名"
+                placeholder="请输入书名"
+                value={series.title || ''}
+                suggestions={suggestions.title}
+                onChange={handleSeriesChange}
+            />
 
-                <input
-                    id="title"
-                    name="title"
-                    type="text"
-                    value={series.title || ''}
-                    onChange={handleSeriesChange}
-                />
-            </div>
-
-            <div className="form-field">
-                <label htmlFor="author">作者</label>
-
-                <input
-                    id="author"
-                    name="author"
-                    type="text"
-                    value={series.author || ''}
-                    onChange={handleSeriesChange}
-                />
-            </div>
+            <SuggestionInput
+                id="author"
+                name="author"
+                label="作者"
+                placeholder="请输入作者"
+                value={series.author || ''}
+                suggestions={suggestions.author}
+                onChange={handleSeriesChange}
+            />
 
             <div className="form-field">
                 <div className="volume-field-header">
@@ -120,8 +193,8 @@ export default function BookForm({
 
                 <div
                     className={`volume-buttons ${showBatchAdd || showOwnershipBatchEdit
-                            ? 'batch-edit-active'
-                            : ''
+                        ? 'batch-edit-active'
+                        : ''
                         }`}
                 >
                     {volumes.map((volume) => (
@@ -253,17 +326,15 @@ export default function BookForm({
                         <summary>其他资料（选填）</summary>
 
                         {/* 版本 */}
-                        <div className="form-field">
-                            <label htmlFor="edition">版本</label>
-
-                            <input
-                                id="edition"
-                                name="edition"
-                                type="text"
-                                value={book.edition || '普通版'}
-                                onChange={handleBookChange}
-                            />
-                        </div>
+                        <SuggestionInput
+                            id="edition"
+                            name="edition"
+                            label="版本"
+                            placeholder="例如：普通版、限定版、特装版"
+                            value={book.edition || '普通版'}
+                            suggestions={suggestions.edition}
+                            onChange={handleBookChange}
+                        />
 
                         {/* 购买日期和价格 */}
                         {ownsBook && (
@@ -303,17 +374,15 @@ export default function BookForm({
                         )}
 
                         {/* 出版社 */}
-                        <div className="form-field">
-                            <label htmlFor="publisher">出版社</label>
-
-                            <input
-                                id="publisher"
-                                name="publisher"
-                                type="text"
-                                value={book.publisher || ''}
-                                onChange={handleBookChange}
-                            />
-                        </div>
+                        <SuggestionInput
+                            id="publisher"
+                            name="publisher"
+                            label="出版社"
+                            placeholder="请输入出版社"
+                            value={book.publisher || ''}
+                            suggestions={suggestions.publisher}
+                            onChange={handleBookChange}
+                        />
 
                         {/* ISBN */}
                         <div className="form-field">
@@ -325,6 +394,7 @@ export default function BookForm({
                                 type="text"
                                 value={book.isbn || ''}
                                 onChange={handleBookChange}
+                                autoComplete="off"
                             />
                         </div>
 
