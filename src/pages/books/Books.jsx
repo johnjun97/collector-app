@@ -163,8 +163,6 @@ export default function Books() {
 
                 <div className="books-header">
 
-                    <h1>My Books</h1>
-
                     <div className="books-header-actions">
                         <input
                             type="search"
