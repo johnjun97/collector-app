@@ -31,13 +31,18 @@
 
 
 /* Remove default details marker */
+.statistic-1 > summary {
+    list-style: none;
+}
 
-.dashboard-card>summary,
+.statistic-1 > summary::-webkit-details-marker {
+    display: none;
+}
+
 .collection-section>summary {
     list-style: none;
 }
 
-.dashboard-card>summary::-webkit-details-marker,
 .collection-section>summary::-webkit-details-marker {
     display: none;
 }
@@ -79,9 +84,12 @@
     transition: transform 0.2s ease;
 }
 
-.dashboard-card[open]>.dashboard-card-header .expand-icon,
-.collection-section[open]>.collection-header .expand-icon {
-    transform: rotate(45deg);
+.statistic-1 {
+    display: block;
+}
+
+.statistic-1-closed-progress {
+    margin-bottom: 20px;
 }
 
 
@@ -103,6 +111,10 @@
     border: 1px solid #eeeeee;
     border-radius: 12px;
     background: #fafafa;
+}
+
+.statistic-2-closed-progress {
+    margin: -20px 20px 20px;
 }
 
 .collection-header {

@@ -20,9 +20,9 @@ export default function Home() {
   })
 
   const [seriesStats, setSeriesStats] = useState([])
-  const [progressKey, setProgressKey] = useState(0)
-  const [collectionProgressKey, setCollectionProgressKey] = useState(0)
+
   const [statistic1Open, setStatistic1Open] = useState(false)
+  const [statistic2Open, setStatistic2Open] = useState(false)
 
   useEffect(() => {
 
@@ -162,10 +162,9 @@ export default function Home() {
 
   return (
     <>
-      <Navbar section="首页" />
+      <Navbar />
 
       <main className="home-page">
-
         <div className="home-header">
           <h1>Dashboard</h1>
 
@@ -176,34 +175,16 @@ export default function Home() {
           </p>
         </div>
 
-
-        {/* Statistic 1 */}
         <div className="dashboard-card">
 
+          {/* Statistic 1 */}
+          {/* Statistic 1 */}
           <details
+            className="statistic-1"
             onToggle={(e) => {
-              const isOpen = e.currentTarget.open
-
-              setStatistic1Open(isOpen)
-
-              if (isOpen) {
-                setProgressKey((key) => key + 1)
-              }
+              setStatistic1Open(e.currentTarget.open)
             }}
           >
-            {!statistic1Open && (
-              <div className="progress-container">
-                <div
-                  className="progress-bar"
-                  style={{
-                    width: `${bookStats.total
-                      ? (bookStats.owned / bookStats.total) * 100
-                      : 0
-                      }%`
-                  }}
-                />
-              </div>
-            )}
             <summary className="dashboard-card-header">
               <div>
                 <h2>所有书籍</h2>
@@ -224,10 +205,9 @@ export default function Home() {
               </span>
             </summary>
 
-            {/* Statistic 1 progress bar */}
+            {/* Progress bar when Statistic 1 is OPEN */}
             <div className="progress-container">
               <div
-                key={progressKey}
                 className="progress-bar progress-animate"
                 style={{
                   width: `${bookStats.total
@@ -237,118 +217,13 @@ export default function Home() {
                 }}
               />
             </div>
-
-            {/* Statistic 2 */}
-            <details
-              className="collection-section"
-              onToggle={(e) => {
-                if (e.currentTarget.open) {
-                  setCollectionProgressKey((key) => key + 1)
-                }
-              }}
-            >
-              <summary className="collection-header">
-                <div>
-                  <h3>我的收藏</h3>
-
-                  <span>
-                    {userBookStats.owned} / {userBookStats.total} (
-                    {userBookStats.total
-                      ? Math.round(
-                        (userBookStats.owned / userBookStats.total) * 100
-                      )
-                      : 0
-                    }%)
-                  </span>
-                </div>
-
-                <span className="expand-icon">
-                  +
-                </span>
-              </summary>
-
-              {/* Statistic 2 progress bar */}
-              <div className="progress-container">
-                <div
-                  key={collectionProgressKey}
-                  className="progress-bar progress-animate"
-                  style={{
-                    width: `${userBookStats.total
-                      ? (userBookStats.owned / userBookStats.total) * 100
-                      : 0
-                      }%`
-                  }}
-                />
-              </div>
-
-              <div className="series-list">
-
-                {seriesStats.length === 0 ? (
-
-                  <p className="empty-message">
-                    还没有收藏书籍
-                  </p>
-
-                ) : (
-
-                  seriesStats.map((series) => {
-
-                    const percentage = series.total
-                      ? (series.owned / series.total) * 100
-                      : 0
-
-                    return (
-                      <div
-                        key={series.id}
-                        className="series-stat"
-                      >
-
-                        <div className="series-info">
-
-                          <div>
-                            <strong>
-                              {series.title}
-                            </strong>
-
-                            <span>
-                              {series.subcategory}
-                            </span>
-                          </div>
-
-                          <strong>
-                            {series.owned} / {series.total} (
-                            {Math.round(percentage)}%)
-                          </strong>
-
-                        </div>
-
-                        <div className="progress-container series-progress">
-                          <div
-                            key={`${collectionProgressKey}-${series.id}`}
-                            className="progress-bar progress-animate"
-                            style={{
-                              width: `${percentage}%`
-                            }}
-                          />
-                        </div>
-
-                      </div>
-                    )
-                  })
-
-                )}
-
-              </div>
-
-            </details>
-
           </details>
 
-          {/* Statistic 1 progress bar - ALWAYS VISIBLE */}
-          {!document.querySelector('.dashboard-card details')?.open && (
-            <div className="progress-container">
+          {/* Progress bar when Statistic 1 is CLOSED */}
+          {!statistic1Open && (
+            <div className="progress-container statistic-1-closed-progress">
               <div
-                className="progress-bar"
+                className="progress-bar progress-animate"
                 style={{
                   width: `${bookStats.total
                     ? (bookStats.owned / bookStats.total) * 100
@@ -359,9 +234,116 @@ export default function Home() {
             </div>
           )}
 
+          {/* Statistic 2 */}
+          <details
+            className="collection-section"
+            onToggle={(e) => {
+              setStatistic2Open(e.currentTarget.open)
+            }}
+          >
+
+
+
+            <summary className="collection-header">
+              <div>
+                <h3>我的收藏</h3>
+
+                <span>
+                  {userBookStats.owned} / {userBookStats.total} (
+                  {userBookStats.total
+                    ? Math.round(
+                      (userBookStats.owned / userBookStats.total) * 100
+                    )
+                    : 0
+                  }%)
+                </span>
+              </div>
+
+              <span className="expand-icon">
+                +
+              </span>
+            </summary>
+
+            {/* Statistic 2 progress bar */}
+
+
+            <div className="series-list">
+
+              {seriesStats.length === 0 ? (
+
+                <p className="empty-message">
+                  还没有收藏书籍
+                </p>
+
+              ) : (
+
+                seriesStats.map((series) => {
+
+                  const percentage = series.total
+                    ? (series.owned / series.total) * 100
+                    : 0
+
+                  return (
+                    <div
+                      key={series.id}
+                      className="series-stat"
+                    >
+
+                      <div className="series-info">
+
+                        <div>
+                          <strong>
+                            {series.title}
+                          </strong>
+
+                          <span>
+                            {series.subcategory}
+                          </span>
+                        </div>
+
+                        <strong>
+                          {series.owned} / {series.total} (
+                          {Math.round(percentage)}%)
+                        </strong>
+
+                      </div>
+
+                      <div className="progress-container series-progress">
+                        <div
+                          className="progress-bar progress-animate"
+                          style={{
+                            width: `${percentage}%`
+                          }}
+                        />
+                      </div>
+
+                    </div>
+                  )
+                })
+
+              )}
+
+            </div>
+
+      </details>
+
+      {!statistic2Open && (
+        <div className="progress-container statistic-2-closed-progress">
+          <div
+            className="progress-bar progress-animate"
+            style={{
+              width: `${userBookStats.total
+                ? (userBookStats.owned / userBookStats.total) * 100
+                : 0
+              }%`
+            }}
+          />
+        </div>
+      )}
+          
         </div>
 
-      </main>
+      </main >
     </>
   )
 }
