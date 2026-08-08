@@ -124,18 +124,43 @@ export default function Books() {
                             .map((book) => book.id)
                     )
 
-                    const visibleVolumes = sortedVolumes.filter((volume) => {
-                        const isSpecialEdition =
-                            volume.edition && volume.edition !== '普通版'
+                    const numericVolumes = sortedVolumes
+                        .map((book) => Number(book.volume))
+                        .filter((volume) => Number.isInteger(volume) && volume > 0)
 
-                        // 普通版：一直显示
-                        if (!isSpecialEdition) {
-                            return true
+                    const latestVolume = numericVolumes.length > 0
+                        ? Math.max(...numericVolumes)
+                        : 0
+
+                    const visibleVolumes = []
+
+                    for (let i = 1; i <= latestVolume; i++) {
+                        const existingVolume = sortedVolumes.find(
+                            (book) => Number(book.volume) === i
+                        )
+
+                        if (existingVolume) {
+                            const isSpecialEdition =
+                                existingVolume.edition &&
+                                existingVolume.edition !== '普通版'
+
+                            // 普通版：一直显示
+                            if (!isSpecialEdition) {
+                                visibleVolumes.push(existingVolume)
+                            } else if (ownedBookIds.has(existingVolume.id)) {
+                                // 特装版：只有用户入手才显示
+                                visibleVolumes.push(existingVolume)
+                            }
+                        } else {
+                            // Volume doesn't exist in Supabase yet
+                            visibleVolumes.push({
+                                id: `placeholder-${seriesId}-${i}`,
+                                volume: String(i),
+                                edition: '普通版',
+                                isPlaceholder: true,
+                            })
                         }
-
-                        // 特装版：只有用户入手才显示
-                        return ownedBookIds.has(volume.id)
-                    })
+                    }
 
 
                     const latestBook = sortedVolumes[sortedVolumes.length - 1]
@@ -300,7 +325,10 @@ export default function Books() {
                                                     className={`volume-indicator ${owned ? 'owned' : ''}`}
                                                     onClick={(e) => {
                                                         e.stopPropagation()
-                                                        navigate(`/books/${volume.id}/edit`)
+
+                                                        if (!volume.isPlaceholder) {
+                                                            navigate(`/books/${volume.id}/edit`)
+                                                        }
                                                     }}
                                                 >
                                                     {volumeValue}
