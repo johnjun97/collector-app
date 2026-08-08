@@ -176,6 +176,22 @@
     color: #888;
 }
 
+.progress-animate {
+    animation: progress-fill 1s ease-out;
+}
+
+@keyframes progress-fill {
+    from {
+        transform: scaleX(0);
+        transform-origin: left;
+    }
+
+    to {
+        transform: scaleX(1);
+        transform-origin: left;
+    }
+}
+
 
 /* Mobile */
 
