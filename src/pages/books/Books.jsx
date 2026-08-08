@@ -134,6 +134,7 @@ export default function Books() {
 
                     const visibleVolumes = []
 
+                    // Numeric volumes: 1, 2, 3...
                     for (let i = 1; i <= latestVolume; i++) {
 
                         const existingVolumes = sortedVolumes.filter(
@@ -168,6 +169,28 @@ export default function Books() {
                                 edition: '普通版',
                                 isPlaceholder: true,
                             })
+                        }
+                    }
+
+                    // Text volumes: 全、上、下
+                    const textVolumes = sortedVolumes.filter(
+                        (book) => ['全', '上', '下'].includes(String(book.volume))
+                    )
+
+                    for (const volume of textVolumes) {
+
+                        const isSpecialEdition =
+                            volume.edition &&
+                            volume.edition !== '普通版'
+
+                        // 普通版：一直显示
+                        if (!isSpecialEdition) {
+                            visibleVolumes.push(volume)
+                        }
+
+                        // 特装版：只有用户入手才显示
+                        else if (ownedBookIds.has(volume.id)) {
+                            visibleVolumes.push(volume)
                         }
                     }
 
