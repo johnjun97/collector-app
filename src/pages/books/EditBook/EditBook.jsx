@@ -540,6 +540,14 @@ export default function EditBook() {
         <>
             <Navbar section="书籍" />
 
+            {saving && (
+                <div className="saving-overlay">
+                    <div className="saving-message">
+                        Updating...
+                    </div>
+                </div>
+            )}
+
             <main className="edit-book-page">
 
                 <div className="edit-book-header">
