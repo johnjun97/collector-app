@@ -27,7 +27,7 @@ export default function BookForm({
     })
 
     const [saving, setSaving] = useState(false)
-    const [ownsBook, setOwnsBook] = useState(false)
+    const [ownsBook, setOwnsBook] = useState(true)
     const [seriesSuggestions, setSeriesSuggestions] = useState([])
     const [showSeriesSuggestions, setShowSeriesSuggestions] = useState(false)
     const seriesInputRef = useRef(null)
