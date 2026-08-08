@@ -36,12 +36,13 @@ export default function Books() {
                 const { data: userBooks, error: userBooksError } = await supabase
                     .from('user_books')
                     .select(`
-    is_owned,
-    book:books (
-        *,
-        series:book_series (*)
-    )
-`)
+        is_owned,
+        updated_at,
+        book:books (
+            *,
+            series:book_series (*)
+        )
+    `)
 
                     .eq('user_id', user.id)
 
@@ -52,7 +53,8 @@ export default function Books() {
                 const addedBooks = userBooks
                     .map((item) => ({
                         ...item.book,
-                        isOwned: item.is_owned
+                        isOwned: item.is_owned,
+                        userBookUpdatedAt: item.updated_at
                     }))
                     .filter(Boolean)
 
