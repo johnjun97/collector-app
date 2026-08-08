@@ -528,9 +528,17 @@ export default function EditBook() {
         }
     }
 
-    if (loading) {
-        return <Loading text="正在加载" />
-    }
+  if (loading) {
+    return (
+        <>
+            <Navbar section="书籍" />
+
+            <main className="edit-book-page">
+                <Loading text="正在加载" />
+            </main>
+        </>
+    )
+}
 
     if (!book || !series) {
         return <p>Book not found.</p>
