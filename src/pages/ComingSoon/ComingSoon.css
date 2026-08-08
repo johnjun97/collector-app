@@ -1,0 +1,27 @@
+.coming-soon-page {
+    min-height: calc(100vh - 64px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.coming-soon-content {
+    max-width: 500px;
+    padding: 40px;
+}
+
+.coming-soon-content h1 {
+    margin-bottom: 20px;
+}
+
+.coming-soon-content p {
+    margin: 8px 0;
+    color: #666;
+}
+
+.coming-soon-content button {
+    margin-top: 24px;
+    padding: 10px 20px;
+    cursor: pointer;
+}

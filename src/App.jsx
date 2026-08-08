@@ -11,6 +11,7 @@ import { useAuthListener } from './auth/useAuthListener'
 import Books from './pages/books/Books.jsx'
 import NewBook from './pages/books/NewBook/NewBook.jsx'
 import EditBook from './pages/books/EditBook/EditBook.jsx'
+import ComingSoon from './pages/ComingSoon/ComingSoon.jsx'
 
 export default function App() {
 
@@ -53,6 +54,11 @@ export default function App() {
       <Route path="/books" element={<ProtectedRoute session={session}><Books /></ProtectedRoute>} />
       <Route path="/books/new" element={<ProtectedRoute session={session}><NewBook /></ProtectedRoute>} />
       <Route path="/books/:id/edit" element={<ProtectedRoute session={session}><EditBook /></ProtectedRoute>} />
+
+      <Route path="/music" element={<ProtectedRoute session={session}><ComingSoon /></ProtectedRoute>} />
+      <Route path="/video" element={<ProtectedRoute session={session}><ComingSoon /></ProtectedRoute>} />
+      <Route path="/games" element={<ProtectedRoute session={session}><ComingSoon /></ProtectedRoute>} />
+      <Route path="/models" element={<ProtectedRoute session={session}><ComingSoon /></ProtectedRoute>} />
     </Routes>
   )
 
