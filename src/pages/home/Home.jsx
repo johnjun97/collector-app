@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 import Navbar from '../../components/Navbar'
+import Loading from '../../components/Loading'
 import './Home.css'
 
 export default function Home() {
 
   const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   const [bookStats, setBookStats] = useState({
     total: 0,
@@ -27,7 +29,10 @@ export default function Home() {
         data: { user }
       } = await supabase.auth.getUser()
 
-      if (!user) return
+      if (!user) {
+        setLoading(false)
+        return
+      }
 
       setUser(user)
 
@@ -49,6 +54,7 @@ export default function Home() {
           'Error loading all books:',
           allBooksError
         )
+        setLoading(false)
         return
       }
 
@@ -67,6 +73,7 @@ export default function Home() {
           'Error loading user books:',
           userBooksError
         )
+        setLoading(false)
         return
       }
 
@@ -139,11 +146,16 @@ export default function Home() {
         [...seriesMap.values()]
           .filter((series) => series.total > 0)
       )
+      setLoading(false)
     }
 
     getDashboardData()
 
   }, [])
+
+  if (loading) {
+    return <Loading />
+  }
 
   return (
     <>
