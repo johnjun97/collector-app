@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import './bookCard.css'
 
 export default function BookCard({
     book,
@@ -17,7 +18,14 @@ export default function BookCard({
         >
 
             <div className="book-title-row">
-                <h2>{book.title}</h2>
+                <h2>
+                    {book.title}
+                    {book.subcategory && (
+                        <span className="book-subcategory">
+                            [{book.subcategory}]
+                        </span>
+                    )}
+                </h2>
 
                 <button
                     type="button"
