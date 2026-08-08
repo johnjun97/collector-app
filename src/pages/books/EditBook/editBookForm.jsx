@@ -2,6 +2,8 @@ import React from 'react'
 import './editBookForm.css'
 
 export default function BookForm({
+    batchOwnership,
+    setBatchOwnership,
     batchVolumes,
     setBatchVolumes,
     series,
@@ -21,9 +23,23 @@ export default function BookForm({
     handleSubmit,
     navigate
 }) {
+
     const [showBatchAdd, setShowBatchAdd] = React.useState(false)
+
+    const [showOwnershipBatchEdit, setShowOwnershipBatchEdit] =
+        React.useState(false)
+
     return (
-        <form onSubmit={handleSubmit}>
+        <form
+            onSubmit={(e) =>
+                handleSubmit(
+                    e,
+                    showOwnershipBatchEdit
+                        ? batchOwnership
+                        : null
+                )
+            }
+        >
 
             <div className="form-field">
                 <label htmlFor="subcategory">类型</label>
@@ -79,9 +95,9 @@ export default function BookForm({
                             onClick={() => {
                                 setShowBatchAdd(!showBatchAdd)
 
-                         if (showBatchAdd) {
-    setBatchVolumes('')
-}
+                                if (showBatchAdd) {
+                                    setBatchVolumes('')
+                                }
                             }}
                         >
                             {showBatchAdd ? '关闭批量编辑' : '批量编辑'}
@@ -124,16 +140,16 @@ export default function BookForm({
                 </div>
             </div>
 
-           {showBatchAdd && (
-    <div className="form-field">
-        <input
-            type="text"
-            placeholder="例如：1-5、8、11-13"
-            value={batchVolumes}
-            onChange={(e) => setBatchVolumes(e.target.value)}
-        />
-    </div>
-)}
+            {showBatchAdd && (
+                <div className="form-field">
+                    <input
+                        type="text"
+                        placeholder="例如：1-5、8、11-13"
+                        value={batchVolumes}
+                        onChange={(e) => setBatchVolumes(e.target.value)}
+                    />
+                </div>
+            )}
 
             {userBookLoading ? (
                 <div className="form-field" >
@@ -143,17 +159,85 @@ export default function BookForm({
                 <>
 
                     <div className="form-field">
-                        <label className="checkbox-label">
-                            <input
-                                type="checkbox"
-                                checked={ownsBook}
-                                onChange={(e) =>
-                                    setOwnsBook(e.target.checked)
-                                }
-                            />
-                            已入手
-                        </label>
+                        <div className="ownership-field-header">
+                            <label className="checkbox-label">
+                                <input
+                                    type="checkbox"
+                                    checked={ownsBook}
+                                    onChange={(e) =>
+                                        setOwnsBook(e.target.checked)
+                                    }
+                                />
+                                已入手
+                            </label>
+
+                            <button
+                                type="button"
+                                className={`batch-add-button ${showOwnershipBatchEdit ? 'active' : ''
+                                    }`}
+                                onClick={() => {
+                                    const nextState = !showOwnershipBatchEdit
+
+                                    setShowOwnershipBatchEdit(nextState)
+
+                                    if (nextState) {
+                                        const initialOwnership = {}
+
+                                        volumes.forEach((volume) => {
+                                            initialOwnership[volume.id] =
+                                                volume.isOwned === true
+                                        })
+
+                                        setBatchOwnership(initialOwnership)
+                                    }
+                                }}
+                            >
+                                {showOwnershipBatchEdit
+                                    ? '关闭批量编辑'
+                                    : '批量编辑'}
+                            </button>
+                        </div>
                     </div>
+
+                    {showOwnershipBatchEdit && (
+                        <div className="ownership-batch-list">
+                            {volumes.map((volume) => (
+                                <label
+                                    key={volume.id}
+                                    className={`ownership-batch-item ${batchOwnership[volume.id]
+                                        ? 'owned'
+                                        : ''
+                                        }`}
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={
+                                            batchOwnership[volume.id] === true
+                                        }
+                                        onChange={(e) => {
+                                            setBatchOwnership({
+                                                ...batchOwnership,
+                                                [volume.id]: e.target.checked
+                                            })
+                                        }}
+                                    />
+
+                                    <span>
+                                        第{volume.volume}集
+
+                                        {volume.edition &&
+                                            volume.edition !== '普通版' && (
+                                                <>
+                                                    {' '}
+                                                    ({volume.edition})
+                                                </>
+                                            )}
+                                    </span>
+                                </label>
+                            ))}
+                        </div>
+                    )}
+
                     <details className="optional-fields">
                         <summary>其他资料（选填）</summary>
 

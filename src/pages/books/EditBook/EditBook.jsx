@@ -15,6 +15,7 @@ export default function EditBook() {
     const [series, setSeries] = useState(null)
     const [volumes, setVolumes] = useState([])
     const [batchVolumes, setBatchVolumes] = useState('')
+    const [batchOwnership, setBatchOwnership] = useState({})
 
     const [ownsBook, setOwnsBook] = useState(false)
     const [purchasedDate, setPurchasedDate] = useState('')
@@ -233,7 +234,7 @@ export default function EditBook() {
         return [...new Set(volumes)].sort((a, b) => a - b)
     }
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e, ownershipChanges = null) => {
         e.preventDefault()
 
         if (!series.title.trim()) {
@@ -251,6 +252,50 @@ export default function EditBook() {
         setSaving(true)
 
         try {
+
+            // Batch update ownership
+            if (ownershipChanges) {
+                const {
+                    data: { user },
+                    error: userError
+                } = await supabase.auth.getUser()
+
+                if (userError) {
+                    throw userError
+                }
+
+                if (!user) {
+                    throw new Error('User is not logged in')
+                }
+
+                for (const volume of volumes) {
+                    const isOwned =
+                        ownershipChanges[volume.id] === true
+
+                    const { error } = await supabase
+                        .from('user_books')
+                        .upsert(
+                            {
+                                user_id: user.id,
+                                book_id: volume.id,
+                                is_owned: isOwned,
+                                purchased_date: isOwned
+                                    ? null
+                                    : null,
+                                purchased_price: isOwned
+                                    ? null
+                                    : null,
+                            },
+                            {
+                                onConflict: 'user_id,book_id'
+                            }
+                        )
+
+                    if (error) {
+                        throw error
+                    }
+                }
+            }
             // Add batch volumes
             // Handle batch edit
             if (parsedBatchVolumes.length > 0) {
@@ -515,6 +560,8 @@ export default function EditBook() {
 
                 <BookForm
                     setBatchVolumes={setBatchVolumes}
+                    batchOwnership={batchOwnership}
+                    setBatchOwnership={setBatchOwnership}
                     series={series}
                     book={book}
                     batchVolumes={batchVolumes}
