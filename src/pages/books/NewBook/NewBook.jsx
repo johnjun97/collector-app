@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../../lib/supabaseClient'
 import { debugError } from '../../../lib/debug'
 import Navbar from '../../../components/Navbar'
-import BookForm from "./BookForm";
+import BookForm from "./BookForm"
 import './NewBook.css'
 
 export default function NewBook() {
@@ -12,34 +12,84 @@ export default function NewBook() {
     const handleSubmit = async (form, ownsBook) => {
 
         try {
-            let book
+            const title = form.title.trim()
 
-            // 1. Check whether this book already exists
-            const { data: existingBook, error: findError } = await supabase
-                .from('books')
-                .select('*')
-                .eq('title', form.title.trim())
-                .eq('volume', form.volume || null)
-                .maybeSingle()
-
-            if (findError) {
-                throw findError
+            if (!title) {
+                throw new Error('请输入书名')
             }
 
-            // 2. Use existing book or create a new one
-            if (existingBook) {
-                book = existingBook
+            if (!form.volume.trim()) {
+                throw new Error('请输入集数')
+            }
+
+            // 1. Find existing book series
+            const { data: existingSeries, error: seriesFindError } = await supabase
+                .from('book_series')
+                .select('*')
+                .eq('title', title)
+                .maybeSingle()
+
+            if (seriesFindError) {
+                throw seriesFindError
+            }
+
+            let series
+
+            // 2. Use existing series or create a new one
+            if (existingSeries) {
+
+                series = existingSeries
+
             } else {
+
+                const { data: newSeries, error: seriesInsertError } = await supabase
+                    .from('book_series')
+                    .insert({
+                        title,
+                        author: form.author.trim() || null,
+                        subcategory: form.subcategory || '漫画',
+                    })
+                    .select()
+                    .single()
+
+                if (seriesInsertError) {
+                    throw seriesInsertError
+                }
+
+                series = newSeries
+            }
+
+            // 3. Check whether this exact book already exists
+            const { data: existingBook, error: bookFindError } = await supabase
+                .from('books')
+                .select('*')
+                .eq('series_id', series.id)
+                .eq('volume', form.volume.trim())
+                .eq('edition', form.edition || '普通版')
+                .eq('publisher', form.publisher.trim() || null)
+                .maybeSingle()
+
+            if (bookFindError) {
+                throw bookFindError
+            }
+
+            let book
+
+            // 4. Use existing book or create a new one
+            if (existingBook) {
+
+                book = existingBook
+
+            } else {
+
                 const { data: newBook, error: insertError } = await supabase
                     .from('books')
                     .insert({
-                        title: form.title.trim(),
-                        volume: form.volume || null,
-                        author: form.author || null,
-                        subcategory: form.subcategory,
-                        edition: form.edition || null,
-                        publisher: form.publisher || null,
-                        isbn: form.isbn || null,
+                        series_id: series.id,
+                        volume: form.volume.trim(),
+                        edition: form.edition || '普通版',
+                        publisher: form.publisher.trim() || null,
+                        isbn: form.isbn.trim() || null,
                         release_date: form.releaseDate || null,
                     })
                     .select()
@@ -52,9 +102,17 @@ export default function NewBook() {
                 book = newBook
             }
 
-            // 3. If the user owns the book, create user_books
+            // 5. If the user owns the book, create user_books
             if (ownsBook) {
-                const { data: { user } } = await supabase.auth.getUser()
+
+                const {
+                    data: { user },
+                    error: userError
+                } = await supabase.auth.getUser()
+
+                if (userError) {
+                    throw userError
+                }
 
                 if (!user) {
                     throw new Error('User is not logged in')
@@ -77,7 +135,9 @@ export default function NewBook() {
             navigate('/books')
 
         } catch (error) {
+
             debugError('Error saving book:', error)
+
             alert(error.message || '保存失败，请稍后再试')
 
             throw error
@@ -89,7 +149,9 @@ export default function NewBook() {
             <Navbar section="书籍" />
 
             <main className="new-book-page">
+
                 <div className="new-book-header">
+
                     <h1>新增书籍</h1>
 
                     <button
@@ -99,14 +161,18 @@ export default function NewBook() {
                     >
                         返回
                     </button>
+
                 </div>
 
                 <div className="new-book-form-container">
+
                     <BookForm
                         onSubmit={handleSubmit}
                         onCancel={() => navigate('/books')}
                     />
+
                 </div>
+
             </main>
         </>
     )

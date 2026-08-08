@@ -13,7 +13,6 @@ import NewBook from './pages/books/NewBook/NewBook.jsx'
 import EditBook from './pages/books/EditBook/EditBook.jsx'
 
 export default function App() {
-  useAuthListener()
 
   const [loading, setLoading] = useState(true)
   const [session, setSession] = useState(null)

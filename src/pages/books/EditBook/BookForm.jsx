@@ -1,6 +1,7 @@
 import React from 'react'
 
 export default function BookForm({
+    series,
     book,
     userBookLoading,
     volumes,
@@ -11,14 +12,14 @@ export default function BookForm({
     purchasedPrice,
     setPurchasedPrice,
     saving,
-    handleChange,
+    handleSeriesChange,
+    handleBookChange,
+    handleVolumeChange,
     handleSubmit,
-    setBook,
-    getUserBook,
     navigate
 }) {
     return (
-        <form className="edit-book-form" onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}>
 
             <div className="form-field">
                 <label htmlFor="subcategory">类型</label>
@@ -26,8 +27,8 @@ export default function BookForm({
                 <select
                     id="subcategory"
                     name="subcategory"
-                    value={book.subcategory || '漫画'}
-                    onChange={handleChange}
+                    value={series.subcategory || '漫画'}
+                    onChange={handleSeriesChange}
                 >
                     <option value="漫画">漫画</option>
                     <option value="小说">小说</option>
@@ -46,8 +47,8 @@ export default function BookForm({
                     id="title"
                     name="title"
                     type="text"
-                    value={book.title || ''}
-                    onChange={handleChange}
+                    value={series.title || ''}
+                    onChange={handleSeriesChange}
                 />
             </div>
 
@@ -58,20 +59,8 @@ export default function BookForm({
                     id="author"
                     name="author"
                     type="text"
-                    value={book.author || ''}
-                    onChange={handleChange}
-                />
-            </div>
-
-            <div className="form-field">
-                <label htmlFor="publisher">出版社</label>
-
-                <input
-                    id="publisher"
-                    name="publisher"
-                    type="text"
-                    value={book.publisher || ''}
-                    onChange={handleChange}
+                    value={series.author || ''}
+                    onChange={handleSeriesChange}
                 />
             </div>
 
@@ -80,17 +69,18 @@ export default function BookForm({
 
                 <div className="volume-buttons">
                     {volumes.map((volume) => (
-<button
-    key={volume.id}
-    type="button"
-    className={String(book.volume) === String(volume.volume) ? 'active' : ''}
-    onClick={() => {
-        setBook(volume)
-        getUserBook(volume.id)
-    }}
->
-    {volume.volume}
-</button>
+                        <button
+                            key={volume.id}
+                            type="button"
+                            className={
+                                book.id === volume.id
+                                    ? 'active'
+                                    : ''
+                            }
+                            onClick={() => handleVolumeChange(volume)}
+                        >
+                            {volume.volume}
+                        </button>
                     ))}
                 </div>
             </div>
@@ -101,32 +91,41 @@ export default function BookForm({
                 </div>
             ) : (
                 <>
+
                     <div className="form-field">
                         <label className="checkbox-label">
                             <input
                                 type="checkbox"
                                 checked={ownsBook}
-                                onChange={(e) => setOwnsBook(e.target.checked)}
+                                onChange={(e) =>
+                                    setOwnsBook(e.target.checked)
+                                }
                             />
-                            入手
+                            已入手
                         </label>
                     </div>
 
                     {ownsBook && (
                         <>
                             <div className="form-field">
-                                <label htmlFor="purchasedDate">购买日期</label>
+                                <label htmlFor="purchasedDate">
+                                    购买日期
+                                </label>
 
                                 <input
                                     id="purchasedDate"
                                     type="date"
                                     value={purchasedDate}
-                                    onChange={(e) => setPurchasedDate(e.target.value)}
+                                    onChange={(e) =>
+                                        setPurchasedDate(e.target.value)
+                                    }
                                 />
                             </div>
 
                             <div className="form-field">
-                                <label htmlFor="purchasedPrice">购买价格</label>
+                                <label htmlFor="purchasedPrice">
+                                    购买价格
+                                </label>
 
                                 <input
                                     id="purchasedPrice"
@@ -134,11 +133,49 @@ export default function BookForm({
                                     step="0.01"
                                     min="0"
                                     value={purchasedPrice}
-                                    onChange={(e) => setPurchasedPrice(e.target.value)}
+                                    onChange={(e) =>
+                                        setPurchasedPrice(e.target.value)
+                                    }
                                 />
                             </div>
                         </>
                     )}
+
+                    <div className="form-field">
+                        <label htmlFor="volume">集数</label>
+
+                        <input
+                            id="volume"
+                            name="volume"
+                            type="text"
+                            value={book.volume || ''}
+                            onChange={handleBookChange}
+                        />
+                    </div>
+
+                    <div className="form-field">
+                        <label htmlFor="edition">版本</label>
+
+                        <input
+                            id="edition"
+                            name="edition"
+                            type="text"
+                            value={book.edition || '普通版'}
+                            onChange={handleBookChange}
+                        />
+                    </div>
+
+                    <div className="form-field">
+                        <label htmlFor="publisher">出版社</label>
+
+                        <input
+                            id="publisher"
+                            name="publisher"
+                            type="text"
+                            value={book.publisher || ''}
+                            onChange={handleBookChange}
+                        />
+                    </div>
 
                     <div className="form-field">
                         <label htmlFor="isbn">ISBN</label>
@@ -148,19 +185,21 @@ export default function BookForm({
                             name="isbn"
                             type="text"
                             value={book.isbn || ''}
-                            onChange={handleChange}
+                            onChange={handleBookChange}
                         />
                     </div>
 
                     <div className="form-field">
-                        <label htmlFor="release_date">发售日期</label>
+                        <label htmlFor="release_date">
+                            发售日期
+                        </label>
 
                         <input
                             id="release_date"
                             name="release_date"
                             type="date"
                             value={book.release_date || ''}
-                            onChange={handleChange}
+                            onChange={handleBookChange}
                         />
                     </div>
 
@@ -173,15 +212,18 @@ export default function BookForm({
                             取消
                         </button>
 
-                        <button type="submit" disabled={saving}>
+                        <button
+                            type="submit"
+                            disabled={saving}
+                        >
                             {saving ? '保存中...' : '保存'}
                         </button>
 
                     </div>
+
                 </>
             )}
 
         </form>
     )
-
 }

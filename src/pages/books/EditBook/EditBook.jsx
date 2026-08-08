@@ -7,17 +7,18 @@ import './EditBook.css'
 import Loading from '../../../components/Loading.jsx'
 import BookForm from './BookForm'
 
-
 export default function EditBook() {
     const { id } = useParams()
     const navigate = useNavigate()
 
     const [book, setBook] = useState(null)
+    const [series, setSeries] = useState(null)
     const [volumes, setVolumes] = useState([])
-    const [userBook, setUserBook] = useState(null)
+
     const [ownsBook, setOwnsBook] = useState(false)
     const [purchasedDate, setPurchasedDate] = useState('')
     const [purchasedPrice, setPurchasedPrice] = useState('')
+
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
     const [userBookLoading, setUserBookLoading] = useState(false)
@@ -25,9 +26,16 @@ export default function EditBook() {
     useEffect(() => {
         const getBook = async () => {
             try {
-                const { data: currentBook, error: currentBookError } = await supabase
+                // Get current book + series
+                const {
+                    data: currentBook,
+                    error: currentBookError
+                } = await supabase
                     .from('books')
-                    .select('*')
+                    .select(`
+                        *,
+                        series:book_series(*)
+                    `)
                     .eq('id', id)
                     .single()
 
@@ -36,22 +44,42 @@ export default function EditBook() {
                 }
 
                 setBook(currentBook)
-                await getUserBook(currentBook.id)
+                setSeries(currentBook.series)
 
-                const { data: allVolumes, error: volumesError } = await supabase
+                // Get all volumes in this series
+                const {
+                    data: allVolumes,
+                    error: volumesError
+                } = await supabase
                     .from('books')
                     .select('*')
-                    .eq('title', currentBook.title)
+                    .eq('series_id', currentBook.series_id)
 
                 if (volumesError) {
                     throw volumesError
                 }
 
                 const sortedVolumes = [...allVolumes].sort(
-                    (a, b) => Number(a.volume) - Number(b.volume)
+                    (a, b) => {
+                        const aNum = Number(a.volume)
+                        const bNum = Number(b.volume)
+
+                        if (!isNaN(aNum) && !isNaN(bNum)) {
+                            return aNum - bNum
+                        }
+
+                        if (!isNaN(aNum)) return -1
+                        if (!isNaN(bNum)) return 1
+
+                        return String(a.volume).localeCompare(
+                            String(b.volume)
+                        )
+                    }
                 )
 
                 setVolumes(sortedVolumes)
+
+                await getUserBook(currentBook.id)
 
             } catch (error) {
                 debugError('Error loading book:', error)
@@ -77,14 +105,16 @@ export default function EditBook() {
             }
 
             if (!user) {
-                setUserBook(null)
                 setOwnsBook(false)
                 setPurchasedDate('')
                 setPurchasedPrice('')
                 return
             }
 
-            const { data, error } = await supabase
+            const {
+                data,
+                error
+            } = await supabase
                 .from('user_books')
                 .select('*')
                 .eq('user_id', user.id)
@@ -95,7 +125,6 @@ export default function EditBook() {
                 throw error
             }
 
-            setUserBook(data)
             setOwnsBook(!!data)
             setPurchasedDate(data?.purchased_date || '')
             setPurchasedPrice(data?.purchased_price || '')
@@ -107,17 +136,29 @@ export default function EditBook() {
         }
     }
 
-    const handleChange = (e) => {
+    const handleSeriesChange = (e) => {
+        setSeries({
+            ...series,
+            [e.target.name]: e.target.value
+        })
+    }
+
+    const handleBookChange = (e) => {
         setBook({
             ...book,
             [e.target.name]: e.target.value
         })
     }
 
+    const handleVolumeChange = async (volume) => {
+        setBook(volume)
+        await getUserBook(volume.id)
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault()
 
-        if (!book.title.trim()) {
+        if (!series.title.trim()) {
             alert('请输入书名')
             return
         }
@@ -125,27 +166,88 @@ export default function EditBook() {
         setSaving(true)
 
         try {
-            const { error } = await supabase
+            // Update series information
+            const {
+                error: seriesError
+            } = await supabase
+                .from('book_series')
+                .update({
+                    title: series.title.trim(),
+                    author: series.author || null,
+                    subcategory: series.subcategory,
+                    cover_image: series.cover_image || null,
+                    cover_image_url: series.cover_image_url || null,
+                })
+                .eq('id', series.id)
+
+            if (seriesError) {
+                throw seriesError
+            }
+
+            // Update volume information
+            const {
+                error: bookError
+            } = await supabase
                 .from('books')
                 .update({
-                    subcategory: book.subcategory,
-                    title: book.title.trim(),
-                    author: book.author || null,
+                    volume: book.volume,
+                    edition: book.edition || '普通版',
                     publisher: book.publisher || null,
-                    volume: book.volume || null,
                     isbn: book.isbn || null,
                     release_date: book.release_date || null,
+                    cover_image: book.cover_image || null,
+                    cover_image_url: book.cover_image_url || null,
                 })
-                .eq('id', id)
+                .eq('id', book.id)
 
-            if (error) {
-                throw error
+            if (bookError) {
+                throw bookError
+            }
+
+            // Update ownership
+            const {
+                data: { user }
+            } = await supabase.auth.getUser()
+
+            if (!user) {
+                throw new Error('User is not logged in')
+            }
+
+            if (ownsBook) {
+                const { error: userBookError } = await supabase
+                    .from('user_books')
+                    .upsert(
+                        {
+                            user_id: user.id,
+                            book_id: book.id,
+                            purchased_date: purchasedDate || null,
+                            purchased_price: purchasedPrice || null,
+                        },
+                        {
+                            onConflict: 'user_id,book_id'
+                        }
+                    )
+
+                if (userBookError) {
+                    throw userBookError
+                }
+
+            } else {
+                const { error: deleteUserBookError } = await supabase
+                    .from('user_books')
+                    .delete()
+                    .eq('user_id', user.id)
+                    .eq('book_id', book.id)
+
+                if (deleteUserBookError) {
+                    throw deleteUserBookError
+                }
             }
 
             navigate('/books')
 
         } catch (error) {
-            debugError('Error updating book:', error)
+            debugError('Error saving book:', error)
             alert(error.message || '保存失败，请稍后再试')
         } finally {
             setSaving(false)
@@ -156,7 +258,7 @@ export default function EditBook() {
         return <Loading text="正在加载" />
     }
 
-    if (!book) {
+    if (!book || !series) {
         return <p>Book not found.</p>
     }
 
@@ -168,7 +270,9 @@ export default function EditBook() {
 
                 <div className="edit-book-header">
                     <div>
-                        <h1>{book.title} - 第{book.volume}集</h1>
+                        <h1>
+                            {series.title} - 第{book.volume}集
+                        </h1>
                     </div>
 
                     <button
@@ -181,8 +285,8 @@ export default function EditBook() {
                 </div>
 
                 <BookForm
+                    series={series}
                     book={book}
-                    userBookLoading={userBookLoading}
                     volumes={volumes}
                     ownsBook={ownsBook}
                     setOwnsBook={setOwnsBook}
@@ -190,11 +294,12 @@ export default function EditBook() {
                     setPurchasedDate={setPurchasedDate}
                     purchasedPrice={purchasedPrice}
                     setPurchasedPrice={setPurchasedPrice}
+                    userBookLoading={userBookLoading}
                     saving={saving}
-                    handleChange={handleChange}
+                    handleSeriesChange={handleSeriesChange}
+                    handleBookChange={handleBookChange}
+                    handleVolumeChange={handleVolumeChange}
                     handleSubmit={handleSubmit}
-                    setBook={setBook}
-                    getUserBook={getUserBook}
                     navigate={navigate}
                 />
 

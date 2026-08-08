@@ -6,13 +6,13 @@ export function useAuthListener() {
     const navigate = useNavigate()
 
     useEffect(() => {
-        const { data: { subscription } } =
-            supabase.auth.onAuthStateChange((event) => {
-
-                if (event === "PASSWORD_RECOVERY") {
-                    navigate("/ResetPassword")
-                }
-            })
+        const {
+            data: { subscription }
+        } = supabase.auth.onAuthStateChange((event) => {
+            if (event === 'PASSWORD_RECOVERY') {
+                navigate('/ResetPassword')
+            }
+        })
 
         return () => subscription.unsubscribe()
     }, [navigate])

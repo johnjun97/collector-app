@@ -71,10 +71,11 @@ export default function BookForm({ initialData, onSubmit, onCancel }) {
             <div className="form-field">
                 <label htmlFor="subcategory">类型</label>
                 <select
-                    id="subcategory"
-                    value={form.subcategory}
-                    onChange={handleChange}
-                >
+    id="subcategory"
+    name="subcategory"
+    value={form.subcategory}
+    onChange={handleChange}
+>
                     <option value="漫画">漫画</option>
                     <option value="小说">小说</option>
                     <option value="画集">画集</option>
