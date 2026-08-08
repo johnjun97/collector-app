@@ -43,3 +43,11 @@
     padding: 8px 12px;
     width: 220px;
 }
+
+.books-filter {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: white;
+    cursor: pointer;
+}

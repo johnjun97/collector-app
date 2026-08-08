@@ -13,6 +13,7 @@ export default function Books() {
     const [loading, setLoading] = useState(true)
     const navigate = useNavigate()
     const [search, setSearch] = useState('')
+    const [subcategoryFilter, setSubcategoryFilter] = useState('')
 
     useEffect(() => {
         const getBooks = async () => {
@@ -106,17 +107,23 @@ export default function Books() {
     const filteredBooks = books.filter((book) => {
         const keyword = search.trim().toLowerCase()
 
-        if (!keyword) return true
+        const matchesSearch =
+            !keyword ||
+            [
+                book.title,
+                book.author,
+                book.subcategory
+            ].some((value) =>
+                String(value || '')
+                    .toLowerCase()
+                    .includes(keyword)
+            )
 
-        return [
-            book.title,
-            book.author,
-            book.subcategory
-        ].some((value) =>
-            String(value || '')
-                .toLowerCase()
-                .includes(keyword)
-        )
+        const matchesSubcategory =
+            !subcategoryFilter ||
+            book.subcategory === subcategoryFilter
+
+        return matchesSearch && matchesSubcategory
     })
 
     const handleRemoveSeries = async (book) => {
@@ -173,6 +180,21 @@ export default function Books() {
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                         />
+
+                        <select
+                            className="books-filter"
+                            value={subcategoryFilter}
+                            onChange={(e) => setSubcategoryFilter(e.target.value)}
+                        >
+                            <option value="">全部类型</option>
+                            <option value="漫画">漫画</option>
+                            <option value="小说">小说</option>
+                            <option value="画集">画集</option>
+                            <option value="设定集">设定集</option>
+                            <option value="公式书">公式书</option>
+                            <option value="同人志">同人志</option>
+                            <option value="其他">其他</option>
+                        </select>
 
                         <button
                             className="add-book-button"
