@@ -123,3 +123,14 @@
     padding: 24px;
     text-align: center;
 }
+
+.books-header-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.books-search {
+    padding: 8px 12px;
+    width: 220px;
+}

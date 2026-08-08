@@ -12,7 +12,7 @@ export default function Books() {
     const [books, setBooks] = useState([])
     const [loading, setLoading] = useState(true)
     const navigate = useNavigate()
-
+    const [search, setSearch] = useState('')
 
     useEffect(() => {
         const getBooks = async () => {
@@ -101,6 +101,22 @@ export default function Books() {
         getBooks()
     }, [])
 
+    const filteredBooks = books.filter((book) => {
+        const keyword = search.trim().toLowerCase()
+
+        if (!keyword) return true
+
+        return [
+            book.title,
+            book.author,
+            book.subcategory
+        ].some((value) =>
+            String(value || '')
+                .toLowerCase()
+                .includes(keyword)
+        )
+    })
+
     const handleRemoveSeries = async (book) => {
         const confirmed = window.confirm(
             `确定要移除「${book.title}」吗？\n\n移除后，入手状态也会一并移除。`
@@ -149,24 +165,35 @@ export default function Books() {
 
                     <h1>My Books</h1>
 
-                    <button
-                        className="add-book-button"
-                        onClick={() => navigate('/books/new')}
-                    >
-                        + Add Book
-                    </button>
+                    <div className="books-header-actions">
+                        <input
+                            type="search"
+                            className="books-search"
+                            placeholder="搜索书名、作者..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                        />
+
+                        <button
+                            className="add-book-button"
+                            onClick={() => navigate('/books/new')}
+                        >
+                            + Add Book
+                        </button>
+                    </div>
 
                 </div>
+
                 {loading ? (
                     <div className="books-loading">
                         Loading books...
                     </div>
-                ) : books.length === 0 ? (
-                    <p>No books yet.</p>
+                ) : filteredBooks.length === 0 ? (
+                    <p>No matching books.</p>
                 ) : (
                     <div className="books-list">
 
-                        {books.map((book) => (
+                        {filteredBooks.map((book) => (
                             <BookCard
                                 key={book.id}
                                 book={book}
