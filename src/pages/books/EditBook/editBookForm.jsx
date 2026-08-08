@@ -331,7 +331,7 @@ export default function BookForm({
                             name="edition"
                             label="版本"
                             placeholder="例如：普通版、限定版、特装版"
-                            value={book.edition || '普通版'}
+                            value={book.edition ?? ''}
                             suggestions={suggestions.edition}
                             onChange={handleBookChange}
                         />
