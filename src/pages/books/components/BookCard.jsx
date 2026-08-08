@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import './bookCard.css'
+import './BookCard.css'
 
 export default function BookCard({
     book,
