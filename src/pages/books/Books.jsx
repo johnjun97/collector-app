@@ -135,23 +135,32 @@ export default function Books() {
                     const visibleVolumes = []
 
                     for (let i = 1; i <= latestVolume; i++) {
-                        const existingVolume = sortedVolumes.find(
+
+                        const existingVolumes = sortedVolumes.filter(
                             (book) => Number(book.volume) === i
                         )
 
-                        if (existingVolume) {
-                            const isSpecialEdition =
-                                existingVolume.edition &&
-                                existingVolume.edition !== '普通版'
+                        if (existingVolumes.length > 0) {
 
-                            // 普通版：一直显示
-                            if (!isSpecialEdition) {
-                                visibleVolumes.push(existingVolume)
-                            } else if (ownedBookIds.has(existingVolume.id)) {
+                            for (const volume of existingVolumes) {
+
+                                const isSpecialEdition =
+                                    volume.edition &&
+                                    volume.edition !== '普通版'
+
+                                // 普通版：一直显示
+                                if (!isSpecialEdition) {
+                                    visibleVolumes.push(volume)
+                                }
+
                                 // 特装版：只有用户入手才显示
-                                visibleVolumes.push(existingVolume)
+                                else if (ownedBookIds.has(volume.id)) {
+                                    visibleVolumes.push(volume)
+                                }
                             }
+
                         } else {
+
                             // Volume doesn't exist in Supabase yet
                             visibleVolumes.push({
                                 id: `placeholder-${seriesId}-${i}`,
