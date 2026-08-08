@@ -54,7 +54,10 @@ export default function BookForm({
     }, [initialData])
 
     const handleChange = (e) => {
-        const value = converter(e.target.value)
+        const value =
+            e.target.name === 'subcategory'
+                ? e.target.value
+                : converter(e.target.value)
 
         setForm({
             ...form,
@@ -65,16 +68,18 @@ export default function BookForm({
     const loadSuggestions = async () => {
         const { data, error } = await supabase
             .from('books')
-            .select(`             edition,
+            .select(`
+            edition,
             publisher,
             updated_at,
-            series:book_series (
+            series:book_series!inner (
                 title,
                 author,
+                subcategory,
                 updated_at
             )
         `)
-
+            .eq('series.subcategory', form.subcategory)
 
         if (error) {
             console.error('Error loading book suggestions:', error)
@@ -127,70 +132,66 @@ export default function BookForm({
                 (book) => book.publisher
             ),
         })
-
-
     }
-
-
 
     useEffect(() => {
         loadSuggestions()
-    }, [])
+    }, [form.subcategory])
 
-  const parseBatchVolumes = (input) => {
-    const volumes = []
+    const parseBatchVolumes = (input) => {
+        const volumes = []
 
-    const parts = input
-        .split(/[,，、]/)
-        .map(part => part.trim())
-        .filter(Boolean)
+        const parts = input
+            .split(/[,，、]/)
+            .map(part => part.trim())
+            .filter(Boolean)
 
-    for (const part of parts) {
+        for (const part of parts) {
 
-        // Numeric range: 1-5
-        if (part.includes('-')) {
-            const [startText, endText] = part
-                .split('-')
-                .map(v => v.trim())
+            // Numeric range: 1-5
+            if (part.includes('-')) {
+                const [startText, endText] = part
+                    .split('-')
+                    .map(v => v.trim())
 
-            const start = Number(startText)
-            const end = Number(endText)
+                const start = Number(startText)
+                const end = Number(endText)
 
-            if (
-                !Number.isInteger(start) ||
-                !Number.isInteger(end) ||
-                start <= 0 ||
-                end <= 0 ||
-                start > end
-            ) {
+                if (
+                    !Number.isInteger(start) ||
+                    !Number.isInteger(end) ||
+                    start <= 0 ||
+                    end <= 0 ||
+                    start > end
+                ) {
+                    return null
+                }
+
+                for (let i = start; i <= end; i++) {
+                    volumes.push(i)
+                }
+
+            } else {
+                // Numeric volume: 1, 2, 3
+                const volume = Number(part)
+
+                if (Number.isInteger(volume) && volume > 0) {
+                    volumes.push(volume)
+                    continue
+                }
+
+                // Text volumes: 全、上、下、其ノ伍、etc.
+                if (part.length > 0) {
+                    volumes.push(part)
+                    continue
+                }
+
                 return null
             }
-
-            for (let i = start; i <= end; i++) {
-                volumes.push(i)
-            }
-
-        } else {
-            // Numeric volume: 1, 2, 3
-            const volume = Number(part)
-
-            if (Number.isInteger(volume) && volume > 0) {
-                volumes.push(volume)
-                continue
-            }
-
-            // Text volumes: 全、上、下、其ノ伍、etc.
-            if (part.length > 0) {
-                volumes.push(part)
-                continue
-            }
-
-            return null
         }
-    }
 
-    return [...new Set(volumes)]
-}
+        return [...new Set(volumes)]
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault()

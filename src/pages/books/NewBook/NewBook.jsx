@@ -23,11 +23,14 @@ export default function NewBook() {
             }
 
             // 1. Find existing book series
+            const subcategory = form.subcategory || '漫画'
+
             const { data: existingSeries, error: seriesFindError } =
                 await supabase
                     .from('book_series')
                     .select('*')
                     .eq('title', title)
+                    .eq('subcategory', subcategory)
                     .maybeSingle()
 
             if (seriesFindError) {
