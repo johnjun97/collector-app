@@ -1,4 +1,5 @@
 import React from 'react'
+import './editBookForm.css'
 
 export default function BookForm({
     series,
@@ -72,11 +73,10 @@ export default function BookForm({
                         <button
                             key={volume.id}
                             type="button"
-                            className={
-                                book.id === volume.id
-                                    ? 'active'
-                                    : ''
-                            }
+   className={[
+    book.id === volume.id ? 'active' : '',
+    volume.isOwned ? 'owned' : ''
+].join(' ')}
                             onClick={() => handleVolumeChange(volume)}
                         >
                             {volume.volume}

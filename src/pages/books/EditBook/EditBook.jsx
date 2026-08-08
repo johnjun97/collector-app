@@ -5,7 +5,7 @@ import { debugError } from '../../../lib/debug'
 import Navbar from '../../../components/Navbar'
 import './EditBook.css'
 import Loading from '../../../components/Loading.jsx'
-import BookForm from './BookForm'
+import BookForm from './editBookForm'
 
 export default function EditBook() {
     const { id } = useParams()
@@ -77,9 +77,40 @@ export default function EditBook() {
                     }
                 )
 
-                setVolumes(sortedVolumes)
+                const {
+    data: { user }
+} = await supabase.auth.getUser()
 
-                await getUserBook(currentBook.id)
+let volumesWithOwnership = sortedVolumes
+
+if (user) {
+    const { data: userBooks, error: userBooksError } =
+        await supabase
+            .from('user_books')
+            .select('book_id')
+            .eq('user_id', user.id)
+            .in(
+                'book_id',
+                sortedVolumes.map((volume) => volume.id)
+            )
+
+    if (userBooksError) {
+        throw userBooksError
+    }
+
+    const ownedBookIds = new Set(
+        userBooks.map((userBook) => userBook.book_id)
+    )
+
+    volumesWithOwnership = sortedVolumes.map((volume) => ({
+        ...volume,
+        isOwned: ownedBookIds.has(volume.id)
+    }))
+}
+
+setVolumes(volumesWithOwnership)
+
+await getUserBook(currentBook.id)
 
             } catch (error) {
                 debugError('Error loading book:', error)

@@ -19,3 +19,13 @@
     width: auto;
     margin: 0;
 }
+
+.volume-buttons button.owned {
+    background: #dff5e3;
+    border-color: #4caf50;
+    color: #247a35;
+}
+
+.volume-buttons button.owned:hover {
+    background: #ccefd2;
+}

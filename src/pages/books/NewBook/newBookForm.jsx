@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import OpenCC from 'opencc-js'
 import BatchAddVolumes from '../components/BatchAddVolumes'
-import './BookForm.css'
+import './newBookForm.css'
 
 
 const converter = OpenCC.Converter({ from: 'tw', to: 'cn' })
