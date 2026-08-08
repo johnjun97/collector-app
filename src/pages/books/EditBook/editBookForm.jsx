@@ -93,9 +93,13 @@ export default function BookForm({
                             type="button"
                             className="batch-add-button"
                             onClick={() => {
-                                setShowBatchAdd(!showBatchAdd)
+                                const nextState = !showBatchAdd
 
-                                if (showBatchAdd) {
+                                setShowBatchAdd(nextState)
+
+                                if (nextState) {
+                                    setShowOwnershipBatchEdit(false)
+                                } else {
                                     setBatchVolumes('')
                                 }
                             }}
@@ -114,7 +118,12 @@ export default function BookForm({
                     </div>
                 </div>
 
-                <div className={`volume-buttons ${showBatchAdd ? 'batch-edit-active' : ''}`}>
+                <div
+                    className={`volume-buttons ${showBatchAdd || showOwnershipBatchEdit
+                            ? 'batch-edit-active'
+                            : ''
+                        }`}
+                >
                     {volumes.map((volume) => (
                         <button
                             key={volume.id}
@@ -124,7 +133,7 @@ export default function BookForm({
                                 volume.isOwned ? 'owned' : ''
                             ].join(' ')}
                             onClick={() => {
-                                if (!showBatchAdd) {
+                                if (!showBatchAdd && !showOwnershipBatchEdit) {
                                     handleVolumeChange(volume)
                                 }
                             }}
@@ -181,6 +190,8 @@ export default function BookForm({
                                     setShowOwnershipBatchEdit(nextState)
 
                                     if (nextState) {
+                                        setShowBatchAdd(false)
+
                                         const initialOwnership = {}
 
                                         volumes.forEach((volume) => {
