@@ -118,9 +118,24 @@ export default function Books() {
                         (book) => String(book.volume)
                     )
 
-                    const ownedVolumes = addedSeriesBooks
-                        .filter((book) => book.isOwned)
-                        .map((book) => String(book.volume))
+                    const ownedBookIds = new Set(
+                        addedSeriesBooks
+                            .filter((book) => book.isOwned)
+                            .map((book) => book.id)
+                    )
+
+                    const visibleVolumes = sortedVolumes.filter((volume) => {
+                        const isSpecialEdition =
+                            volume.edition && volume.edition !== '普通版'
+
+                        // 普通版：一直显示
+                        if (!isSpecialEdition) {
+                            return true
+                        }
+
+                        // 特装版：只有用户入手才显示
+                        return ownedBookIds.has(volume.id)
+                    })
 
 
                     const latestBook = sortedVolumes[sortedVolumes.length - 1]
@@ -131,9 +146,9 @@ export default function Books() {
                         subcategory: series.subcategory,
                         cover_image: series.cover_image,
                         cover_image_url: series.cover_image_url,
-                        allVolumes: sortedVolumes,
+                        allVolumes: visibleVolumes,
+                        ownedBookIds,
                         addedVolumes,
-                        ownedVolumes,
                         latestBook
                     }
                 }).filter(Boolean)
@@ -240,36 +255,44 @@ export default function Books() {
                                         移除
                                     </button>
                                 </div>
-                                
+
                                 <div className="volume-indicators">
 
                                     {book.allVolumes
                                         .sort((a, b) => {
-
                                             const aNum = Number(a.volume)
                                             const bNum = Number(b.volume)
 
                                             if (!isNaN(aNum) && !isNaN(bNum)) {
-                                                return aNum - bNum
+                                                if (aNum !== bNum) {
+                                                    return aNum - bNum
+                                                }
+
+                                                // Same volume number:
+                                                // 普通版 first, special editions after
+                                                const aIsNormal = !a.edition || a.edition === '普通版'
+                                                const bIsNormal = !b.edition || b.edition === '普通版'
+
+                                                if (aIsNormal && !bIsNormal) return -1
+                                                if (!aIsNormal && bIsNormal) return 1
+
+                                                return String(a.edition || '')
+                                                    .localeCompare(String(b.edition || ''))
                                             }
 
                                             if (!isNaN(aNum)) return -1
                                             if (!isNaN(bNum)) return 1
 
-                                            return String(a.volume)
-                                                .localeCompare(
-                                                    String(b.volume)
-                                                )
+                                            return String(a.volume).localeCompare(
+                                                String(b.volume)
+                                            )
                                         })
                                         .map((volume) => {
 
                                             const volumeValue =
                                                 String(volume.volume)
 
-                                            const owned =
-                                                book.ownedVolumes.includes(
-                                                    volumeValue
-                                                )
+                                            const owned = book.ownedBookIds.has(volume.id)
 
                                             return (
                                                 <span
@@ -281,6 +304,11 @@ export default function Books() {
                                                     }}
                                                 >
                                                     {volumeValue}
+                                                    {volume.edition && volume.edition !== '普通版' && (
+                                                        <span className="volume-edition">
+                                                            {' '}({volume.edition})
+                                                        </span>
+                                                    )}
                                                 </span>
                                             )
                                         })}

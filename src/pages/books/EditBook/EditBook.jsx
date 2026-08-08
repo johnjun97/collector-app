@@ -88,7 +88,7 @@ export default function EditBook() {
                     const { data: userBooks, error: userBooksError } =
                         await supabase
                             .from('user_books')
-                            .select('book_id')
+                            .select('book_id, is_owned')
                             .eq('user_id', user.id)
                             .in(
                                 'book_id',
@@ -100,7 +100,9 @@ export default function EditBook() {
                     }
 
                     const ownedBookIds = new Set(
-                        userBooks.map((userBook) => userBook.book_id)
+                        userBooks
+                            .filter((userBook) => userBook.is_owned === true)
+                            .map((userBook) => userBook.book_id)
                     )
 
                     volumesWithOwnership = sortedVolumes.map((volume) => ({
@@ -157,7 +159,7 @@ export default function EditBook() {
                 throw error
             }
 
-            setOwnsBook(!!data)
+            setOwnsBook(data?.is_owned === true)
             setPurchasedDate(data?.purchased_date || '')
             setPurchasedPrice(data?.purchased_price || '')
 
@@ -270,7 +272,9 @@ export default function EditBook() {
                         }
 
                         if (existingUserBook) {
-                            const updates = {}
+                            const updates = {
+                                is_owned: true
+                            }
 
                             if (purchasedDate) {
                                 updates.purchased_date = purchasedDate
@@ -300,10 +304,10 @@ export default function EditBook() {
                                     .insert({
                                         user_id: user.id,
                                         book_id: targetBook.id,
+                                        is_owned: true,
                                         purchased_date: purchasedDate || null,
                                         purchased_price: purchasedPrice || null,
                                     })
-
                             if (insertUserBookError) {
                                 throw insertUserBookError
                             }
@@ -311,15 +315,19 @@ export default function EditBook() {
 
                     } else {
                         // Remove ownership for this volume
-                        const { error: deleteUserBookError } =
+                        const { error: updateUserBookError } =
                             await supabase
                                 .from('user_books')
-                                .delete()
+                                .update({
+                                    is_owned: false,
+                                    purchased_date: null,
+                                    purchased_price: null,
+                                })
                                 .eq('user_id', user.id)
                                 .eq('book_id', targetBook.id)
 
-                        if (deleteUserBookError) {
-                            throw deleteUserBookError
+                        if (updateUserBookError) {
+                            throw updateUserBookError
                         }
                     }
                 }
@@ -384,6 +392,7 @@ export default function EditBook() {
                                 book_id: book.id,
                                 purchased_date: purchasedDate || null,
                                 purchased_price: purchasedPrice || null,
+                                is_owned: true,
                             },
                             {
                                 onConflict: 'user_id,book_id'
@@ -394,18 +403,23 @@ export default function EditBook() {
                         throw userBookError
                     }
 
-                } else {
+         } else {
 
-                    const { error: deleteUserBookError } = await supabase
-                        .from('user_books')
-                        .delete()
-                        .eq('user_id', user.id)
-                        .eq('book_id', book.id)
+    const { error: updateUserBookError } =
+        await supabase
+            .from('user_books')
+            .update({
+                is_owned: false,
+                purchased_date: null,
+                purchased_price: null,
+            })
+            .eq('user_id', user.id)
+            .eq('book_id', book.id)
 
-                    if (deleteUserBookError) {
-                        throw deleteUserBookError
-                    }
-                }
+    if (updateUserBookError) {
+        throw updateUserBookError
+    }
+}
             }
 
             navigate('/books')
