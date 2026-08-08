@@ -1,0 +1,221 @@
+.home-page {
+    padding: 32px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.home-header {
+    margin-bottom: 28px;
+}
+
+.home-header h1 {
+    margin: 0 0 8px;
+    font-size: 28px;
+}
+
+.home-header p {
+    margin: 0;
+    color: #666;
+}
+
+
+/* Main dashboard card */
+
+.dashboard-card {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+
+/* Remove default details marker */
+
+.dashboard-card>summary,
+.collection-section>summary {
+    list-style: none;
+}
+
+.dashboard-card>summary::-webkit-details-marker,
+.collection-section>summary::-webkit-details-marker {
+    display: none;
+}
+
+
+/* Card header */
+
+.dashboard-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 28px;
+    cursor: pointer;
+}
+
+.dashboard-card-header h2 {
+    margin: 0 0 6px;
+    font-size: 18px;
+}
+
+.dashboard-card-header span {
+    color: #666;
+    font-size: 14px;
+}
+
+
+/* Expand icon */
+
+.expand-icon {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #f3f3f3;
+    color: #555;
+    font-size: 20px;
+    transition: transform 0.2s ease;
+}
+
+.dashboard-card[open]>.dashboard-card-header .expand-icon,
+.collection-section[open]>.collection-header .expand-icon {
+    transform: rotate(45deg);
+}
+
+
+/* Progress */
+
+.progress-container {
+    height: 8px;
+    margin: 0 28px 24px;
+    background: #eeeeee;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: #22c55e;
+    border-radius: inherit;
+    transition: width 0.3s ease;
+}
+
+
+/* Collection section */
+
+.collection-section {
+    margin: 0 20px 20px;
+    border: 1px solid #eeeeee;
+    border-radius: 12px;
+    background: #fafafa;
+}
+
+.collection-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px;
+    cursor: pointer;
+}
+
+.collection-header h3 {
+    margin: 0 0 4px;
+    font-size: 16px;
+}
+
+.collection-header span {
+    color: #666;
+    font-size: 14px;
+}
+
+
+/* Series list */
+
+.series-list {
+    padding: 0 20px 12px;
+}
+
+.series-stat {
+    padding: 16px 0;
+    border-top: 1px solid #e8e8e8;
+}
+
+.series-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.series-info>div {
+    min-width: 0;
+}
+
+.series-info strong {
+    display: block;
+    font-size: 15px;
+}
+
+.series-info span {
+    display: block;
+    margin-top: 4px;
+    color: #888;
+    font-size: 13px;
+}
+
+.series-progress {
+    margin: 10px 0 0;
+    height: 6px;
+}
+
+.empty-message {
+    padding: 16px 0;
+    margin: 0;
+    color: #888;
+}
+
+
+/* Mobile */
+
+@media (max-width: 600px) {
+
+    .home-page {
+        padding: 20px 14px;
+    }
+
+    .home-header h1 {
+        font-size: 24px;
+    }
+
+    .dashboard-card-header {
+        padding: 20px;
+    }
+
+    .progress-container {
+        width: 100%;
+        height: 8px;
+        background: #e5e7eb;
+        border-radius: 999px;
+        overflow: hidden;
+    }
+
+    .collection-section {
+        margin-left: 12px;
+        margin-right: 12px;
+    }
+
+    .series-list {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .series-info {
+        gap: 10px;
+    }
+
+    .series-info strong {
+        font-size: 14px;
+    }
+}
