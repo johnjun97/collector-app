@@ -68,16 +68,10 @@ export default function Books() {
 
                     const ownedVolumes = ownedBooks
                         .filter((book) => book.title === title)
-                        .map((book) => Number(book.volume))
-
-                    const latestBook = [...titleBooks].sort(
-                        (a, b) => Number(b.volume) - Number(a.volume)
-                    )[0]
-
-                    const latestVolume = Number(latestBook.volume)
+                        .map((book) => String(book.volume))
 
                     return {
-                        ...latestBook,
+                        ...titleBooks[0],
                         allVolumes: titleBooks,
                         ownedVolumes
                     }
@@ -125,24 +119,37 @@ export default function Books() {
                             >
                                 <h2>{book.title}</h2>
 
+
                                 <div className="volume-indicators">
-                                    {Array.from(
-                                        { length: Number(book.volume) },
-                                        (_, index) => {
-                                            const volumeNumber = index + 1
-                                            const owned = book.ownedVolumes.includes(volumeNumber)
+                                    {book.allVolumes
+                                        .sort((a, b) => {
+                                            const aNum = Number(a.volume)
+                                            const bNum = Number(b.volume)
+
+                                            if (!isNaN(aNum) && !isNaN(bNum)) {
+                                                return aNum - bNum
+                                            }
+
+                                            if (!isNaN(aNum)) return -1
+                                            if (!isNaN(bNum)) return 1
+
+                                            return String(a.volume).localeCompare(String(b.volume))
+                                        })
+                                        .map((volume) => {
+                                            const volumeValue = String(volume.volume)
+                                            const owned = book.ownedVolumes.includes(volumeValue)
 
                                             return (
                                                 <span
-                                                    key={volumeNumber}
+                                                    key={volume.id}
                                                     className={`volume-indicator ${owned ? 'owned' : ''}`}
                                                 >
-                                                    {volumeNumber}
+                                                    {volumeValue}
                                                 </span>
                                             )
-                                        }
-                                    )}
+                                        })}
                                 </div>
+
 
                                 <p>Author: {book.author || 'Unknown'}</p>
                             </div>
