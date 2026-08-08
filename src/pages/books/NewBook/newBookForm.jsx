@@ -194,6 +194,14 @@ export default function BookForm({
     return (
         <form className="new-book-form" onSubmit={handleSubmit}>
 
+            {saving && (
+                <div className="saving-overlay">
+                    <div className="saving-message">
+                        保存中...
+                    </div>
+                </div>
+            )}
+
             <div className="form-field">
                 <label htmlFor="subcategory">类型</label>
                 <select
