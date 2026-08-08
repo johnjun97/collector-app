@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../../../lib/supabaseClient'
 import OpenCC from 'opencc-js'
-import BatchAddVolumes from '../components/BatchAddVolumes'
 import './newBookForm.css'
 
 
@@ -30,7 +29,7 @@ export default function BookForm({
     const [ownsBook, setOwnsBook] = useState(false)
     const [saving, setSaving] = useState(false)
     const [showBatchAdd, setShowBatchAdd] = useState(false)
-    const [batchVolumes, setBatchVolumes] = useState([])
+    const [batchVolumes, setBatchVolumes] = useState('')
     const [seriesSuggestions, setSeriesSuggestions] = useState([])
     const [showSeriesSuggestions, setShowSeriesSuggestions] = useState(false)
     const seriesInputRef = useRef(null)
@@ -106,6 +105,48 @@ export default function BookForm({
         await loadSeriesSuggestions(value)
     }
 
+    const parseBatchVolumes = (input) => {
+        const volumes = []
+
+        const parts = input
+            .split(',')
+            .map(part => part.trim())
+            .filter(Boolean)
+
+        for (const part of parts) {
+            if (part.includes('-')) {
+                const [startText, endText] = part.split('-').map(v => v.trim())
+
+                const start = Number(startText)
+                const end = Number(endText)
+
+                if (
+                    !Number.isInteger(start) ||
+                    !Number.isInteger(end) ||
+                    start <= 0 ||
+                    end <= 0 ||
+                    start > end
+                ) {
+                    return null
+                }
+
+                for (let i = start; i <= end; i++) {
+                    volumes.push(i)
+                }
+            } else {
+                const volume = Number(part)
+
+                if (!Number.isInteger(volume) || volume <= 0) {
+                    return null
+                }
+
+                volumes.push(volume)
+            }
+        }
+
+        return [...new Set(volumes)].sort((a, b) => a - b)
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault()
 
@@ -114,9 +155,13 @@ export default function BookForm({
             return
         }
 
+        let parsedVolumes = []
+
         if (showBatchAdd) {
-            if (batchVolumes.length === 0) {
-                alert('请输入有效的集数范围')
+            parsedVolumes = parseBatchVolumes(batchVolumes)
+
+            if (!parsedVolumes || parsedVolumes.length === 0) {
+                alert('请输入有效的集数，例如：1-5、8、11-13')
                 return
             }
         } else {
@@ -131,7 +176,7 @@ export default function BookForm({
         try {
             if (showBatchAdd) {
                 await onBatchAdd(
-                    batchVolumes,
+                    parsedVolumes,
                     form,
                     ownsBook
                 )
@@ -237,9 +282,11 @@ export default function BookForm({
                 )}
 
                 {showBatchAdd && (
-                    <BatchAddVolumes
-                        existingVolumes={[]}
-                        onChange={setBatchVolumes}
+                    <input
+                        type="text"
+                        placeholder="例如：1-5、8、11-13"
+                        value={batchVolumes}
+                        onChange={(e) => setBatchVolumes(e.target.value)}
                     />
                 )}
             </div>
