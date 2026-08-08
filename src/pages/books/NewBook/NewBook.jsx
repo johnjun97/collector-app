@@ -56,24 +56,18 @@ export default function NewBook() {
                 series = newSeries
             }
 
-            // 2. Get current user if these books should be owned
-            let user = null
+            // 2. Get current user
+            const {
+                data: { user },
+                error: userError
+            } = await supabase.auth.getUser()
 
-            if (ownsBook) {
-                const {
-                    data: { user: currentUser },
-                    error: userError
-                } = await supabase.auth.getUser()
+            if (userError) {
+                throw userError
+            }
 
-                if (userError) {
-                    throw userError
-                }
-
-                if (!currentUser) {
-                    throw new Error('User is not logged in')
-                }
-
-                user = currentUser
+            if (!user) {
+                throw new Error('User is not logged in')
             }
 
             // 3. Process each volume
@@ -124,26 +118,29 @@ export default function NewBook() {
                     book = newBook
                 }
 
-                // 4. Add ownership if required
-                if (user) {
-                    const { error: userBookError } =
-                        await supabase
-                            .from('user_books')
-                            .upsert(
-                                {
-                                    user_id: user.id,
-                                    book_id: book.id,
-                                    purchased_date: form.purchasedDate || null,
-                                    purchased_price: form.purchasedPrice || null,
-                                },
-                                {
-                                    onConflict: 'user_id,book_id'
-                                }
-                            )
+                // 4. Add book to user's collection
+                const { error: userBookError } =
+                    await supabase
+                        .from('user_books')
+                        .upsert(
+                            {
+                                user_id: user.id,
+                                book_id: book.id,
+                                is_owned: ownsBook,
+                                purchased_date: ownsBook
+                                    ? form.purchasedDate || null
+                                    : null,
+                                purchased_price: ownsBook
+                                    ? form.purchasedPrice || null
+                                    : null,
+                            },
+                            {
+                                onConflict: 'user_id,book_id'
+                            }
+                        )
 
-                    if (userBookError) {
-                        throw userBookError
-                    }
+                if (userBookError) {
+                    throw userBookError
                 }
             }
 
@@ -250,34 +247,41 @@ export default function NewBook() {
                 book = newBook
             }
 
-            // 5. If the user owns the book, create user_books
-            if (ownsBook) {
+            // 5. Add book to user's collection
+            const {
+                data: { user },
+                error: userError
+            } = await supabase.auth.getUser()
 
-                const {
-                    data: { user },
-                    error: userError
-                } = await supabase.auth.getUser()
+            if (userError) {
+                throw userError
+            }
 
-                if (userError) {
-                    throw userError
-                }
+            if (!user) {
+                throw new Error('User is not logged in')
+            }
 
-                if (!user) {
-                    throw new Error('User is not logged in')
-                }
-
-                const { error: userBookError } = await supabase
-                    .from('user_books')
-                    .insert({
+            const { error: userBookError } = await supabase
+                .from('user_books')
+                .upsert(
+                    {
                         user_id: user.id,
                         book_id: book.id,
-                        purchased_date: form.purchasedDate || null,
-                        purchased_price: form.purchasedPrice || null,
-                    })
+                        is_owned: ownsBook,
+                        purchased_date: ownsBook
+                            ? form.purchasedDate || null
+                            : null,
+                        purchased_price: ownsBook
+                            ? form.purchasedPrice || null
+                            : null,
+                    },
+                    {
+                        onConflict: 'user_id,book_id'
+                    }
+                )
 
-                if (userBookError) {
-                    throw userBookError
-                }
+            if (userBookError) {
+                throw userBookError
             }
 
             navigate('/books')

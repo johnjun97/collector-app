@@ -34,22 +34,27 @@ export default function Books() {
                 const { data: userBooks, error: userBooksError } = await supabase
                     .from('user_books')
                     .select(`
-                    book:books (
-                        *,
-                        series:book_series (*)
-                    )
-                `)
+    is_owned,
+    book:books (
+        *,
+        series:book_series (*)
+    )
+`)
+
                     .eq('user_id', user.id)
 
                 if (userBooksError) {
                     throw userBooksError
                 }
 
-                const ownedBooks = userBooks
-                    .map((item) => item.book)
+                const addedBooks = userBooks
+                    .map((item) => ({
+                        ...item.book,
+                        isOwned: item.is_owned
+                    }))
                     .filter(Boolean)
 
-                if (ownedBooks.length === 0) {
+                if (addedBooks.length === 0) {
                     setBooks([])
                     return
                 }
@@ -57,7 +62,7 @@ export default function Books() {
                 // Get unique series IDs
                 const seriesIds = [
                     ...new Set(
-                        ownedBooks
+                        addedBooks
                             .map((book) => book.series_id)
                             .filter(Boolean)
                     )
@@ -82,7 +87,7 @@ export default function Books() {
                         (book) => book.series_id === seriesId
                     )
 
-                    const ownedSeriesBooks = ownedBooks.filter(
+                    const addedSeriesBooks = addedBooks.filter(
                         (book) => book.series_id === seriesId
                     )
 
@@ -109,28 +114,16 @@ export default function Books() {
                         )
                     })
 
-                    const ownedVolumes = ownedSeriesBooks.map(
+                    const addedVolumes = addedSeriesBooks.map(
                         (book) => String(book.volume)
                     )
 
-                    // Latest volume actually owned
-                    const latestOwnedBook =
-                        [...ownedSeriesBooks].sort((a, b) => {
-                            const aNum = Number(a.volume)
-                            const bNum = Number(b.volume)
+                    const ownedVolumes = addedSeriesBooks
+                        .filter((book) => book.isOwned)
+                        .map((book) => String(book.volume))
 
-                            if (!isNaN(aNum) && !isNaN(bNum)) {
-                                return bNum - aNum
-                            }
 
-                            if (!isNaN(aNum)) return -1
-                            if (!isNaN(bNum)) return 1
-
-                            return String(b.volume).localeCompare(
-                                String(a.volume)
-                            )
-                        })[0]
-
+                    const latestBook = sortedVolumes[sortedVolumes.length - 1]
                     return {
                         id: series.id,
                         title: series.title,
@@ -139,8 +132,9 @@ export default function Books() {
                         cover_image: series.cover_image,
                         cover_image_url: series.cover_image_url,
                         allVolumes: sortedVolumes,
+                        addedVolumes,
                         ownedVolumes,
-                        latestOwnedBook
+                        latestBook
                     }
                 }).filter(Boolean)
 
@@ -155,6 +149,43 @@ export default function Books() {
 
         getBooks()
     }, [])
+
+    const handleRemoveSeries = async (book) => {
+        const confirmed = window.confirm(
+            `确定要移除「${book.title}」吗？\n\n移除后，入手状态也会一并移除。`
+        )
+
+        if (!confirmed) return
+
+        try {
+            const {
+                data: { user },
+                error: userError
+            } = await supabase.auth.getUser()
+
+            if (userError) throw userError
+            if (!user) throw new Error('User is not logged in')
+
+            const bookIds = book.allVolumes.map((volume) => volume.id)
+
+            const { error } = await supabase
+                .from('user_books')
+                .delete()
+                .eq('user_id', user.id)
+                .in('book_id', bookIds)
+
+            if (error) throw error
+
+            // Remove the card immediately from the page
+            setBooks((currentBooks) =>
+                currentBooks.filter((item) => item.id !== book.id)
+            )
+
+        } catch (error) {
+            debugError('Error removing series:', error)
+            alert('移除失败，请稍后再试')
+        }
+    }
 
 
     return (
@@ -189,14 +220,27 @@ export default function Books() {
                                 key={book.id}
                                 className="book-card"
                                 onClick={() => {
-                                    if (book.latestOwnedBook) {
-                                        navigate(`/books/${book.latestOwnedBook.id}/edit`)
+                                    if (book.latestBook) {
+                                        navigate(`/books/${book.latestBook.id}/edit`)
                                     }
                                 }}
                             >
 
-                                <h2>{book.title}</h2>
+                                <div className="book-title-row">
+                                    <h2>{book.title}</h2>
 
+                                    <button
+                                        type="button"
+                                        className="remove-series-button"
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            handleRemoveSeries(book)
+                                        }}
+                                    >
+                                        移除
+                                    </button>
+                                </div>
+                                
                                 <div className="volume-indicators">
 
                                     {book.allVolumes
