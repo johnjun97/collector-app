@@ -106,14 +106,18 @@ export default function BookForm({
     const parseBatchVolumes = (input) => {
         const volumes = []
 
-   const parts = input
-    .split(/[,，、]/)
-    .map(part => part.trim())
-    .filter(Boolean)
+        const parts = input
+            .split(/[,，、]/)
+            .map(part => part.trim())
+            .filter(Boolean)
 
         for (const part of parts) {
+
+            // Numeric range: 1-5
             if (part.includes('-')) {
-                const [startText, endText] = part.split('-').map(v => v.trim())
+                const [startText, endText] = part
+                    .split('-')
+                    .map(v => v.trim())
 
                 const start = Number(startText)
                 const end = Number(endText)
@@ -131,52 +135,61 @@ export default function BookForm({
                 for (let i = start; i <= end; i++) {
                     volumes.push(i)
                 }
+
             } else {
+                // Numeric volume: 1, 2, 3
                 const volume = Number(part)
 
-                if (!Number.isInteger(volume) || volume <= 0) {
-                    return null
+                if (Number.isInteger(volume) && volume > 0) {
+                    volumes.push(volume)
+                    continue
                 }
 
-                volumes.push(volume)
+                // Text volumes: 全、上、下
+                if (['全', '上', '下'].includes(part)) {
+                    volumes.push(part)
+                    continue
+                }
+
+                return null
             }
         }
 
-        return [...new Set(volumes)].sort((a, b) => a - b)
+        return [...new Set(volumes)]
     }
 
     const handleSubmit = async (e) => {
-    e.preventDefault()
+        e.preventDefault()
 
-    if (!form.title.trim()) {
-        alert('请输入书名')
-        return
+        if (!form.title.trim()) {
+            alert('请输入书名')
+            return
+        }
+
+        if (!form.volume.trim()) {
+            alert('请输入集数')
+            return
+        }
+
+        const parsedVolumes = parseBatchVolumes(form.volume)
+
+        if (!parsedVolumes || parsedVolumes.length === 0) {
+            alert('请输入有效的集数，例如：1、2、3、全 或 1-5、8、11-13')
+            return
+        }
+
+        setSaving(true)
+
+        try {
+            await onSubmit(
+                form,
+                ownsBook,
+                parsedVolumes
+            )
+        } finally {
+            setSaving(false)
+        }
     }
-
-    if (!form.volume.trim()) {
-        alert('请输入集数')
-        return
-    }
-
-    const parsedVolumes = parseBatchVolumes(form.volume)
-
-    if (!parsedVolumes || parsedVolumes.length === 0) {
-        alert('请输入有效的集数，例如：1、2、3、全 或 1-5、8、11-13')
-        return
-    }
-
-    setSaving(true)
-
-    try {
-        await onSubmit(
-            form,
-            ownsBook,
-            parsedVolumes
-        )
-    } finally {
-        setSaving(false)
-    }
-}
 
     return (
         <form className="new-book-form" onSubmit={handleSubmit}>
@@ -239,17 +252,17 @@ export default function BookForm({
             </div>
 
             <div className="form-field">
-    <label htmlFor="volume">集数</label>
+                <label htmlFor="volume">集数</label>
 
-    <input
-        id="volume"
-        name="volume"
-        type="text"
-        placeholder="例如：1、2、3、全 或 1-5、8、11-13"
-        value={form.volume}
-        onChange={handleChange}
-    />
-</div>
+                <input
+                    id="volume"
+                    name="volume"
+                    type="text"
+                    placeholder="例如：1、2、3、全 或 1-5、8、11-13"
+                    value={form.volume}
+                    onChange={handleChange}
+                />
+            </div>
 
             <div className="ownership-field">
                 <label>
