@@ -14,7 +14,7 @@ export default function EditBook() {
     const [book, setBook] = useState(null)
     const [series, setSeries] = useState(null)
     const [volumes, setVolumes] = useState([])
-    const [batchVolumes, setBatchVolumes] = useState([])
+    const [batchVolumes, setBatchVolumes] = useState('')
 
     const [ownsBook, setOwnsBook] = useState(false)
     const [purchasedDate, setPurchasedDate] = useState('')
@@ -189,6 +189,50 @@ export default function EditBook() {
         await getUserBook(volume.id)
     }
 
+    const parseBatchVolumes = (input) => {
+        const volumes = []
+
+        const parts = input
+            .split(/[,，]/)
+            .map(part => part.trim())
+            .filter(Boolean)
+
+        for (const part of parts) {
+            if (part.includes('-')) {
+                const [startText, endText] = part
+                    .split('-')
+                    .map(value => value.trim())
+
+                const start = Number(startText)
+                const end = Number(endText)
+
+                if (
+                    !Number.isInteger(start) ||
+                    !Number.isInteger(end) ||
+                    start <= 0 ||
+                    end <= 0 ||
+                    start > end
+                ) {
+                    return null
+                }
+
+                for (let i = start; i <= end; i++) {
+                    volumes.push(i)
+                }
+            } else {
+                const volume = Number(part)
+
+                if (!Number.isInteger(volume) || volume <= 0) {
+                    return null
+                }
+
+                volumes.push(volume)
+            }
+        }
+
+        return [...new Set(volumes)].sort((a, b) => a - b)
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault()
 
@@ -197,12 +241,19 @@ export default function EditBook() {
             return
         }
 
+        const parsedBatchVolumes = parseBatchVolumes(batchVolumes)
+
+        if (batchVolumes.trim() && !parsedBatchVolumes) {
+            alert('请输入有效的集数，例如：1-5、8、11-13')
+            return
+        }
+
         setSaving(true)
 
         try {
             // Add batch volumes
             // Handle batch edit
-            if (batchVolumes.length > 0) {
+            if (parsedBatchVolumes.length > 0) {
                 // Get all books in this series
                 const { data: existingBooks, error: existingBooksError } =
                     await supabase
@@ -229,7 +280,7 @@ export default function EditBook() {
                 }
 
                 // Process each selected volume
-                for (const volume of batchVolumes) {
+                for (const volume of parsedBatchVolumes) {
                     const volumeValue = String(volume)
 
                     let targetBook = existingBooks.find(
@@ -372,7 +423,7 @@ export default function EditBook() {
             }
 
             // Update ownership for single-book edit only
-            if (batchVolumes.length === 0) {
+            if (parsedBatchVolumes.length === 0) {
 
                 const {
                     data: { user }
@@ -403,23 +454,23 @@ export default function EditBook() {
                         throw userBookError
                     }
 
-         } else {
+                } else {
 
-    const { error: updateUserBookError } =
-        await supabase
-            .from('user_books')
-            .update({
-                is_owned: false,
-                purchased_date: null,
-                purchased_price: null,
-            })
-            .eq('user_id', user.id)
-            .eq('book_id', book.id)
+                    const { error: updateUserBookError } =
+                        await supabase
+                            .from('user_books')
+                            .update({
+                                is_owned: false,
+                                purchased_date: null,
+                                purchased_price: null,
+                            })
+                            .eq('user_id', user.id)
+                            .eq('book_id', book.id)
 
-    if (updateUserBookError) {
-        throw updateUserBookError
-    }
-}
+                    if (updateUserBookError) {
+                        throw updateUserBookError
+                    }
+                }
             }
 
             navigate('/books')

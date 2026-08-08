@@ -1,7 +1,5 @@
 import React from 'react'
 import './editBookForm.css'
-import BatchAddVolumes from '../components/BatchAddVolumes'
-
 
 export default function BookForm({
     batchVolumes,
@@ -81,9 +79,9 @@ export default function BookForm({
                             onClick={() => {
                                 setShowBatchAdd(!showBatchAdd)
 
-                                if (showBatchAdd) {
-                                    setBatchVolumes([])
-                                }
+                         if (showBatchAdd) {
+    setBatchVolumes('')
+}
                             }}
                         >
                             {showBatchAdd ? '关闭批量编辑' : '批量编辑'}
@@ -126,13 +124,16 @@ export default function BookForm({
                 </div>
             </div>
 
-            {showBatchAdd && (
-                <BatchAddVolumes
-                    existingVolumes={volumes}
-                    excludeExisting={false}
-                    onChange={setBatchVolumes}
-                />
-            )}
+           {showBatchAdd && (
+    <div className="form-field">
+        <input
+            type="text"
+            placeholder="例如：1-5、8、11-13"
+            value={batchVolumes}
+            onChange={(e) => setBatchVolumes(e.target.value)}
+        />
+    </div>
+)}
 
             {userBookLoading ? (
                 <div className="form-field" >
@@ -247,7 +248,7 @@ export default function BookForm({
                             />
                         </div>
                     </details>
-                    
+
 
                     <div className="form-actions">
 
