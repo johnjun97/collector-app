@@ -3,14 +3,14 @@ import Navbar from '../../components/Navbar'
 import './ComingSoon.css'
 
 
-export default function ComingSoon() {
+export default function ComingSoon({ section }) {
 
     const navigate = useNavigate()
 
 
     return (
         <>
-            <Navbar section="音乐" />
+            <Navbar section={section} />
 
             <main className="coming-soon-page">
                 <div className="coming-soon-content">
