@@ -137,60 +137,60 @@ export default function BookForm({
         loadSuggestions()
     }, [])
 
-    const parseBatchVolumes = (input) => {
-        const volumes = []
+  const parseBatchVolumes = (input) => {
+    const volumes = []
 
-        const parts = input
-            .split(/[,，、]/)
-            .map(part => part.trim())
-            .filter(Boolean)
+    const parts = input
+        .split(/[,，、]/)
+        .map(part => part.trim())
+        .filter(Boolean)
 
-        for (const part of parts) {
+    for (const part of parts) {
 
-            // Numeric range: 1-5
-            if (part.includes('-')) {
-                const [startText, endText] = part
-                    .split('-')
-                    .map(v => v.trim())
+        // Numeric range: 1-5
+        if (part.includes('-')) {
+            const [startText, endText] = part
+                .split('-')
+                .map(v => v.trim())
 
-                const start = Number(startText)
-                const end = Number(endText)
+            const start = Number(startText)
+            const end = Number(endText)
 
-                if (
-                    !Number.isInteger(start) ||
-                    !Number.isInteger(end) ||
-                    start <= 0 ||
-                    end <= 0 ||
-                    start > end
-                ) {
-                    return null
-                }
-
-                for (let i = start; i <= end; i++) {
-                    volumes.push(i)
-                }
-
-            } else {
-                // Numeric volume: 1, 2, 3
-                const volume = Number(part)
-
-                if (Number.isInteger(volume) && volume > 0) {
-                    volumes.push(volume)
-                    continue
-                }
-
-                // Text volumes: 全、上、下
-                if (['全', '上', '下'].includes(part)) {
-                    volumes.push(part)
-                    continue
-                }
-
+            if (
+                !Number.isInteger(start) ||
+                !Number.isInteger(end) ||
+                start <= 0 ||
+                end <= 0 ||
+                start > end
+            ) {
                 return null
             }
-        }
 
-        return [...new Set(volumes)]
+            for (let i = start; i <= end; i++) {
+                volumes.push(i)
+            }
+
+        } else {
+            // Numeric volume: 1, 2, 3
+            const volume = Number(part)
+
+            if (Number.isInteger(volume) && volume > 0) {
+                volumes.push(volume)
+                continue
+            }
+
+            // Text volumes: 全、上、下、其ノ伍、etc.
+            if (part.length > 0) {
+                volumes.push(part)
+                continue
+            }
+
+            return null
+        }
     }
+
+    return [...new Set(volumes)]
+}
 
     const handleSubmit = async (e) => {
         e.preventDefault()
