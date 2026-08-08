@@ -51,3 +51,26 @@
     background: white;
     cursor: pointer;
 }
+
+@media (max-width: 600px) {
+    .books-header-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .books-search {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .books-filter {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .add-book-button {
+        flex: 1;
+        min-width: 0;
+    }
+}
