@@ -118,3 +118,8 @@
     background: green;
     border-color: green;
 }
+
+.books-loading {
+    padding: 24px;
+    text-align: center;
+}

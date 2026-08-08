@@ -278,9 +278,10 @@ export default function Books() {
                     </button>
 
                 </div>
-
                 {loading ? (
-                    <p>Loading books...</p>
+                    <div className="books-loading">
+                        Loading books...
+                    </div>
                 ) : books.length === 0 ? (
                     <p>No books yet.</p>
                 ) : (
