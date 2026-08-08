@@ -306,7 +306,7 @@ export default function Books() {
                                                     {volumeValue}
                                                     {volume.edition && volume.edition !== '普通版' && (
                                                         <span className="volume-edition">
-                                                            {' '}({volume.edition})
+                                                            &nbsp;({volume.edition})
                                                         </span>
                                                     )}
                                                 </span>
