@@ -632,8 +632,19 @@ export default function EditBook() {
                         <h1
                             onClick={async () => {
                                 try {
-                                    await navigator.clipboard.writeText(series.title)
-                                    alert('已复制书名')
+                                    const copyText =
+                                        `${series.title}${book.edition && book.edition !== '普通版'
+                                            ? ` (${book.edition})`
+                                            : ''
+                                        }`
+
+                                    await navigator.clipboard.writeText(copyText)
+                                    alert(
+                                        `已复制：${series.title}${book.edition && book.edition !== '普通版'
+                                            ? ` (${book.edition})`
+                                            : ''
+                                        }`
+                                    )
                                 } catch (error) {
                                     debugError('Error copying title:', error)
                                 }
@@ -642,8 +653,8 @@ export default function EditBook() {
                             style={{ cursor: 'pointer' }}
                         >
                             {isNumericVolume
-                                ? `${series.title} - 第${book.volume}集`
-                                : `${series.title} - ${book.volume}`
+                                ? `${series.title} - 第${book.volume}集${book.edition && book.edition !== '普通版' ? ` (${book.edition})` : ''}`
+                                : `${series.title} - ${book.volume}${book.edition && book.edition !== '普通版' ? ` (${book.edition})` : ''}`
                             }
                         </h1>
                     </div>

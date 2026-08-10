@@ -9,7 +9,7 @@ export default function BookCard({
     expandAll
 }) {
 
-const [copied, setCopied] = useState(false)
+    const [copied, setCopied] = useState(false)
     const navigate = useNavigate()
     const [expanded, setExpanded] = useState(expandAll)
     useEffect(() => {
@@ -101,7 +101,7 @@ const [copied, setCopied] = useState(false)
 
                             try {
                                 await navigator.clipboard.writeText(book.title)
-                                alert('已复制书名')
+                                alert(`已复制：${book.title}`)
                             } catch (error) {
                                 console.error('Failed to copy title:', error)
                             }
@@ -136,15 +136,15 @@ const [copied, setCopied] = useState(false)
 
             </div>
 
-      {expanded && (
-    <div
-        className="volume-indicators"
-        onClick={() => {
-            if (coverVolume) {
-                navigate(`/books/${coverVolume.id}/edit`)
-            }
-        }}
-    >
+            {expanded && (
+                <div
+                    className="volume-indicators"
+                    onClick={() => {
+                        if (coverVolume) {
+                            navigate(`/books/${coverVolume.id}/edit`)
+                        }
+                    }}
+                >
 
                     {sortedVolumes.map((volume) => {
 
