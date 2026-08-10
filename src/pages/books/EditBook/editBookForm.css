@@ -139,3 +139,17 @@ gap: 12px;
     max-height: 220px;
     object-fit: contain;
 }
+
+.current-cover-preview {
+    display: block;
+    width: 160px;
+    max-height: 240px;
+    object-fit: contain;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+.no-cover {
+    margin-bottom: 10px;
+    color: #888;
+}

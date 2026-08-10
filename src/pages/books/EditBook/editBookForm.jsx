@@ -32,19 +32,19 @@ export default function BookForm({
     const [showBatchAdd, setShowBatchAdd] = React.useState(false)
     const [currentCoverUrl, setCurrentCoverUrl] = useState(null)
 
-useEffect(() => {
-    if (!book?.cover_image) {
-        setCurrentCoverUrl(null)
-        return
-    }
+    useEffect(() => {
+        if (!book?.cover_image) {
+            setCurrentCoverUrl(null)
+            return
+        }
 
-    const { data } = supabase
-        .storage
-        .from('book-covers')
-        .getPublicUrl(book.cover_image)
+        const { data } = supabase
+            .storage
+            .from('book-covers')
+            .getPublicUrl(book.cover_image)
 
-    setCurrentCoverUrl(data.publicUrl)
-}, [book?.cover_image])
+        setCurrentCoverUrl(data.publicUrl)
+    }, [book?.cover_image])
 
     const [showOwnershipBatchEdit, setShowOwnershipBatchEdit] =
         React.useState(false)
@@ -123,9 +123,55 @@ useEffect(() => {
     useEffect(() => {
         loadSuggestions()
     }, [])
+    const getCurrentCover = () => {
+        // Current volume has its own cover
+        if (book?.cover_image_url) {
+            return book.cover_image_url
+        }
+
+        if (book?.cover_image) {
+            const { data } = supabase.storage
+                .from('book-covers')
+                .getPublicUrl(book.cover_image)
+
+            return data.publicUrl
+        }
+
+        // Find the latest volume with a cover
+        const volumeWithCover = [...volumes]
+            .filter((volume) => volume.cover_image_url || volume.cover_image)
+            .sort((a, b) => {
+                const aNum = Number(a.volume)
+                const bNum = Number(b.volume)
+
+                if (!isNaN(aNum) && !isNaN(bNum)) {
+                    return bNum - aNum
+                }
+
+                return String(b.volume).localeCompare(String(a.volume))
+            })
+        [0]
+
+        if (!volumeWithCover) {
+            return null
+        }
+
+        if (volumeWithCover.cover_image_url) {
+            return volumeWithCover.cover_image_url
+        }
+
+        const { data } = supabase.storage
+            .from('book-covers')
+            .getPublicUrl(volumeWithCover.cover_image)
+
+        return data.publicUrl
+    }
+
+    const currentCover = getCurrentCover()
 
     return (
         <form
+
             onSubmit={(e) =>
                 handleSubmit(
                     e,
@@ -430,32 +476,42 @@ useEffect(() => {
                             />
                         </div>
 
-                       <div className="form-field">
-    <label htmlFor="cover">
-        封面
-        <HelpTooltip>
-            上传新封面将替换当前集数的封面。
-        </HelpTooltip>
-    </label>
+                        <div className="form-field">
+                            <label htmlFor="cover">
+                                封面
+                                <HelpTooltip>
+                                    上传新封面将替换当前集数的封面。
+                                </HelpTooltip>
+                            </label>
 
-    {currentCoverUrl && (
-        <div className="current-cover">
-            <img
-                src={currentCoverUrl}
-                alt={`${series.title} - ${book.volume}`}
-            />
-        </div>
-    )}
+                            {cover ? (
+                                <img
+                                    src={URL.createObjectURL(cover)}
+                                    alt="新封面预览"
+                                    className="current-cover-preview"
+                                />
+                            ) : currentCover ? (
+                                <img
+                                    src={currentCover}
+                                    alt="当前封面"
+                                    className="current-cover-preview"
+                                    onClick={() => window.open(currentCover, '_blank')}
+                                />
+                            ) : (
+                                <div className="no-cover">
+                                    暂无封面
+                                </div>
+                            )}
 
-    <input
-        id="cover"
-        type="file"
-        accept="image/jpeg,image/png,image/webp"
-        onChange={(e) =>
-            setCover(e.target.files?.[0] || null)
-        }
-    />
-</div>
+                            <input
+                                id="cover"
+                                type="file"
+                                accept="image/jpeg,image/png,image/webp"
+                                onChange={(e) =>
+                                    setCover(e.target.files?.[0] || null)
+                                }
+                            />
+                        </div>
 
                     </details>
 

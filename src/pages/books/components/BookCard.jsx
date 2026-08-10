@@ -9,11 +9,11 @@ export default function BookCard({
     expandAll
 }) {
     const navigate = useNavigate()
-const [expanded, setExpanded] = useState(false)
+    const [expanded, setExpanded] = useState(false)
 
-useEffect(() => {
-    setExpanded(expandAll)
-}, [expandAll])
+    useEffect(() => {
+        setExpanded(expandAll)
+    }, [expandAll])
 
     const sortedVolumes = [...book.allVolumes].sort((a, b) => {
         const aNum = Number(a.volume)
@@ -45,28 +45,24 @@ useEffect(() => {
         )
     })
 
-    const coverPath =
-    book.allVolumes.find((volume) => volume.cover_image)?.cover_image
+    const coverVolume =
+        [...sortedVolumes]
+            .reverse()
+            .find((volume) => volume.cover_image)
+
+    const coverPath = coverVolume?.cover_image
 
     const coverUrl = coverPath
-    ? supabase.storage
-        .from('book-covers')
-        .getPublicUrl(coverPath).data.publicUrl
-    : null
+        ? supabase.storage
+            .from('book-covers')
+            .getPublicUrl(coverPath).data.publicUrl
+        : null
 
-return (
-    <div className="book-card">
+    return (
+        <div className="book-card">
 
-        {coverUrl && (
-            <img
-                className="book-card-cover"
-                src={coverUrl}
-                alt={`${book.title} 封面`}
-            />
-        )}
-
-        <div
-            className="book-card-header"
+            <div
+                className="book-card-header"
                 onClick={() => setExpanded(!expanded)}
             >
 
@@ -88,6 +84,21 @@ return (
 
                 </div>
 
+                {expanded && coverUrl && (
+                    <img
+                        className="book-card-cover-mobile"
+                        src={coverUrl}
+                        alt={`${book.title} 封面`}
+                        onClick={(e) => {
+                            e.stopPropagation()
+
+                            if (coverVolume) {
+                                navigate(`/books/${coverVolume.id}/edit`)
+                            }
+                        }}
+                    />
+                )}
+
                 <button
                     type="button"
                     className="remove-series-button"
@@ -101,45 +112,60 @@ return (
 
             </div>
 
+            {expanded && coverUrl && (
+    <img
+        className="book-card-cover-desktop"
+        src={coverUrl}
+        alt={`${book.title} 封面`}
+        onClick={() => {
+            if (coverVolume) {
+                navigate(`/books/${coverVolume.id}/edit`)
+            }
+        }}
+    />
+)}
+
             {expanded && (
-                <div className="volume-indicators">
+                <>
+                    <div className="volume-indicators">
 
-                    {sortedVolumes.map((volume) => {
+                        {sortedVolumes.map((volume) => {
 
-                        const volumeValue = String(volume.volume)
+                            const volumeValue = String(volume.volume)
 
-                        const owned =
-                            book.ownedBookIds.has(volume.id)
+                            const owned =
+                                book.ownedBookIds.has(volume.id)
 
-                        return (
-                            <span
-                                key={volume.id}
-                                className={`volume-indicator ${owned ? 'owned' : ''}`}
-                                onClick={(e) => {
-                                    e.stopPropagation()
+                            return (
+                                <span
+                                    key={volume.id}
+                                    className={`volume-indicator ${owned ? 'owned' : ''}`}
+                                    onClick={(e) => {
+                                        e.stopPropagation()
 
-                                    if (!volume.isPlaceholder) {
-                                        navigate(
-                                            `/books/${volume.id}/edit`
-                                        )
-                                    }
-                                }}
-                            >
-                                {volumeValue}
+                                        if (!volume.isPlaceholder) {
+                                            navigate(
+                                                `/books/${volume.id}/edit`
+                                            )
+                                        }
+                                    }}
+                                >
+                                    {volumeValue}
 
-                                {volume.edition &&
-                                    volume.edition !== '普通版' && (
-                                        <span className="volume-edition">
-                                            &nbsp;({volume.edition})
-                                        </span>
-                                    )}
-                            </span>
-                        )
-                    })}
+                                    {volume.edition &&
+                                        volume.edition !== '普通版' && (
+                                            <span className="volume-edition">
+                                                &nbsp;({volume.edition})
+                                            </span>
+                                        )}
+                                </span>
+                            )
+                        }
+                        )}
 
-                </div>
+                    </div>
+                </>
             )}
-
         </div>
     )
 }
