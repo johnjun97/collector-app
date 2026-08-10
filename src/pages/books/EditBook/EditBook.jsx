@@ -516,6 +516,7 @@ export default function EditBook() {
                             purchased_price: ownsBook
                                 ? purchasedPrice || null
                                 : null,
+                                updated_at: new Date().toISOString(),
                         },
                         {
                             onConflict: 'user_id,book_id'
