@@ -368,7 +368,7 @@ export default function BookForm({
                             >
                                 {showOwnershipBatchEdit
                                     ? '关闭批量编辑'
-                                    : '批量批量编辑'}
+                                    : '批量编辑'}
                             </button>
 
                         </div>
