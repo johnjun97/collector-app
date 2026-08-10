@@ -16,7 +16,7 @@ export default function EditBook() {
     const [volumes, setVolumes] = useState([])
     const [batchVolumes, setBatchVolumes] = useState('')
     const [batchOwnership, setBatchOwnership] = useState({})
-
+    const [cover, setCover] = useState(null)
     const [ownsBook, setOwnsBook] = useState(false)
     const [purchasedDate, setPurchasedDate] = useState('')
     const [purchasedPrice, setPurchasedPrice] = useState('')
@@ -260,6 +260,24 @@ export default function EditBook() {
 
         try {
 
+            let coverPath = book.cover_image || null
+
+            if (cover) {
+                const fileExt = cover.name.split('.').pop()
+                const fileName = `${crypto.randomUUID()}.${fileExt}`
+
+                const { error: uploadError } = await supabase
+                    .storage
+                    .from('book-covers')
+                    .upload(fileName, cover)
+
+                if (uploadError) {
+                    throw uploadError
+                }
+
+                coverPath = fileName
+            }
+
             // Batch update ownership
             if (ownershipChanges) {
                 const {
@@ -446,8 +464,6 @@ export default function EditBook() {
                     title: series.title.trim(),
                     author: series.author || null,
                     subcategory: series.subcategory,
-                    cover_image: series.cover_image || null,
-                    cover_image_url: series.cover_image_url || null,
                 })
                 .eq('id', series.id)
 
@@ -466,7 +482,7 @@ export default function EditBook() {
                     publisher: book.publisher || null,
                     isbn: book.isbn || null,
                     release_date: book.release_date || null,
-                    cover_image: book.cover_image || null,
+                    cover_image: coverPath,
                     cover_image_url: book.cover_image_url || null,
                 })
                 .eq('id', book.id)
@@ -635,6 +651,8 @@ export default function EditBook() {
                     setBatchVolumes={setBatchVolumes}
                     batchOwnership={batchOwnership}
                     setBatchOwnership={setBatchOwnership}
+                    cover={cover}
+                    setCover={setCover}
                     series={series}
                     book={book}
                     batchVolumes={batchVolumes}

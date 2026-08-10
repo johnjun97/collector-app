@@ -174,49 +174,49 @@ export default function Books() {
                 <div className="books-header">
 
                     <div className="books-header-actions">
-    <div className="books-search-group">
-        <input
-            type="search"
-            className="books-search"
-            placeholder="搜索书名、作者..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-        />
+                        <div className="books-search-group">
+                            <input
+                                type="search"
+                                className="books-search"
+                                placeholder="搜索书名、作者..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                            />
 
-        <select
-            className="books-filter"
-            value={subcategoryFilter}
-            onChange={(e) => setSubcategoryFilter(e.target.value)}
-        >
-            <option value="">全部类型</option>
-            <option value="漫画">漫画</option>
-            <option value="小说">小说</option>
-            <option value="画集">画集</option>
-            <option value="设定集">设定集</option>
-            <option value="公式书">公式书</option>
-            <option value="同人志">同人志</option>
-            <option value="其他">其他</option>
-        </select>
-    </div>
+                            <select
+                                className="books-filter"
+                                value={subcategoryFilter}
+                                onChange={(e) => setSubcategoryFilter(e.target.value)}
+                            >
+                                <option value="">全部类型</option>
+                                <option value="漫画">漫画</option>
+                                <option value="小说">小说</option>
+                                <option value="画集">画集</option>
+                                <option value="设定集">设定集</option>
+                                <option value="公式书">公式书</option>
+                                <option value="同人志">同人志</option>
+                                <option value="其他">其他</option>
+                            </select>
+                        </div>
 
-  <div className="books-header-buttons">
+                        <div className="books-header-buttons">
 
-    <button
-        className="expand-all-button"
-        onClick={() => setExpandAll(!expandAll)}
-    >
-        {expandAll ? '全部收起' : '全部展开'}
-    </button>
+                            <button
+                                className="expand-all-button"
+                                onClick={() => setExpandAll(!expandAll)}
+                            >
+                                {expandAll ? '全部收起' : '全部展开'}
+                            </button>
 
-    <button
-        className="add-book-button"
-        onClick={() => navigate('/books/new')}
-    >
-        + Add Book
-    </button>
+                            <button
+                                className="add-book-button"
+                                onClick={() => navigate('/books/new')}
+                            >
+                                + Add Book
+                            </button>
 
-</div>
-</div>
+                        </div>
+                    </div>
 
                 </div>
 
@@ -230,12 +230,12 @@ export default function Books() {
                     <div className="books-list">
 
                         {filteredBooks.map((book) => (
-                        <BookCard
-    key={book.id}
-    book={book}
-    onRemove={handleRemoveSeries}
-    expandAll={expandAll}
-/>
+                            <BookCard
+                                key={book.id}
+                                book={book}
+                                onRemove={handleRemoveSeries}
+                                expandAll={expandAll}
+                            />
                         ))}
 
                     </div>

@@ -128,3 +128,14 @@ gap: 12px;
 .ownership-batch-item.owned:hover {
     background: #ccefd2;
 }
+
+.current-cover {
+    margin-bottom: 10px;
+}
+
+.current-cover img {
+    display: block;
+    width: 150px;
+    max-height: 220px;
+    object-fit: contain;
+}

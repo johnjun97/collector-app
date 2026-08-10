@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { supabase } from '../../../lib/supabaseClient'
 import './BookCard.css'
 
 export default function BookCard({
@@ -44,11 +45,28 @@ useEffect(() => {
         )
     })
 
-    return (
-        <div className="book-card">
+    const coverPath =
+    book.allVolumes.find((volume) => volume.cover_image)?.cover_image
 
-            <div
-                className="book-card-header"
+    const coverUrl = coverPath
+    ? supabase.storage
+        .from('book-covers')
+        .getPublicUrl(coverPath).data.publicUrl
+    : null
+
+return (
+    <div className="book-card">
+
+        {coverUrl && (
+            <img
+                className="book-card-cover"
+                src={coverUrl}
+                alt={`${book.title} 封面`}
+            />
+        )}
+
+        <div
+            className="book-card-header"
                 onClick={() => setExpanded(!expanded)}
             >
 

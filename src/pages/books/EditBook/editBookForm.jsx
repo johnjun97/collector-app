@@ -9,6 +9,8 @@ export default function BookForm({
     setBatchOwnership,
     batchVolumes,
     setBatchVolumes,
+    cover,
+    setCover,
     series,
     book,
     userBookLoading,
@@ -28,6 +30,21 @@ export default function BookForm({
 }) {
 
     const [showBatchAdd, setShowBatchAdd] = React.useState(false)
+    const [currentCoverUrl, setCurrentCoverUrl] = useState(null)
+
+useEffect(() => {
+    if (!book?.cover_image) {
+        setCurrentCoverUrl(null)
+        return
+    }
+
+    const { data } = supabase
+        .storage
+        .from('book-covers')
+        .getPublicUrl(book.cover_image)
+
+    setCurrentCoverUrl(data.publicUrl)
+}, [book?.cover_image])
 
     const [showOwnershipBatchEdit, setShowOwnershipBatchEdit] =
         React.useState(false)
@@ -181,11 +198,11 @@ export default function BookForm({
                             {showBatchAdd ? '新增集数' : '新增集数'}
                         </button>
 
-             <HelpTooltip>
-    购买日期和购买价格如有填写，
-    将应用于所有批量新增的集数。
-    留空则不会修改已有集数的相关资料。
-</HelpTooltip>
+                        <HelpTooltip>
+                            购买日期和购买价格如有填写，
+                            将应用于所有批量新增的集数。
+                            留空则不会修改已有集数的相关资料。
+                        </HelpTooltip>
 
                     </div>
                 </div>
@@ -413,14 +430,33 @@ export default function BookForm({
                             />
                         </div>
 
-                        <div className="ownership-field">
-                            <label htmlFor="cover">封面: </label>
-                            <input
-                                id="cover"
-                                type="file"
-                                accept="image/*"
-                            />
-                        </div>
+                       <div className="form-field">
+    <label htmlFor="cover">
+        封面
+        <HelpTooltip>
+            上传新封面将替换当前集数的封面。
+        </HelpTooltip>
+    </label>
+
+    {currentCoverUrl && (
+        <div className="current-cover">
+            <img
+                src={currentCoverUrl}
+                alt={`${series.title} - ${book.volume}`}
+            />
+        </div>
+    )}
+
+    <input
+        id="cover"
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        onChange={(e) =>
+            setCover(e.target.files?.[0] || null)
+        }
+    />
+</div>
+
                     </details>
 
 

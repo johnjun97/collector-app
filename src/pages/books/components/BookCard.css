@@ -5,6 +5,15 @@
     background: white;
 }
 
+.book-card-cover {
+    display: block;
+    width: 100%;
+    height: 220px;
+    object-fit: contain;
+    border-radius: 6px;
+    margin-bottom: 12px;
+}
+
 .book-card-header {
     display: flex;
     align-items: flex-start;
