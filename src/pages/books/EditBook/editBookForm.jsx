@@ -259,28 +259,49 @@ export default function BookForm({
                         : ''
                         }`}
                 >
-                    {volumes.map((volume) => (
-                        <button
-                            key={volume.id}
-                            type="button"
-                            className={[
-                                book.id === volume.id ? 'active' : '',
-                                volume.isOwned ? 'owned' : ''
-                            ].join(' ')}
-                            onClick={() => {
-                                if (!showBatchAdd && !showOwnershipBatchEdit) {
-                                    handleVolumeChange(volume)
-                                }
-                            }}
-                        >
-                            {volume.volume}
-                            {volume.edition && volume.edition !== '普通版' && (
-                                <span className="volume-edition">
-                                    {' '}({volume.edition})
-                                </span>
-                            )}
-                        </button>
-                    ))}
+                    {[...volumes]
+                        .sort((a, b) => {
+                            const aNum = Number(a.volume)
+                            const bNum = Number(b.volume)
+
+                            if (!isNaN(aNum) && !isNaN(bNum) && aNum !== bNum) {
+                                return aNum - bNum
+                            }
+
+                            const aIsNormal =
+                                !a.edition || a.edition === '普通版'
+
+                            const bIsNormal =
+                                !b.edition || b.edition === '普通版'
+
+                            if (aIsNormal && !bIsNormal) return -1
+                            if (!aIsNormal && bIsNormal) return 1
+
+                            return String(a.edition || '')
+                                .localeCompare(String(b.edition || ''))
+                        })
+                        .map((volume) => (
+                            <button
+                                key={volume.id}
+                                type="button"
+                                className={[
+                                    book.id === volume.id ? 'active' : '',
+                                    volume.isOwned ? 'owned' : ''
+                                ].join(' ')}
+                                onClick={() => {
+                                    if (!showBatchAdd && !showOwnershipBatchEdit) {
+                                        handleVolumeChange(volume)
+                                    }
+                                }}
+                            >
+                                {volume.volume}
+                                {volume.edition && volume.edition !== '普通版' && (
+                                    <span className="volume-edition">
+                                        {' '}({volume.edition})
+                                    </span>
+                                )}
+                            </button>
+                        ))}
                 </div>
             </div>
 
