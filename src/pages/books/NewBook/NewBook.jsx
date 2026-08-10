@@ -109,6 +109,7 @@ export default function NewBook() {
                                 publisher: form.publisher.trim() || null,
                                 isbn: form.isbn.trim() || null,
                                 release_date: form.releaseDate || null,
+                                created_by: user.id,
                             })
                             .select()
                             .single()

@@ -418,13 +418,6 @@ export default function BookForm({
                     <div className="form-actions">
 
                         <button
-                            type="button"
-                            onClick={() => navigate('/books')}
-                        >
-                            取消
-                        </button>
-
-                        <button
                             type="submit"
                             disabled={saving}
                         >

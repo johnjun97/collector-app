@@ -499,7 +499,19 @@ export default function EditBook() {
                         throw userBookError
                     }
 
-                } else {
+                }
+
+                const { error: bookError } =
+                    await supabase
+                        .from('books')
+                        .delete()
+                        .eq('id', book.id)
+
+                if (bookError) {
+                    throw bookError
+                }
+
+                else {
 
                     const { error: updateUserBookError } =
                         await supabase
@@ -528,21 +540,77 @@ export default function EditBook() {
         }
     }
 
-  if (loading) {
-    return (
-        <>
-            <Navbar section="书籍" />
+    const handleDelete = async () => {
+        const isNumericVolume = Number.isInteger(Number(book.volume))
 
-            <main className="edit-book-page">
-                <Loading text="正在加载" />
-            </main>
-        </>
-    )
-}
+        const confirmed = window.confirm(
+            isNumericVolume
+                ? `确定要删除《${series.title} - 第${book.volume}集》吗？\n\n此操作将从数据库中永久删除该书籍及此集资料，所有用户都将无法再使用此书籍。\n\n此操作无法恢复。`
+                : `确定要删除《${series.title} - ${book.volume}》吗？\n\n此操作将从数据库中永久删除该书籍及此集资料，所有用户都将无法再使用此书籍。\n\n此操作无法恢复。`
+        )
 
-    if (!book || !series) {
-        return <p>Book not found.</p>
+        if (!confirmed) {
+            return
+        }
+
+        setSaving(true)
+
+        try {
+            const {
+                data: { user },
+                error: userError
+            } = await supabase.auth.getUser()
+
+            if (userError) {
+                throw userError
+            }
+
+            if (user) {
+                const { error: userBookError } =
+                    await supabase
+                        .from('user_books')
+                        .delete()
+                        .eq('user_id', user.id)
+                        .eq('book_id', book.id)
+
+                if (userBookError) {
+                    throw userBookError
+                }
+            }
+
+            const { error: bookError } =
+                await supabase
+                    .from('books')
+                    .delete()
+                    .eq('id', book.id)
+
+            if (bookError) {
+                throw bookError
+            }
+
+            navigate('/books')
+
+        } catch (error) {
+            debugError('Error deleting book:', error)
+            alert(error.message || '删除失败，请稍后再试')
+        } finally {
+            setSaving(false)
+        }
     }
+
+    if (loading) {
+        return (
+            <>
+                <Navbar section="书籍" />
+
+                <main className="edit-book-page">
+                    <Loading text="正在加载" />
+                </main>
+            </>
+        )
+    }
+
+    const isNumericVolume = Number.isInteger(Number(book.volume))
 
     return (
         <>
@@ -559,19 +627,32 @@ export default function EditBook() {
             <main className="edit-book-page">
 
                 <div className="edit-book-header">
-                    <div>
-                        <h1>
-                            {series.title} - 第{book.volume}集
-                        </h1>
-                    </div>
+                    <h1>
+                        {isNumericVolume
+                            ? `${series.title} - 第${book.volume}集`
+                            : `${series.title} - ${book.volume}`
+                        }
+                    </h1>
 
-                    <button
-                        type="button"
-                        className="back-button"
-                        onClick={() => navigate('/books')}
-                    >
-                        返回
-                    </button>
+                    <div className="header-actions">
+                        <button
+                            type="button"
+                            className="delete-button"
+                            onClick={handleDelete}
+                            disabled={saving}
+                        >
+                            删除
+                        </button>
+
+                        <button
+                            type="button"
+                            className="back-button"
+                            onClick={() => navigate('/books')}
+                            disabled={saving}
+                        >
+                            返回
+                        </button>
+                    </div>
                 </div>
 
                 <BookForm
