@@ -1,7 +1,39 @@
 .edit-book-page {
-    max-width: 800px;
-    margin: 0 auto;
+    min-height: calc(100vh - 64px);
     padding: 24px;
+    position: relative;
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+
+    box-sizing: border-box;
+}
+
+.edit-book-content {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.edit-book-content {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+.edit-book-header,
+.edit-book-form-container {
+    position: relative;
+    z-index: 1;
+}
+
+.edit-book-header,
+.edit-book-form-container {
+    position: relative;
+    z-index: 1;
 }
 
 .edit-book-header {

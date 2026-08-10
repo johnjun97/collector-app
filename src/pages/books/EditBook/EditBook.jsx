@@ -590,12 +590,21 @@ export default function EditBook() {
         }
     }
 
-    if (loading) {
+    if (loading || !book || !series) {
         return (
             <>
                 <Navbar section="书籍" />
 
-                <main className="edit-book-page">
+                <main
+                    className="edit-book-page"
+                    style={{
+                        backgroundImage: book?.cover_image
+                            ? `url(${supabase.storage
+                                .from('book-covers')
+                                .getPublicUrl(book.cover_image).data.publicUrl})`
+                            : 'none'
+                    }}
+                >
                     <Loading text="正在加载" />
                 </main>
             </>
@@ -627,21 +636,6 @@ export default function EditBook() {
                             }
                         </h1>
 
-                        <button
-                            type="button"
-                            className="copy-title-button"
-                            onClick={async () => {
-                                try {
-                                    await navigator.clipboard.writeText(series.title)
-                                } catch (error) {
-                                    debugError('Error copying title:', error)
-                                }
-                            }}
-                            title="复制书名"
-                            aria-label="复制书名"
-                        >
-                            复制
-                        </button>
                     </div>
 
                     <div className="header-actions">
@@ -665,30 +659,41 @@ export default function EditBook() {
                     </div>
                 </div>
 
-                <BookForm
-                    setBatchVolumes={setBatchVolumes}
-                    batchOwnership={batchOwnership}
-                    setBatchOwnership={setBatchOwnership}
-                    cover={cover}
-                    setCover={setCover}
-                    series={series}
-                    book={book}
-                    batchVolumes={batchVolumes}
-                    volumes={volumes}
-                    ownsBook={ownsBook}
-                    setOwnsBook={setOwnsBook}
-                    purchasedDate={purchasedDate}
-                    setPurchasedDate={setPurchasedDate}
-                    purchasedPrice={purchasedPrice}
-                    setPurchasedPrice={setPurchasedPrice}
-                    userBookLoading={userBookLoading}
-                    saving={saving}
-                    handleSeriesChange={handleSeriesChange}
-                    handleBookChange={handleBookChange}
-                    handleVolumeChange={handleVolumeChange}
-                    handleSubmit={handleSubmit}
-                    navigate={navigate}
-                />
+                <section
+                    className="edit-book-content"
+                    style={{
+                        backgroundImage: book.cover_image
+                            ? `url(${supabase.storage
+                                .from('book-covers')
+                                .getPublicUrl(book.cover_image).data.publicUrl})`
+                            : 'none'
+                    }}
+                >
+                    <BookForm
+                        setBatchVolumes={setBatchVolumes}
+                        batchOwnership={batchOwnership}
+                        setBatchOwnership={setBatchOwnership}
+                        cover={cover}
+                        setCover={setCover}
+                        series={series}
+                        book={book}
+                        batchVolumes={batchVolumes}
+                        volumes={volumes}
+                        ownsBook={ownsBook}
+                        setOwnsBook={setOwnsBook}
+                        purchasedDate={purchasedDate}
+                        setPurchasedDate={setPurchasedDate}
+                        purchasedPrice={purchasedPrice}
+                        setPurchasedPrice={setPurchasedPrice}
+                        userBookLoading={userBookLoading}
+                        saving={saving}
+                        handleSeriesChange={handleSeriesChange}
+                        handleBookChange={handleBookChange}
+                        handleVolumeChange={handleVolumeChange}
+                        handleSubmit={handleSubmit}
+                        navigate={navigate}
+                    />
+                </section>
 
             </main>
         </>
