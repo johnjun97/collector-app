@@ -44,10 +44,21 @@ useEffect(() => {
         )
     })
 
-    const coverVolume =
-        [...sortedVolumes]
-            .reverse()
-            .find((volume) => volume.cover_image)
+const coverVolume = [...book.allVolumes]
+    .filter((volume) => volume.cover_image)
+    .sort((a, b) => {
+        const aNum = Number(a.volume)
+        const bNum = Number(b.volume)
+
+        if (!isNaN(aNum) && !isNaN(bNum)) {
+            return bNum - aNum
+        }
+
+        if (!isNaN(aNum)) return -1
+        if (!isNaN(bNum)) return 1
+
+        return String(b.volume).localeCompare(String(a.volume))
+    })[0]
 
     const coverPath = coverVolume?.cover_image
 
