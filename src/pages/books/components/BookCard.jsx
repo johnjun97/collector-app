@@ -46,6 +46,20 @@ export default function BookCard({
         )
     })
 
+    const latestVolume = [...book.allVolumes].sort((a, b) => {
+        const aNum = Number(a.volume)
+        const bNum = Number(b.volume)
+
+        if (!isNaN(aNum) && !isNaN(bNum)) {
+            return bNum - aNum
+        }
+
+        if (!isNaN(aNum)) return -1
+        if (!isNaN(bNum)) return 1
+
+        return String(b.volume).localeCompare(String(a.volume))
+    })[0]
+
     const coverVolume = [...book.allVolumes]
         .filter((volume) => volume.cover_image)
         .sort((a, b) => {
@@ -72,7 +86,10 @@ export default function BookCard({
 
 
     return (
-        <div className="book-card">
+        <div
+            className="book-card"
+            onClick={() => setExpanded(!expanded)}
+        >
 
             {expanded && coverUrl && (
                 <img
@@ -87,18 +104,10 @@ export default function BookCard({
                 />
             )}
 
-    <div
-    className="book-card-header"
-    onClick={() => {
-        if (expanded) {
-            setExpanded(false)
-        } else if (coverVolume) {
-            navigate(`/books/${coverVolume.id}/edit`)
-        }
-    }}
->
+            <div className="book-card-header">
 
                 <div className="book-card-info">
+
 
                     <h2
                         className="book-card-title"
@@ -114,13 +123,19 @@ export default function BookCard({
                         }}
                         title="点击复制书名"
                     >
-                        {book.title}
+       <span className="book-title-with-icon">
+    {book.title}
+    <span className="book-card-expand-icon">
+        {expanded ? '▼' : '▶'}
+    </span>
+</span>
 
-                        {book.subcategory && (
-                            <span className="book-subcategory">
-                                [{book.subcategory}]
-                            </span>
-                        )}
+{book.subcategory && (
+    <span className="book-subcategory">
+        [{book.subcategory}]
+    </span>
+)}
+
                     </h2>
 
                     <p>
@@ -143,14 +158,7 @@ export default function BookCard({
             </div>
 
             {expanded && (
-                <div
-                    className="volume-indicators"
-                    onClick={() => {
-                        if (coverVolume) {
-                            navigate(`/books/${coverVolume.id}/edit`)
-                        }
-                    }}
-                >
+                <div className="volume-indicators">
 
                     {sortedVolumes.map((volume) => {
 

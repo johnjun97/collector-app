@@ -43,6 +43,21 @@
     cursor: pointer;
 }
 
+.book-title-with-icon {
+    display: inline;
+}
+
+.book-card-expand-icon {
+    white-space: nowrap;
+    margin-left: 6px;
+    font-size: 14px;
+}
+
+.book-card-expand-icon {
+    margin-left: 6px;
+    font-size: 14px;
+}
+
 .book-title-text {
     min-width: 0;
 }
@@ -136,3 +151,8 @@
     border-color: green;
 }
 
+.book-card-expand-icon {
+    display: inline-block;
+    margin-right: 8px;
+    font-size: 14px;
+}
