@@ -35,13 +35,27 @@
 
 .books-header-actions {
     display: flex;
-    gap: 10px;
     align-items: center;
+    justify-content: space-between;
+    width: 100%;
 }
 
 .books-search {
     padding: 8px 12px;
-    width: 220px;
+    width: 400px;
+}
+
+.books-search-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.books-header-right {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-left: auto;
 }
 
 .books-filter {
