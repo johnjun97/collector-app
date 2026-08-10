@@ -414,6 +414,15 @@ export default function BookForm({
                                 onChange={handleBookChange}
                             />
                         </div>
+
+                        <div className="ownership-field">
+                            <label htmlFor="cover">封面: </label>
+                            <input
+                                id="cover"
+                                type="file"
+                                accept="image/*"
+                            />
+                        </div>
                     </details>
 
 
