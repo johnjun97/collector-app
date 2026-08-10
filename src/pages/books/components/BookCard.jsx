@@ -87,10 +87,16 @@ export default function BookCard({
                 />
             )}
 
-            <div
-                className="book-card-header"
-                onClick={() => setExpanded(!expanded)}
-            >
+    <div
+    className="book-card-header"
+    onClick={() => {
+        if (expanded) {
+            setExpanded(false)
+        } else if (coverVolume) {
+            navigate(`/books/${coverVolume.id}/edit`)
+        }
+    }}
+>
 
                 <div className="book-card-info">
 
