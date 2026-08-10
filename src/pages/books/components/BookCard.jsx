@@ -136,8 +136,15 @@ const [copied, setCopied] = useState(false)
 
             </div>
 
-            {expanded && (
-                <div className="volume-indicators">
+      {expanded && (
+    <div
+        className="volume-indicators"
+        onClick={() => {
+            if (coverVolume) {
+                navigate(`/books/${coverVolume.id}/edit`)
+            }
+        }}
+    >
 
                     {sortedVolumes.map((volume) => {
 
