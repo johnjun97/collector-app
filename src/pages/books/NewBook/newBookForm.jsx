@@ -209,7 +209,7 @@ export default function BookForm({
         const parsedVolumes = parseBatchVolumes(form.volume)
 
         if (!parsedVolumes || parsedVolumes.length === 0) {
-            alert('请输入有效的集数，例如：1、2、3、全 或 1-5、8、11-13')
+            alert('请输入有效的集数，例如：1 ,2 ,3 ,全 或 1-5 ,8 ,11-13')
             return
         }
 
@@ -272,7 +272,7 @@ export default function BookForm({
                     id="volume"
                     name="volume"
                     type="text"
-                    placeholder="例如：1、2、3、全 或 1-5、8、11-13"
+                    placeholder="例如：1, 2, 3,全 或 1-5, 8, 11-13"
                     value={form.volume}
                     onChange={handleChange}
                 />

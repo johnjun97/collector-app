@@ -223,11 +223,18 @@ export default function EditBook() {
             } else {
                 const volume = Number(part)
 
-                if (!Number.isInteger(volume) || volume <= 0) {
-                    return null
+                if (Number.isInteger(volume) && volume > 0) {
+                    volumes.push(volume)
+                    continue
                 }
 
-                volumes.push(volume)
+                // Text volumes: 全、上、下、其ノ伍、etc.
+                if (part.length > 0) {
+                    volumes.push(part)
+                    continue
+                }
+
+                return null
             }
         }
 
@@ -341,6 +348,7 @@ export default function EditBook() {
                                     series_id: series.id,
                                     volume: volumeValue,
                                     edition: book.edition || '普通版',
+                                    created_by: user.id,
                                 })
                                 .select()
                                 .single()
@@ -468,6 +476,7 @@ export default function EditBook() {
             }
 
             // Update ownership for single-book edit only
+            // Update ownership for single-book edit only
             if (parsedBatchVolumes.length === 0) {
 
                 const {
@@ -478,55 +487,27 @@ export default function EditBook() {
                     throw new Error('User is not logged in')
                 }
 
-                if (ownsBook) {
+                const { error: userBookError } = await supabase
+                    .from('user_books')
+                    .upsert(
+                        {
+                            user_id: user.id,
+                            book_id: book.id,
+                            is_owned: ownsBook,
+                            purchased_date: ownsBook
+                                ? purchasedDate || null
+                                : null,
+                            purchased_price: ownsBook
+                                ? purchasedPrice || null
+                                : null,
+                        },
+                        {
+                            onConflict: 'user_id,book_id'
+                        }
+                    )
 
-                    const { error: userBookError } = await supabase
-                        .from('user_books')
-                        .upsert(
-                            {
-                                user_id: user.id,
-                                book_id: book.id,
-                                purchased_date: purchasedDate || null,
-                                purchased_price: purchasedPrice || null,
-                                is_owned: true,
-                            },
-                            {
-                                onConflict: 'user_id,book_id'
-                            }
-                        )
-
-                    if (userBookError) {
-                        throw userBookError
-                    }
-
-                }
-
-                const { error: bookError } =
-                    await supabase
-                        .from('books')
-                        .delete()
-                        .eq('id', book.id)
-
-                if (bookError) {
-                    throw bookError
-                }
-
-                else {
-
-                    const { error: updateUserBookError } =
-                        await supabase
-                            .from('user_books')
-                            .update({
-                                is_owned: false,
-                                purchased_date: null,
-                                purchased_price: null,
-                            })
-                            .eq('user_id', user.id)
-                            .eq('book_id', book.id)
-
-                    if (updateUserBookError) {
-                        throw updateUserBookError
-                    }
+                if (userBookError) {
+                    throw userBookError
                 }
             }
 
@@ -565,17 +546,12 @@ export default function EditBook() {
                 throw userError
             }
 
-            if (user) {
-                const { error: userBookError } =
-                    await supabase
-                        .from('user_books')
-                        .delete()
-                        .eq('user_id', user.id)
-                        .eq('book_id', book.id)
+            if (!user) {
+                throw new Error('User is not logged in')
+            }
 
-                if (userBookError) {
-                    throw userBookError
-                }
+            if (book.created_by !== user.id) {
+                throw new Error('你无法删除其他用户创建的书籍集数。')
             }
 
             const { error: bookError } =

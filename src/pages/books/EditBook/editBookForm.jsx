@@ -177,17 +177,18 @@ export default function BookForm({
                                 }
                             }}
                         >
-                            {showBatchAdd ? '关闭批量编辑' : '批量编辑'}
+                            {showBatchAdd ? '新增集数' : '新增集数'}
                         </button>
 
                         <span className="batch-add-help">
                             !
                             <span className="batch-add-tooltip">
                                 购买日期和购买价格如有填写，
-                                将应用于所有批量编辑的集数。
+                                将应用于所有批量新增的集数。
                                 留空则不会修改已有集数的相关资料。
                             </span>
                         </span>
+
                     </div>
                 </div>
 
@@ -226,7 +227,7 @@ export default function BookForm({
                 <div className="form-field">
                     <input
                         type="text"
-                        placeholder="例如：1-5、8、11-13"
+                        placeholder="例如：1、2、3、全 或 1-5、8、11-13"
                         value={batchVolumes}
                         onChange={(e) => setBatchVolumes(e.target.value)}
                     />
@@ -278,8 +279,9 @@ export default function BookForm({
                             >
                                 {showOwnershipBatchEdit
                                     ? '关闭批量编辑'
-                                    : '批量编辑'}
+                                    : '批量批量编辑'}
                             </button>
+
                         </div>
                     </div>
 
