@@ -3,26 +3,38 @@
     border: 1px solid #ddd;
     border-radius: 8px;
     background: white;
+}
+
+.book-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
     cursor: pointer;
 }
 
+.book-card-info {
+    min-width: 0;
+}
+
 .book-card h2 {
-    margin: 0 0 10px;
+    margin: 0 0 6px;
     font-size: 18px;
 }
 
-.book-title-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
+.book-card p {
+    margin: 4px 0;
+    color: #555;
 }
 
-.book-title-row h2 {
-    margin: 0;
+.book-subcategory {
+    margin-left: 6px;
+    font-size: 0.7em;
+    font-weight: normal;
 }
 
 .remove-series-button {
+    flex: 0 0 auto;
     border: 1px solid #ccc;
     background: white;
     color: #777;
@@ -38,16 +50,32 @@
     color: #d00;
 }
 
-.book-card p {
-    margin: 4px 0;
-    color: #555;
+.books-header-buttons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.expand-all-button {
+    border: 1px solid #ccc;
+    background: white;
+    color: #333;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.expand-all-button:hover {
+    background: #f5f5f5;
 }
 
 .volume-indicators {
     display: flex;
     flex-wrap: wrap;
     gap: 4px;
-    margin: 10px 0;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #eee;
 }
 
 .volume-indicator {
@@ -62,16 +90,11 @@
     font-size: 12px;
     color: #555;
     background: #f5f5f5;
+    cursor: pointer;
 }
 
 .volume-indicator.owned {
     color: white;
     background: green;
     border-color: green;
-}
-
-.book-subcategory {
-    margin-left: 6px;
-    font-size: 0.7em;
-    font-weight: normal;
 }

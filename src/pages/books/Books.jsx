@@ -14,6 +14,7 @@ export default function Books() {
     const navigate = useNavigate()
     const [search, setSearch] = useState('')
     const [subcategoryFilter, setSubcategoryFilter] = useState('')
+    const [expandAll, setExpandAll] = useState(false)
 
     useEffect(() => {
         const getBooks = async () => {
@@ -198,12 +199,23 @@ export default function Books() {
         </select>
     </div>
 
+  <div className="books-header-buttons">
+
+    <button
+        className="expand-all-button"
+        onClick={() => setExpandAll(!expandAll)}
+    >
+        {expandAll ? '全部收起' : '全部展开'}
+    </button>
+
     <button
         className="add-book-button"
         onClick={() => navigate('/books/new')}
     >
         + Add Book
     </button>
+
+</div>
 </div>
 
                 </div>
@@ -218,11 +230,12 @@ export default function Books() {
                     <div className="books-list">
 
                         {filteredBooks.map((book) => (
-                            <BookCard
-                                key={book.id}
-                                book={book}
-                                onRemove={handleRemoveSeries}
-                            />
+                        <BookCard
+    key={book.id}
+    book={book}
+    onRemove={handleRemoveSeries}
+    expandAll={expandAll}
+/>
                         ))}
 
                     </div>
