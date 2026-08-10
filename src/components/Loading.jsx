@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import './Loading.css'
 
 export default function Loading({ text = 'Loading' }) {
+    console.log('Loading component:', text, window.location.pathname)
+
     const [dots, setDots] = useState('')
 
     useEffect(() => {
@@ -19,7 +21,16 @@ export default function Loading({ text = 'Loading' }) {
     }, [])
 
     return (
-        <div className="loading-container">
+        <div
+            className="loading-container"
+            style={{
+                position: 'fixed',
+                inset: 0,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center'
+            }}
+        >
             <p>{text}{dots}</p>
         </div>
     )

@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabaseClient'
 import { FaEye, FaEyeSlash } from "react-icons/fa"
 import { useNavigate } from 'react-router-dom'
 import './Login.css'
+import Loading from '../../components/Loading'
 
 export default function Login() {
   const navigate = useNavigate()
@@ -36,7 +37,7 @@ export default function Login() {
       email,
       password
     })
-    
+
     setLoading(false)
 
     if (error) {
@@ -52,50 +53,52 @@ export default function Login() {
         <h1 className="login-title">Collector-App</h1>
 
         {/* <div className="form-content"> */}
-        <form
-          className={`form-content ${loading ? "loading" : ""}`}
-          onSubmit={handleLogin}
-        >
+        {loading ? (
+          <Loading text="Logging in" />
+        ) : (
+          <form
+            className="form-content"
+            onSubmit={handleLogin}
+          >
 
-          {/* email */}
-          <input
-            className="field"
-            disabled={loading}
-            type="email"
-            name="email"
-            autoComplete="email"
-            placeholder="Email"
-            onChange={(e) => setEmail(e.target.value)}
-          />
-
-          {/* password */}
-          <div className="password-wrapper">
+            {/* email */}
             <input
-              type={showPassword ? "text" : "password"}
-              disabled={loading}
-              name="password"
-              autoComplete="current-password"
-              placeholder="Password"
-              onChange={(e) => setPassword(e.target.value)}
               className="field"
+              type="email"
+              name="email"
+              autoComplete="email"
+              placeholder="Email"
+              onChange={(e) => setEmail(e.target.value)}
             />
 
-            <span
-              onClick={() => setShowPassword(prev => !prev)}
-              className="eye-icon"
-            >
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
-            </span>
-          </div>
+            {/* password */}
+            <div className="password-wrapper">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                autoComplete="current-password"
+                placeholder="Password"
+                onChange={(e) => setPassword(e.target.value)}
+                className="field"
+              />
 
-          {/* buttons */}
-          <button 
-          className="login-button" 
-          type="submit" 
-          disabled={loading}>
-            {loading ? "Logging in..." : "Login"}
-          </button>
-        </form>
+              <span
+                onClick={() => setShowPassword(prev => !prev)}
+                className="eye-icon"
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </span>
+            </div>
+
+            <button
+              className="login-button"
+              type="submit"
+            >
+              Login
+            </button>
+
+          </form>
+        )}
 
         {/* Forgot Password */}
         <div className="forgot-password">
