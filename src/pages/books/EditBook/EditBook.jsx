@@ -619,12 +619,30 @@ export default function EditBook() {
             <main className="edit-book-page">
 
                 <div className="edit-book-header">
-                    <h1>
-                        {isNumericVolume
-                            ? `${series.title} - 第${book.volume}集`
-                            : `${series.title} - ${book.volume}`
-                        }
-                    </h1>
+                    <div className="edit-book-title">
+                        <h1>
+                            {isNumericVolume
+                                ? `${series.title} - 第${book.volume}集`
+                                : `${series.title} - ${book.volume}`
+                            }
+                        </h1>
+
+                        <button
+                            type="button"
+                            className="copy-title-button"
+                            onClick={async () => {
+                                try {
+                                    await navigator.clipboard.writeText(series.title)
+                                } catch (error) {
+                                    debugError('Error copying title:', error)
+                                }
+                            }}
+                            title="复制书名"
+                            aria-label="复制书名"
+                        >
+                            复制
+                        </button>
+                    </div>
 
                     <div className="header-actions">
                         <button

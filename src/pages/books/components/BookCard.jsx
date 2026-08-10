@@ -8,11 +8,13 @@ export default function BookCard({
     onRemove,
     expandAll
 }) {
+
+const [copied, setCopied] = useState(false)
     const navigate = useNavigate()
-const [expanded, setExpanded] = useState(expandAll)
-useEffect(() => {
-    setExpanded(expandAll)
-}, [expandAll])
+    const [expanded, setExpanded] = useState(expandAll)
+    useEffect(() => {
+        setExpanded(expandAll)
+    }, [expandAll])
 
     const sortedVolumes = [...book.allVolumes].sort((a, b) => {
         const aNum = Number(a.volume)
@@ -44,21 +46,21 @@ useEffect(() => {
         )
     })
 
-const coverVolume = [...book.allVolumes]
-    .filter((volume) => volume.cover_image)
-    .sort((a, b) => {
-        const aNum = Number(a.volume)
-        const bNum = Number(b.volume)
+    const coverVolume = [...book.allVolumes]
+        .filter((volume) => volume.cover_image)
+        .sort((a, b) => {
+            const aNum = Number(a.volume)
+            const bNum = Number(b.volume)
 
-        if (!isNaN(aNum) && !isNaN(bNum)) {
-            return bNum - aNum
-        }
+            if (!isNaN(aNum) && !isNaN(bNum)) {
+                return bNum - aNum
+            }
 
-        if (!isNaN(aNum)) return -1
-        if (!isNaN(bNum)) return 1
+            if (!isNaN(aNum)) return -1
+            if (!isNaN(bNum)) return 1
 
-        return String(b.volume).localeCompare(String(a.volume))
-    })[0]
+            return String(b.volume).localeCompare(String(a.volume))
+        })[0]
 
     const coverPath = coverVolume?.cover_image
 
@@ -69,97 +71,110 @@ const coverVolume = [...book.allVolumes]
         : null
 
 
-   return (
-    <div className="book-card">
+    return (
+        <div className="book-card">
 
-        {expanded && coverUrl && (
-            <img
-                className="book-card-cover"
-                src={coverUrl}
-                alt={`${book.title} 封面`}
-                onClick={() => {
-                    if (coverVolume) {
-                        navigate(`/books/${coverVolume.id}/edit`)
-                    }
-                }}
-            />
-        )}
+            {expanded && coverUrl && (
+                <img
+                    className="book-card-cover"
+                    src={coverUrl}
+                    alt={`${book.title} 封面`}
+                    onClick={() => {
+                        if (coverVolume) {
+                            navigate(`/books/${coverVolume.id}/edit`)
+                        }
+                    }}
+                />
+            )}
 
-        <div
-            className="book-card-header"
-            onClick={() => setExpanded(!expanded)}
-        >
+            <div
+                className="book-card-header"
+                onClick={() => setExpanded(!expanded)}
+            >
 
-            <div className="book-card-info">
+                <div className="book-card-info">
 
-                <h2>
-                    {book.title}
+                    <h2
+                        className="book-card-title"
+                        onClick={async (e) => {
+                            e.stopPropagation()
 
-                    {book.subcategory && (
-                        <span className="book-subcategory">
-                            [{book.subcategory}]
-                        </span>
-                    )}
-                </h2>
+                            try {
+                                await navigator.clipboard.writeText(book.title)
+                                alert('已复制书名')
+                            } catch (error) {
+                                console.error('Failed to copy title:', error)
+                            }
+                        }}
+                        title="点击复制书名"
+                    >
+                        {book.title}
 
-                <p>
-                    Author: {book.author || 'Unknown'}
-                </p>
+                        {book.subcategory && (
+                            <span className="book-subcategory">
+                                [{book.subcategory}]
+                            </span>
+                        )}
+                    </h2>
+
+                    <p>
+                        Author: {book.author || 'Unknown'}
+                    </p>
+
+                </div>
+
+                <button
+                    type="button"
+                    className="remove-series-button"
+                    onClick={(e) => {
+                        e.stopPropagation()
+                        onRemove(book)
+                    }}
+                >
+                    移除
+                </button>
 
             </div>
 
-            <button
-                type="button"
-                className="remove-series-button"
-                onClick={(e) => {
-                    e.stopPropagation()
-                    onRemove(book)
-                }}
-            >
-                移除
-            </button>
+            {expanded && (
+                <div className="volume-indicators">
+
+                    {sortedVolumes.map((volume) => {
+
+                        const volumeValue = String(volume.volume)
+
+                        const owned =
+                            book.ownedBookIds.has(volume.id)
+
+                        return (
+                            <span
+                                key={volume.id}
+                                className={`volume-indicator ${owned ? 'owned' : ''}`}
+                                onClick={(e) => {
+                                    e.stopPropagation()
+
+                                    if (!volume.isPlaceholder) {
+                                        navigate(
+                                            `/books/${volume.id}/edit`
+                                        )
+                                    }
+                                }}
+                            >
+                                {volumeValue}
+
+                                {volume.edition &&
+                                    volume.edition !== '普通版' && (
+                                        <span className="volume-edition">
+                                            &nbsp;({volume.edition})
+                                        </span>
+                                    )}
+                            </span>
+                        )
+                    })}
+
+                </div>
+            )}
 
         </div>
-
-        {expanded && (
-            <div className="volume-indicators">
-
-                {sortedVolumes.map((volume) => {
-
-                    const volumeValue = String(volume.volume)
-
-                    const owned =
-                        book.ownedBookIds.has(volume.id)
-
-                    return (
-                        <span
-                            key={volume.id}
-                            className={`volume-indicator ${owned ? 'owned' : ''}`}
-                            onClick={(e) => {
-                                e.stopPropagation()
-
-                                if (!volume.isPlaceholder) {
-                                    navigate(
-                                        `/books/${volume.id}/edit`
-                                    )
-                                }
-                            }}
-                        >
-                            {volumeValue}
-
-                            {volume.edition &&
-                                volume.edition !== '普通版' && (
-                                    <span className="volume-edition">
-                                        &nbsp;({volume.edition})
-                                    </span>
-                                )}
-                        </span>
-                    )
-                })}
-
-            </div>
-        )}
-
-    </div>
-)
+    )
 }

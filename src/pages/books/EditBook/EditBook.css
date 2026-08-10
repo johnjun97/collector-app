@@ -169,3 +169,15 @@
     white-space: nowrap;
     flex-shrink: 0;
 }
+
+.edit-book-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+}
+
+.edit-book-title h1 {
+    margin: 0;
+}
