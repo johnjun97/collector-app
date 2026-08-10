@@ -14,7 +14,7 @@ export default function Books() {
     const navigate = useNavigate()
     const [search, setSearch] = useState('')
     const [subcategoryFilter, setSubcategoryFilter] = useState('')
-    const [expandAll, setExpandAll] = useState(false)
+const [expandAll, setExpandAll] = useState(true)
 
     useEffect(() => {
         const getBooks = async () => {

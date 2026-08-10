@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../../lib/supabaseClient'
 import './BookCard.css'
@@ -9,7 +9,10 @@ export default function BookCard({
     expandAll
 }) {
     const navigate = useNavigate()
-    const [expanded, setExpanded] = useState(true)
+const [expanded, setExpanded] = useState(expandAll)
+useEffect(() => {
+    setExpanded(expandAll)
+}, [expandAll])
 
     const sortedVolumes = [...book.allVolumes].sort((a, b) => {
         const aNum = Number(a.volume)
