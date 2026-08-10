@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
+import { debugLog } from '../lib/debug'
 import './Loading.css'
 
 export default function Loading({ text = 'Loading' }) {
-    console.log('Loading component:', text, window.location.pathname)
+    debugLog('Loading component:', text, window.location.pathname)
 
     const [dots, setDots] = useState('')
 

@@ -1,13 +1,19 @@
 const DEBUG_MODE = import.meta.env.VITE_DEBUG_MODE === 'true'
 
-export function debugLog(...args) {
-  if (DEBUG_MODE) {
-    console.log(...args)
-  }
+export const debugLog = (...args) => {
+    if (DEBUG_MODE) {
+        console.log(...args)
+    }
 }
 
-export function debugError(...args) {
-  if (DEBUG_MODE) {
-    console.error(...args)
-  }
+export const debugWarn = (...args) => {
+    if (DEBUG_MODE) {
+        console.warn(...args)
+    }
+}
+
+export const debugError = (...args) => {
+    if (DEBUG_MODE) {
+        console.error(...args)
+    }
 }
