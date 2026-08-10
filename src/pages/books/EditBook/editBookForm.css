@@ -153,3 +153,24 @@ gap: 12px;
     margin-bottom: 10px;
     color: #888;
 }
+
+.book-edit-form {
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    overflow: hidden;
+}
+
+.book-edit-form::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.88);
+    z-index: 0;
+}
+
+.book-edit-form > * {
+    position: relative;
+    z-index: 1;
+}
