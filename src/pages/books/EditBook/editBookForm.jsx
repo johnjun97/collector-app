@@ -169,25 +169,25 @@ export default function BookForm({
 
     const currentCover = getCurrentCover()
 
-return (
-    <form
-        className="book-edit-form"
-        style={
-            currentCover
-                ? {
-                    backgroundImage: `url("${currentCover}")`,
-                }
-                : undefined
-        }
-        onSubmit={(e) =>
-            handleSubmit(
-                e,
-                showOwnershipBatchEdit
-                    ? batchOwnership
-                    : null
-            )
-        }
-    >
+    return (
+        <form
+            className="book-edit-form"
+            style={
+                currentCover
+                    ? {
+                        backgroundImage: `url("${currentCover}")`,
+                    }
+                    : undefined
+            }
+            onSubmit={(e) =>
+                handleSubmit(
+                    e,
+                    showOwnershipBatchEdit
+                        ? batchOwnership
+                        : null
+                )
+            }
+        >
 
             <div className="form-field">
                 <label htmlFor="subcategory">类型</label>
@@ -413,7 +413,7 @@ return (
                         </div>
                     )}
 
-<details className="optional-fields">
+                    <details className="optional-fields">
                         <summary>其他资料（选填）</summary>
 
                         {/* 版本 */}

@@ -629,13 +629,23 @@ export default function EditBook() {
 
                 <div className="edit-book-header">
                     <div className="edit-book-title">
-                        <h1>
+                        <h1
+                            onClick={async () => {
+                                try {
+                                    await navigator.clipboard.writeText(series.title)
+                                    alert('已复制书名')
+                                } catch (error) {
+                                    debugError('Error copying title:', error)
+                                }
+                            }}
+                            title="点击复制书名"
+                            style={{ cursor: 'pointer' }}
+                        >
                             {isNumericVolume
                                 ? `${series.title} - 第${book.volume}集`
                                 : `${series.title} - ${book.volume}`
                             }
                         </h1>
-
                     </div>
 
                     <div className="header-actions">
