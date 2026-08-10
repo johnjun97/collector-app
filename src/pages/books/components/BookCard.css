@@ -6,25 +6,15 @@
 }
 
 .book-card-cover {
-    flex: 0 0 auto;
-    width: 60px;
-    height: 80px;
-    object-fit: contain;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.book-card-cover-mobile {
-    display: none;
-}
-
-.book-card-cover-desktop {
     display: block;
     width: 100%;
-    height: 220px;
+    max-width: 500px;
+    height: auto;
+    max-height: 600px;
     object-fit: contain;
+    object-position: center;
     border-radius: 6px;
-    margin: 12px 0;
+    margin: 12px auto;
     cursor: pointer;
 }
 
@@ -122,28 +112,3 @@
     border-color: green;
 }
 
-@media (max-width: 600px) {
-    .book-card-cover-mobile {
-        display: block;
-        flex: 0 0 auto;
-        width: 60px;
-        height: 80px;
-        object-fit: contain;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-
-    .book-card-cover-desktop {
-        display: none;
-    }
-
-    .book-card-cover-expanded {
-        display: block;
-        width: 100%;
-        max-height: 300px;
-        object-fit: contain;
-        border-radius: 6px;
-        margin: 12px 0;
-        cursor: pointer;
-    }
-}

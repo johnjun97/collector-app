@@ -9,7 +9,7 @@ export default function BookCard({
     expandAll
 }) {
     const navigate = useNavigate()
-    const [expanded, setExpanded] = useState(false)
+    const [expanded, setExpanded] = useState(true)
 
     useEffect(() => {
         setExpanded(expandAll)
@@ -58,114 +58,98 @@ export default function BookCard({
             .getPublicUrl(coverPath).data.publicUrl
         : null
 
-    return (
-        <div className="book-card">
 
-            <div
-                className="book-card-header"
-                onClick={() => setExpanded(!expanded)}
-            >
+   return (
+    <div className="book-card">
 
-                <div className="book-card-info">
+        {expanded && coverUrl && (
+            <img
+                className="book-card-cover"
+                src={coverUrl}
+                alt={`${book.title} 封面`}
+                onClick={() => {
+                    if (coverVolume) {
+                        navigate(`/books/${coverVolume.id}/edit`)
+                    }
+                }}
+            />
+        )}
 
-                    <h2>
-                        {book.title}
+        <div
+            className="book-card-header"
+            onClick={() => setExpanded(!expanded)}
+        >
 
-                        {book.subcategory && (
-                            <span className="book-subcategory">
-                                [{book.subcategory}]
-                            </span>
-                        )}
-                    </h2>
+            <div className="book-card-info">
 
-                    <p>
-                        Author: {book.author || 'Unknown'}
-                    </p>
+                <h2>
+                    {book.title}
 
-                </div>
+                    {book.subcategory && (
+                        <span className="book-subcategory">
+                            [{book.subcategory}]
+                        </span>
+                    )}
+                </h2>
 
-                {expanded && coverUrl && (
-                    <img
-                        className="book-card-cover-mobile"
-                        src={coverUrl}
-                        alt={`${book.title} 封面`}
-                        onClick={(e) => {
-                            e.stopPropagation()
-
-                            if (coverVolume) {
-                                navigate(`/books/${coverVolume.id}/edit`)
-                            }
-                        }}
-                    />
-                )}
-
-                <button
-                    type="button"
-                    className="remove-series-button"
-                    onClick={(e) => {
-                        e.stopPropagation()
-                        onRemove(book)
-                    }}
-                >
-                    移除
-                </button>
+                <p>
+                    Author: {book.author || 'Unknown'}
+                </p>
 
             </div>
 
-            {expanded && coverUrl && (
-    <img
-        className="book-card-cover-desktop"
-        src={coverUrl}
-        alt={`${book.title} 封面`}
-        onClick={() => {
-            if (coverVolume) {
-                navigate(`/books/${coverVolume.id}/edit`)
-            }
-        }}
-    />
-)}
+            <button
+                type="button"
+                className="remove-series-button"
+                onClick={(e) => {
+                    e.stopPropagation()
+                    onRemove(book)
+                }}
+            >
+                移除
+            </button>
 
-            {expanded && (
-                <>
-                    <div className="volume-indicators">
-
-                        {sortedVolumes.map((volume) => {
-
-                            const volumeValue = String(volume.volume)
-
-                            const owned =
-                                book.ownedBookIds.has(volume.id)
-
-                            return (
-                                <span
-                                    key={volume.id}
-                                    className={`volume-indicator ${owned ? 'owned' : ''}`}
-                                    onClick={(e) => {
-                                        e.stopPropagation()
-
-                                        if (!volume.isPlaceholder) {
-                                            navigate(
-                                                `/books/${volume.id}/edit`
-                                            )
-                                        }
-                                    }}
-                                >
-                                    {volumeValue}
-
-                                    {volume.edition &&
-                                        volume.edition !== '普通版' && (
-                                            <span className="volume-edition">
-                                                &nbsp;({volume.edition})
-                                            </span>
-                                        )}
-                                </span>
-                            )
-                        }
-                        )}
-
-                    </div>
-                </>
-            )}
         </div>
-    )
+
+        {expanded && (
+            <div className="volume-indicators">
+
+                {sortedVolumes.map((volume) => {
+
+                    const volumeValue = String(volume.volume)
+
+                    const owned =
+                        book.ownedBookIds.has(volume.id)
+
+                    return (
+                        <span
+                            key={volume.id}
+                            className={`volume-indicator ${owned ? 'owned' : ''}`}
+                            onClick={(e) => {
+                                e.stopPropagation()
+
+                                if (!volume.isPlaceholder) {
+                                    navigate(
+                                        `/books/${volume.id}/edit`
+                                    )
+                                }
+                            }}
+                        >
+                            {volumeValue}
+
+                            {volume.edition &&
+                                volume.edition !== '普通版' && (
+                                    <span className="volume-edition">
+                                        &nbsp;({volume.edition})
+                                    </span>
+                                )}
+                        </span>
+                    )
+                })}
+
+            </div>
+        )}
+
+    </div>
+)
 }
