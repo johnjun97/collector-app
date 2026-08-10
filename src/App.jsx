@@ -7,11 +7,11 @@ import ProtectedRoute from './routes/ProtectedRoute.jsx'
 import ForgotPassword from './pages/forgot-password/ForgotPassword.jsx'
 import ResetPassword from './pages/reset-password/ResetPassword.jsx'
 import { supabase } from './lib/supabaseClient'
-import { useAuthListener } from './auth/useAuthListener'
 import Books from './pages/books/Books.jsx'
 import NewBook from './pages/books/NewBook/NewBook.jsx'
 import EditBook from './pages/books/EditBook/EditBook.jsx'
 import ComingSoon from './pages/coming-soon/ComingSoon.jsx'
+import Loading from './components/Loading.jsx'
 
 export default function App() {
 
@@ -40,7 +40,7 @@ export default function App() {
     return () => subscription.unsubscribe()
   }, [])
 
-  if (loading) return <p>Loading...</p>
+  if (loading) return <Loading />
 
   return (
     <Routes>
