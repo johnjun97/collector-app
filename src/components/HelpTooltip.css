@@ -1,0 +1,41 @@
+.help-tooltip {
+    position: relative;
+    display: inline-block;
+    margin-left: 6px;
+}
+
+.help-tooltip-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border: 1px solid #999;
+    border-radius: 50%;
+    color: #666;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+    cursor: help;
+}
+
+.help-tooltip-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    width: 260px;
+    padding: 10px 12px;
+    background: #333;
+    color: #fff;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: normal;
+    line-height: 1.5;
+    text-align: left;
+    z-index: 100;
+}
+
+.help-tooltip:hover .help-tooltip-content {
+    display: block;
+}

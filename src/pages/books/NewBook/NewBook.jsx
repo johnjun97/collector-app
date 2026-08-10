@@ -37,6 +37,24 @@ export default function NewBook() {
                 throw seriesFindError
             }
 
+            let coverPath = null
+
+            if (form.cover) {
+                const fileExt = form.cover.name.split('.').pop()
+                const fileName = `${crypto.randomUUID()}.${fileExt}`
+
+                const { error: uploadError } = await supabase
+                    .storage
+                    .from('book-covers')
+                    .upload(fileName, form.cover)
+
+                if (uploadError) {
+                    throw uploadError
+                }
+
+                coverPath = fileName
+            }
+
             let series
 
             // 2. Use existing series or create a new one
@@ -109,6 +127,7 @@ export default function NewBook() {
                                 publisher: form.publisher.trim() || null,
                                 isbn: form.isbn.trim() || null,
                                 release_date: form.releaseDate || null,
+                                cover_url: coverPath,
                                 created_by: user.id,
                             })
                             .select()

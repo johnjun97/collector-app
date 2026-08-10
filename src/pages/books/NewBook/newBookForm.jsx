@@ -3,7 +3,7 @@ import { supabase } from '../../../lib/supabaseClient'
 import OpenCC from 'opencc-js'
 import SuggestionInput from '../components/SuggestionInput'
 import './newBookForm.css'
-
+import HelpTooltip from '../../../components/HelpTooltip'
 
 const converter = OpenCC.Converter({ from: 'tw', to: 'cn' })
 
@@ -25,6 +25,7 @@ export default function BookForm({
         releaseDate: '',
         purchasedDate: '',
         purchasedPrice: '',
+        cover: null,
     })
 
     const [saving, setSaving] = useState(false)
@@ -253,6 +254,8 @@ export default function BookForm({
                     <option value="同人志">同人志</option>
                     <option value="其他">其他</option>
                 </select>
+
+
             </div>
 
             <SuggestionInput
@@ -371,13 +374,25 @@ export default function BookForm({
                     />
                 </div>
 
-                <div className="ownership-field">
-                    <label htmlFor="cover">封面: </label>
+                <div className="form-field">
+                    <label htmlFor="cover">封面
+                        <HelpTooltip>
+                            上传的封面将应用于本次新增的所有集数。
+                        </HelpTooltip>
+                    </label>
+
                     <input
                         id="cover"
                         type="file"
                         accept="image/*"
+                        onChange={(e) =>
+                            setForm({
+                                ...form,
+                                cover: e.target.files?.[0] || null
+                            })
+                        }
                     />
+
                 </div>
 
             </details>

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { supabase } from '../../../lib/supabaseClient'
 import SuggestionInput from '../components/SuggestionInput'
 import './editBookForm.css'
+import HelpTooltip from '../../../components/HelpTooltip'
 
 export default function BookForm({
     batchOwnership,
@@ -180,14 +181,11 @@ export default function BookForm({
                             {showBatchAdd ? '新增集数' : '新增集数'}
                         </button>
 
-                        <span className="batch-add-help">
-                            !
-                            <span className="batch-add-tooltip">
-                                购买日期和购买价格如有填写，
-                                将应用于所有批量新增的集数。
-                                留空则不会修改已有集数的相关资料。
-                            </span>
-                        </span>
+             <HelpTooltip>
+    购买日期和购买价格如有填写，
+    将应用于所有批量新增的集数。
+    留空则不会修改已有集数的相关资料。
+</HelpTooltip>
 
                     </div>
                 </div>
