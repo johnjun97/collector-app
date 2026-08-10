@@ -44,13 +44,7 @@
 }
 
 .book-title-with-icon {
-    display: inline;
-}
-
-.book-card-expand-icon {
     white-space: nowrap;
-    margin-left: 6px;
-    font-size: 14px;
 }
 
 .book-card-expand-icon {

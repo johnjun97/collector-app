@@ -123,18 +123,15 @@ export default function BookCard({
                         }}
                         title="点击复制书名"
                     >
-       <span className="book-title-with-icon">
-    {book.title}
-    <span className="book-card-expand-icon">
-        {expanded ? '▼' : '▶'}
-    </span>
-</span>
-
-{book.subcategory && (
-    <span className="book-subcategory">
-        [{book.subcategory}]
-    </span>
-)}
+                        {book.title}
+                        <span className="book-card-expand-icon">
+                            {expanded ? '▼' : '▶'}
+                        </span>
+                        {book.subcategory && (
+                            <span className="book-subcategory">
+                                [{book.subcategory}]
+                            </span>
+                        )}
 
                     </h2>
 
