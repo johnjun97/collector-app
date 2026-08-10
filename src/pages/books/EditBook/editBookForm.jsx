@@ -527,8 +527,7 @@ export default function BookForm({
                             <input
                                 id="cover"
                                 type="file"
-                                accept="image/*"
-                                capture="environment"
+                                accept="image/jpeg,image/png,image/webp"
                                 onChange={(e) =>
                                     setCover(e.target.files?.[0] || null)
                                 }
