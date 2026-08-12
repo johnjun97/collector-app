@@ -599,14 +599,19 @@ export default function EditBook() {
                 <main
                     className="edit-book-page"
                     style={{
-                        backgroundImage: book?.cover_image
-                            ? `url(${supabase.storage
-                                .from('book-covers')
-                                .getPublicUrl(book.cover_image).data.publicUrl})`
-                            : 'none'
+                        backgroundImage:
+                            book?.cover_image_url
+                                ? `url("${book.cover_image_url}")`
+                                : book?.cover_image
+                                    ? `url("${supabase.storage
+                                        .from('book-covers')
+                                        .getPublicUrl(book.cover_image).data.publicUrl}")`
+                                    : 'none'
                     }}
                 >
-                    <Loading text="正在加载" />
+                    <div className="edit-book-loading-overlay">
+                        <Loading text="正在加载" />
+                    </div>
                 </main>
             </>
         )
@@ -684,11 +689,14 @@ export default function EditBook() {
                 <section
                     className="edit-book-content"
                     style={{
-                        backgroundImage: book.cover_image
-                            ? `url(${supabase.storage
-                                .from('book-covers')
-                                .getPublicUrl(book.cover_image).data.publicUrl})`
-                            : 'none'
+                        backgroundImage:
+                            book?.cover_image
+                                ? `url("${supabase.storage
+                                    .from('book-covers')
+                                    .getPublicUrl(book.cover_image).data.publicUrl}")`
+                                : book?.cover_image_url
+                                    ? `url("${book.cover_image_url}")`
+                                    : 'none'
                     }}
                 >
                     <EditBookForm
