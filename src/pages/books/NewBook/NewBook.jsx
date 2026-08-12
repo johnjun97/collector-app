@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../../lib/supabaseClient'
 import { debugError } from '../../../lib/debug'
 import Navbar from '../../../components/Navbar'
-import BookForm from "./newBookForm"
+import NewBookForm from './newBookForm'
 import './NewBook.css'
 
 export default function NewBook() {
@@ -12,10 +12,10 @@ export default function NewBook() {
     const handleSubmit = async (form, ownsBook, parsedVolumes) => {
 
         console.log('handleSubmit called:', {
-    form,
-    ownsBook,
-    parsedVolumes
-})
+            form,
+            ownsBook,
+            parsedVolumes
+        })
 
         try {
             const title = form.title.trim()
@@ -206,7 +206,7 @@ export default function NewBook() {
 
                 <div className="new-book-form-container">
 
-                    <BookForm
+                    <NewBookForm
                         onSubmit={handleSubmit}
                         onCancel={() => navigate('/books')}
                     />

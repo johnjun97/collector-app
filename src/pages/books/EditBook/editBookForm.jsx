@@ -4,7 +4,7 @@ import SuggestionInput from '../components/SuggestionInput'
 import './editBookForm.css'
 import HelpTooltip from '../../../components/HelpTooltip'
 
-export default function BookForm({
+export default function editBookForm({
     batchOwnership,
     setBatchOwnership,
     batchVolumes,

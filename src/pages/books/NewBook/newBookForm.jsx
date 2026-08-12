@@ -6,10 +6,11 @@ import './newBookForm.css'
 import HelpTooltip from '../../../components/HelpTooltip'
 import { useZxing } from 'react-zxing'
 import { BrowserMultiFormatReader } from '@zxing/browser'
+import Loading from '../../../components/loading'
 
 const converter = OpenCC.Converter({ from: 'tw', to: 'cn' })
 
-export default function BookForm({
+export default function NewBookForm({
     initialData,
     onSubmit,
     onBatchAdd,
@@ -392,10 +393,13 @@ export default function BookForm({
     return (
         <form className="new-book-form" onSubmit={handleSubmit}>
 
-            {saving && (
+            {(saving || lookingUpISBN) && (
                 <div className="saving-overlay">
                     <div className="saving-message">
-                        保存中...
+                        <Loading
+                            text={saving ? '保存中' : '查询中'}
+                            inline
+                        />
                     </div>
                 </div>
             )}
@@ -422,44 +426,99 @@ export default function BookForm({
                 <label htmlFor="isbn">ISBN</label>
 
                 <div className="isbn-input-row">
-                    <input
-                        id="isbn"
-                        name="isbn"
-                        type="text"
-                        autoComplete="off"
-                        placeholder="请输入 ISBN"
-                        value={form.isbn}
-                        onChange={handleChange}
-                    />
+
+                    <div className="isbn-input-group">
+                        <input
+                            id="isbn"
+                            name="isbn"
+                            type="text"
+                            autoComplete="off"
+                            placeholder="请输入 ISBN"
+                            value={form.isbn}
+                            onChange={handleChange}
+                        />
+
+                        <button
+                            type="button"
+                            className="isbn-icon-button"
+                            onClick={() => setScanningISBN(prev => !prev)}
+                            title={scanningISBN ? '关闭扫描' : '扫描 ISBN'}
+                            aria-label={scanningISBN ? '关闭扫描' : '扫描 ISBN'}
+                        >
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path
+                                    d="M4 7V5a1 1 0 0 1 1-1h2M17 4h2a1 1 0 0 1 1 1v2M20 17v2a1 1 0 0 1-1 1h-2M7 20H5a1 1 0 0 1-1-1v-2"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                />
+                                <path
+                                    d="M8 9h8v6H8z"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                />
+                                <path
+                                    d="M10 12h4"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                />
+                            </svg>
+                        </button>
+
+                        <label
+                            className="isbn-icon-button"
+                            title="从相册选择"
+                            aria-label="从相册选择"
+                        >
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <rect
+                                    x="3"
+                                    y="4"
+                                    width="18"
+                                    height="16"
+                                    rx="2"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                />
+                                <circle
+                                    cx="8.5"
+                                    cy="9"
+                                    r="1.5"
+                                    fill="currentColor"
+                                />
+                                <path
+                                    d="M3 17l5-5 3 3 2-2 5 5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                />
+                            </svg>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                hidden
+                                onChange={(e) => {
+                                    scanISBNFromImage(e.target.files?.[0])
+                                    e.target.value = ''
+                                }}
+                            />
+                        </label>
+                    </div>
 
                     <button
                         type="button"
+                        className="google-books-button"
                         onClick={lookupISBN}
                         disabled={lookingUpISBN}
                     >
-                        {lookingUpISBN ? '查询中...' : 'Google Books 查询'}
+                        Google Books 查询
                     </button>
-
-                    <button
-                        type="button"
-                        onClick={() => setScanningISBN(true)}
-                        disabled={scanningISBN}
-                    >
-                        扫描 ISBN
-                    </button>
-
-                    <label className="scan-image-button">
-                        从相册选择
-                        <input
-                            type="file"
-                            accept="image/*"
-                            hidden
-                            onChange={(e) => {
-                                scanISBNFromImage(e.target.files?.[0])
-                                e.target.value = ''
-                            }}
-                        />
-                    </label>
 
                 </div>
             </div>
@@ -476,12 +535,13 @@ export default function BookForm({
                         }}
                     />
 
-                    <button
-                        type="button"
-                        onClick={() => setScanningISBN(false)}
-                    >
-                        取消扫描
-                    </button>
+         <button
+    type="button"
+    className="cancel-scan-button"
+    onClick={() => setScanningISBN(false)}
+>
+    取消扫描
+</button>
                 </div>
             )}
 

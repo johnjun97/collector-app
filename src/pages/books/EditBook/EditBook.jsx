@@ -5,7 +5,7 @@ import { debugError } from '../../../lib/debug'
 import Navbar from '../../../components/Navbar'
 import './EditBook.css'
 import Loading from '../../../components/Loading.jsx'
-import BookForm from './editBookForm'
+import EditBookForm from './editBookForm'
 
 export default function EditBook() {
     const { id } = useParams()
@@ -516,7 +516,7 @@ export default function EditBook() {
                             purchased_price: ownsBook
                                 ? purchasedPrice || null
                                 : null,
-                                updated_at: new Date().toISOString(),
+                            updated_at: new Date().toISOString(),
                         },
                         {
                             onConflict: 'user_id,book_id'
@@ -691,7 +691,7 @@ export default function EditBook() {
                             : 'none'
                     }}
                 >
-                    <BookForm
+                    <EditBookForm
                         setBatchVolumes={setBatchVolumes}
                         batchOwnership={batchOwnership}
                         setBatchOwnership={setBatchOwnership}
