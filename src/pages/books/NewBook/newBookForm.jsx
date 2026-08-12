@@ -269,6 +269,8 @@ export default function NewBookForm({
                 isbn: isbn13 || isbn10 || prev.isbn,
 
                 coverUrl:
+                    info.imageLinks?.large ||
+                    info.imageLinks?.medium ||
                     info.imageLinks?.thumbnail ||
                     prev.coverUrl,
             }))
