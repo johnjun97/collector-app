@@ -75,6 +75,12 @@ export default function NewBookForm({
                                 ...prev,
                                 isbn: value
                             }))
+
+                            setScanningISBN(false)
+
+                            setTimeout(() => {
+                                setDetectedISBN('')
+                            }, 3000)
                         }
                     }
                 )
@@ -162,6 +168,7 @@ export default function NewBookForm({
                 ...prev,
                 isbn: value
             }))
+            setScanningISBN(false)
 
             URL.revokeObjectURL(imageUrl)
 
@@ -473,6 +480,39 @@ export default function NewBookForm({
                 </select>
             </div>
 
+            {scanningISBN && (
+                <div className="isbn-scanner">
+
+                    <video
+                        ref={videoRef}
+                        autoPlay
+                        muted
+                        playsInline
+                        style={{
+                            width: '100%',
+                            maxWidth: '400px',
+                            display: 'block',
+                            marginTop: '10px'
+                        }}
+                    />
+
+                    <button
+                        type="button"
+                        className="cancel-scan-button"
+                        onClick={() => setScanningISBN(false)}
+                    >
+                        取消扫描
+                    </button>
+
+                </div>
+            )}
+
+            {detectedISBN && (
+                <div className="isbn-detected-message">
+                    已检测到 ISBN：{detectedISBN}
+                </div>
+            )}
+
             <div className="form-field">
                 <label htmlFor="isbn">ISBN</label>
 
@@ -574,36 +614,9 @@ export default function NewBookForm({
                 </div>
             </div>
 
-            {scanningISBN && (
-                <div className="isbn-scanner">
-
-                    <video
-                        ref={videoRef}
-                        autoPlay
-                        muted
-                        playsInline
-                        style={{
-                            width: '100%',
-                            maxWidth: '400px',
-                            display: 'block',
-                            marginTop: '10px'
-                        }}
-                    />
-
-                    {detectedISBN && (
-                        <div className="isbn-detected-message">
-                            已检测到 ISBN：{detectedISBN}
-                        </div>
-                    )}
-
-                    <button
-                        type="button"
-                        className="cancel-scan-button"
-                        onClick={() => setScanningISBN(false)}
-                    >
-                        取消扫描
-                    </button>
-
+            {detectedISBN && (
+                <div className="isbn-detected-message">
+                    已检测到 ISBN：{detectedISBN}
                 </div>
             )}
 
