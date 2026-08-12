@@ -82,9 +82,10 @@ export default function Home() {
         (book) => book.is_owned
       ).length
 
-      // 4. Set ALL books statistics
+      const userBookCount = userBooks.length
+
       setBookStats({
-        total: allBooks.length,
+        total: userBookCount,
         owned: ownedCount
       })
 
