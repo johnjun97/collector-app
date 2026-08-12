@@ -75,11 +75,6 @@ export default function NewBookForm({
                                 ...prev,
                                 isbn: value
                             }))
-
-                            setTimeout(() => {
-                                setScanningISBN(false)
-                                setDetectedISBN('')
-                            }, 1500)
                         }
                     }
                 )
