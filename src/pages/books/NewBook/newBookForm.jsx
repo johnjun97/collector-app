@@ -489,8 +489,9 @@ export default function NewBookForm({
                         muted
                         playsInline
                         style={{
-                            width: '300px',
-                            height: '120px',
+                            width: '100%',
+                            maxWidth: '400px',
+                            aspectRatio: '3 / 1',
                             objectFit: 'cover',
                             display: 'block',
                             marginTop: '10px'
