@@ -95,6 +95,27 @@ export default function NewBookForm({
 
             const info = data.items[0].volumeInfo
 
+            const apiAuthor = info.authors?.join(', ') || ''
+
+            let authorName = apiAuthor
+
+            if (apiAuthor) {
+                const { data: authorAlias, error: authorAliasError } =
+                    await supabase
+                        .from('author_aliases')
+                        .select('chinese_name')
+                        .eq('source_name', apiAuthor)
+                        .maybeSingle()
+
+                if (authorAliasError) {
+                    console.error('Author alias lookup error:', authorAliasError)
+                }
+
+                if (authorAlias) {
+                    authorName = authorAlias.chinese_name
+                }
+            }
+
             const rawTitle = info.title || ''
 
             // Detect volume at the end:
@@ -162,7 +183,7 @@ export default function NewBookForm({
                 volume: volume || prev.volume,
 
                 author:
-                    converter(info.authors?.join(', ') || '') ||
+                    converter(authorName) ||
                     prev.author,
 
                 publisher:
