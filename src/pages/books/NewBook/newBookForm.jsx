@@ -71,13 +71,6 @@ export default function NewBookForm({
 
                             setDetectedISBN(value)
 
-                            setForm(prev => ({
-                                ...prev,
-                                isbn: value
-                            }))
-
-                            setScanningISBN(false)
-
                             setTimeout(() => {
                                 setDetectedISBN('')
                             }, 3000)
@@ -178,8 +171,8 @@ export default function NewBookForm({
         }
     }
 
-    const lookupISBN = async () => {
-        const isbn = form.isbn.trim()
+    const lookupISBN = async (isbnValue = form.isbn) => {
+        const isbn = isbnValue.trim()
 
         if (!isbn) {
             alert('请输入 ISBN')
@@ -497,7 +490,7 @@ export default function NewBookForm({
                         style={{
                             width: '100%',
                             maxWidth: '400px',
-                            aspectRatio: '3 / 1',
+                            aspectRatio: '3 / 1.3',
                             objectFit: 'cover',
                             display: 'block',
                             marginTop: '10px'
