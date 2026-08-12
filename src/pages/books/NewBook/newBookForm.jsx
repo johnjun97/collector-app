@@ -95,6 +95,25 @@ export default function NewBookForm({
 
             const info = data.items[0].volumeInfo
 
+            const rawTitle = info.title || ''
+
+            // Detect volume at the end:
+            // (1), (2), （1）, （2）, (全), （全）, etc.
+            const volumeMatch = rawTitle.match(
+                /[\s]*[（(]([0-9]+|全|上|下)[）)]$/
+            )
+
+            const cleanTitle = volumeMatch
+                ? rawTitle.replace(
+                    /[\s]*[（(]([0-9]+|全|上|下)[）)]$/,
+                    ''
+                )
+                : rawTitle
+
+            const volume = volumeMatch
+                ? volumeMatch[1]
+                : ''
+
             const missingInfo = []
 
             if (!info.imageLinks) {
@@ -113,12 +132,6 @@ export default function NewBookForm({
                 missingInfo.push('发售日期')
             }
 
-            const rawTitle = info.title || ''
-
-            const volumeMatch = rawTitle.match(
-                /[\s]*[（(]([0-9]+|全|上|下)[）)]$/
-            )
-
             if (!volumeMatch) {
                 missingInfo.push('集数')
             }
@@ -130,20 +143,6 @@ export default function NewBookForm({
             } else {
                 setIsbnLookupError('')
             }
-
-            const rawTitle = info.title || ''
-
-            // Detect volume at the end:
-            // (1), (2), （1）, （2）, (全), （全）, etc.
-            const volumeMatch = rawTitle.match(/[\s]*[（(]([0-9]+|全|上|下)[）)]$/)
-
-            const cleanTitle = volumeMatch
-                ? rawTitle.replace(/[\s]*[（(]([0-9]+|全|上|下)[）)]$/, '')
-                : rawTitle
-
-            const volume = volumeMatch
-                ? volumeMatch[1]
-                : ''
 
             const isbn13 =
                 info.industryIdentifiers?.find(
