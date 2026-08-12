@@ -117,20 +117,25 @@ export default function NewBookForm({
             }
 
             const rawTitle = info.title || ''
+            const rawSubtitle = info.subtitle || ''
+
+            const combinedTitle = rawSubtitle
+                ? `${rawTitle} ${rawSubtitle}`
+                : rawTitle
 
             // Detect volume at the end:
-            // (1), (2), （1）, （2）, (全), （全）, etc.
-            const volumeMatch = rawTitle.match(
-                /[\s]*[（(]([0-9]+|全|上|下)[）)]$/
+            // (1), (2), （1）, （2）, (全), （全）, (上), (下), （上）, （下）
+            const volumeMatch = combinedTitle.match(
+                /[\s]*[（(](\d+|全|上|下)[）)]$/
             )
 
             const cleanTitle = volumeMatch
-                ? rawTitle.replace(
-                    /[\s]*[（(]([0-9]+|全|上|下)[）)]$/,
+                ? combinedTitle.replace(
+                    /[\s]*[（(](\d+|全|上|下)[）)]$/,
                     ''
                 )
-                : rawTitle
-
+                : combinedTitle
+                
             const volume = volumeMatch
                 ? volumeMatch[1]
                 : ''
