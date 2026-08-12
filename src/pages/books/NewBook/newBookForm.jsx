@@ -37,16 +37,22 @@ export default function NewBookForm({
     const [lookingUpISBN, setLookingUpISBN] = useState(false)
     const [scanningISBN, setScanningISBN] = useState(false)
 
+    useEffect(() => {
+        console.log('scanningISBN:', scanningISBN)
+    }, [scanningISBN])
+
     const { ref } = useZxing({
         paused: !scanningISBN,
+
         constraints: {
+            audio: false,
             video: {
                 facingMode: { ideal: 'environment' },
                 width: { ideal: 1280 },
                 height: { ideal: 720 }
             }
         },
-        formats: ['ean_13'],
+
         onDecodeResult(result) {
             const value = result.getText()
 
@@ -59,6 +65,7 @@ export default function NewBookForm({
 
             setScanningISBN(false)
         },
+
         onError(error) {
             console.error('Barcode scanner error:', error)
         }
