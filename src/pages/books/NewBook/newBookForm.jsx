@@ -41,12 +41,16 @@ export default function NewBookForm({
         paused: !scanningISBN,
         constraints: {
             video: {
-                facingMode: 'environment'
+                facingMode: { ideal: 'environment' },
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
             }
         },
         formats: ['ean_13'],
         onDecodeResult(result) {
             const value = result.getText()
+
+            console.log('ISBN barcode detected:', value)
 
             setForm(prev => ({
                 ...prev,
@@ -54,6 +58,9 @@ export default function NewBookForm({
             }))
 
             setScanningISBN(false)
+        },
+        onError(error) {
+            console.error('Barcode scanner error:', error)
         }
     })
 
@@ -527,6 +534,9 @@ export default function NewBookForm({
                 <div className="isbn-scanner">
                     <video
                         ref={ref}
+                        autoPlay
+                        muted
+                        playsInline
                         style={{
                             width: '100%',
                             maxWidth: '400px',
@@ -535,13 +545,13 @@ export default function NewBookForm({
                         }}
                     />
 
-         <button
-    type="button"
-    className="cancel-scan-button"
-    onClick={() => setScanningISBN(false)}
->
-    取消扫描
-</button>
+                    <button
+                        type="button"
+                        className="cancel-scan-button"
+                        onClick={() => setScanningISBN(false)}
+                    >
+                        取消扫描
+                    </button>
                 </div>
             )}
 
