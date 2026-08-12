@@ -6,6 +6,7 @@ import './newBookForm.css'
 import HelpTooltip from '../../../components/HelpTooltip'
 import { BrowserMultiFormatReader } from '@zxing/browser'
 import Loading from '../../../components/Loading.jsx'
+import useMessage from '../../../components/useMessage'
 
 const converter = OpenCC.Converter({ from: 'tw', to: 'cn' })
 
@@ -36,9 +37,8 @@ export default function NewBookForm({
     const [lookingUpISBN, setLookingUpISBN] = useState(false)
     const [scanningISBN, setScanningISBN] = useState(false)
     const [detectedISBN, setDetectedISBN] = useState('')
-    const [lookupMessage, setLookupMessage] = useState('')
-    const [lookupError, setLookupError] = useState(false)
-    const [isbnLookupError, setIsbnLookupError] = useState('')
+    const [lookupMessage, setLookupMessage] = useMessage()
+    const [isbnLookupError, setIsbnLookupError] = useMessage()
 
     const videoRef = useRef(null)
     const scannerControlsRef = useRef(null)
@@ -46,12 +46,10 @@ export default function NewBookForm({
     const lookupISBN = async (isbnValue = form.isbn) => {
         const isbn = isbnValue.trim()
         setLookupMessage('')
-        setLookupError(false)
         setIsbnLookupError('')
 
         if (!isbn) {
             setLookupMessage('请输入 ISBN')
-            setLookupError(true)
             return
         }
 
@@ -92,7 +90,6 @@ export default function NewBookForm({
                 }))
 
                 setLookupMessage('Google Books 找不到这本书')
-                setLookupError(true)
                 return
             }
 
@@ -100,19 +97,16 @@ export default function NewBookForm({
 
             if (!info.imageLinks) {
                 setIsbnLookupError('Google Books 找不到这本书的封面')
-
-                setTimeout(() => {
-                    setIsbnLookupError('')
-                }, 3000)
             }
 
             const rawTitle = info.title || ''
 
-            // Detect "(1)", "(2)", "(全)" etc. at the end
-            const volumeMatch = rawTitle.match(/\((\d+)\)$/)
+            // Detect volume at the end:
+            // (1), (2), （1）, （2）, (全), （全）, etc.
+            const volumeMatch = rawTitle.match(/[\s]*[（(]([0-9]+|全|上|下)[）)]$/)
 
             const cleanTitle = volumeMatch
-                ? rawTitle.replace(/\s*\(\d+\)$/, '')
+                ? rawTitle.replace(/[\s]*[（(]([0-9]+|全|上|下)[）)]$/, '')
                 : rawTitle
 
             const volume = volumeMatch
@@ -175,8 +169,6 @@ export default function NewBookForm({
                 console.error('Google Books lookup error:', error)
                 setLookupMessage('查询 Google Books 失败')
             }
-
-            setLookupError(true)
         } finally {
             clearTimeout(timeoutId)
             setLookingUpISBN(false)
@@ -202,7 +194,8 @@ export default function NewBookForm({
                         video: {
                             facingMode: { ideal: 'environment' },
                             width: { ideal: 1280 },
-                            height: { ideal: 720 }
+                            height: { ideal: 720 },
+                            focusMode: 'continuous'
                         }
                     },
                     videoRef.current,
@@ -242,7 +235,6 @@ export default function NewBookForm({
 
                 if (!cancelled) {
                     setLookupMessage(`无法启动摄像头：${error.message}`)
-                    setLookupError(true)
                     setScanningISBN(false)
                 }
             }
@@ -331,7 +323,6 @@ export default function NewBookForm({
             }))
 
             setLookupMessage('无法从图片中找到 ISBN 条码')
-            setLookupError(true)
         }
     }
 
@@ -546,6 +537,11 @@ export default function NewBookForm({
                         }}
                     />
 
+                    <div className="isbn-scan-guide">
+                        <div className="isbn-scan-frame" />
+                        <p>请将 ISBN 条码放入框内</p>
+                    </div>
+
                     <button
                         type="button"
                         className="cancel-scan-button"
@@ -564,7 +560,7 @@ export default function NewBookForm({
             )}
 
             {lookupMessage && (
-                <div className={`isbn-detected-message ${lookupError ? 'isbn-lookup-error' : ''}`}>
+                <div className="isbn-detected-message isbn-lookup-error">
                     {lookupMessage}
                 </div>
             )}
