@@ -40,137 +40,6 @@ export default function NewBookForm({
     const videoRef = useRef(null)
     const scannerControlsRef = useRef(null)
 
-    useEffect(() => {
-        if (!scanningISBN) {
-            scannerControlsRef.current?.stop()
-            scannerControlsRef.current = null
-            return
-        }
-
-        let cancelled = false
-
-        const startScanner = async () => {
-            try {
-                const reader = new BrowserMultiFormatReader()
-
-                const controls = await reader.decodeFromConstraints(
-                    {
-                        audio: false,
-                        video: {
-                            facingMode: { ideal: 'environment' },
-                            width: { ideal: 1280 },
-                            height: { ideal: 720 }
-                        }
-                    },
-                    videoRef.current,
-                    (result, error) => {
-                        if (result) {
-                            const value = result.getText()
-
-                            console.log('ISBN barcode detected:', value)
-
-                            setDetectedISBN(value)
-
-                            setTimeout(() => {
-                                setDetectedISBN('')
-                            }, 3000)
-                        }
-                    }
-                )
-
-                if (cancelled) {
-                    controls.stop()
-                } else {
-                    scannerControlsRef.current = controls
-                }
-
-            } catch (error) {
-                console.error('Barcode scanner error:', error)
-
-                if (!cancelled) {
-                    alert(`无法启动摄像头：${error.message}`)
-                    setScanningISBN(false)
-                }
-            }
-        }
-
-        startScanner()
-
-        return () => {
-            cancelled = true
-            scannerControlsRef.current?.stop()
-            scannerControlsRef.current = null
-        }
-    }, [scanningISBN])
-
-    useEffect(() => {
-        console.log('scanningISBN:', scanningISBN)
-    }, [scanningISBN])
-
-    const [suggestions, setSuggestions] = useState({
-        title: [],
-        edition: [],
-        author: [],
-        publisher: [],
-    })
-
-    useEffect(() => {
-        if (!initialData) return
-
-        setForm({
-            subcategory: initialData.subcategory || '漫画',
-            title: initialData.title || '',
-            volume: initialData.volume || '',
-            edition: initialData.edition || '普通版',
-            author: initialData.author || '',
-            publisher: initialData.publisher || '',
-            isbn: initialData.isbn || '',
-            releaseDate: initialData.release_date || '',
-            purchasedDate: initialData.purchased_date || '',
-            purchasedPrice: initialData.purchased_price || '',
-            cover: null,
-            coverUrl: initialData.cover_url || '',
-        })
-    }, [initialData])
-
-    const handleChange = (e) => {
-        const value =
-            e.target.name === 'subcategory'
-                ? e.target.value
-                : converter(e.target.value)
-
-        setForm({
-            ...form,
-            [e.target.name]: value
-        })
-    }
-
-    const scanISBNFromImage = async (file) => {
-        if (!file) return
-
-        try {
-            const reader = new BrowserMultiFormatReader()
-
-            const imageUrl = URL.createObjectURL(file)
-
-            const result = await reader.decodeFromImageUrl(imageUrl)
-
-            const value = result.getText()
-
-            setForm(prev => ({
-                ...prev,
-                isbn: value
-            }))
-            setScanningISBN(false)
-
-            URL.revokeObjectURL(imageUrl)
-
-        } catch (error) {
-            console.error('ISBN image scan error:', error)
-            alert('无法从图片中找到 ISBN 条码')
-        }
-    }
-
     const lookupISBN = async (isbnValue = form.isbn) => {
         const isbn = isbnValue.trim()
 
@@ -283,6 +152,147 @@ export default function NewBookForm({
         } finally {
             clearTimeout(timeoutId)
             setLookingUpISBN(false)
+        }
+    }
+
+    useEffect(() => {
+        if (!scanningISBN) {
+            scannerControlsRef.current?.stop()
+            scannerControlsRef.current = null
+            return
+        }
+
+        let cancelled = false
+
+        const startScanner = async () => {
+            try {
+                const reader = new BrowserMultiFormatReader()
+
+                const controls = await reader.decodeFromConstraints(
+                    {
+                        audio: false,
+                        video: {
+                            facingMode: { ideal: 'environment' },
+                            width: { ideal: 1280 },
+                            height: { ideal: 720 }
+                        }
+                    },
+                    videoRef.current,
+                    (result, error) => {
+                        if (result) {
+                            const value = result.getText()
+
+                            console.log('ISBN barcode detected:', value)
+                            console.log('Starting automatic Google Books lookup:', value)
+
+                            setDetectedISBN(value)
+
+                            setForm(prev => ({
+                                ...prev,
+                                isbn: value
+                            }))
+
+                            setScanningISBN(false)
+
+                            lookupISBN(value)
+
+                            setTimeout(() => {
+                                setDetectedISBN('')
+                            }, 3000)
+                        }
+                    }
+                )
+
+                if (cancelled) {
+                    controls.stop()
+                } else {
+                    scannerControlsRef.current = controls
+                }
+
+            } catch (error) {
+                console.error('Barcode scanner error:', error)
+
+                if (!cancelled) {
+                    alert(`无法启动摄像头：${error.message}`)
+                    setScanningISBN(false)
+                }
+            }
+        }
+
+        startScanner()
+
+        return () => {
+            cancelled = true
+            scannerControlsRef.current?.stop()
+            scannerControlsRef.current = null
+        }
+    }, [scanningISBN])
+
+    useEffect(() => {
+        console.log('scanningISBN:', scanningISBN)
+    }, [scanningISBN])
+
+    const [suggestions, setSuggestions] = useState({
+        title: [],
+        edition: [],
+        author: [],
+        publisher: [],
+    })
+
+    useEffect(() => {
+        if (!initialData) return
+
+        setForm({
+            subcategory: initialData.subcategory || '漫画',
+            title: initialData.title || '',
+            volume: initialData.volume || '',
+            edition: initialData.edition || '普通版',
+            author: initialData.author || '',
+            publisher: initialData.publisher || '',
+            isbn: initialData.isbn || '',
+            releaseDate: initialData.release_date || '',
+            purchasedDate: initialData.purchased_date || '',
+            purchasedPrice: initialData.purchased_price || '',
+            cover: null,
+            coverUrl: initialData.cover_url || '',
+        })
+    }, [initialData])
+
+    const handleChange = (e) => {
+        const value =
+            e.target.name === 'subcategory'
+                ? e.target.value
+                : converter(e.target.value)
+
+        setForm({
+            ...form,
+            [e.target.name]: value
+        })
+    }
+
+    const scanISBNFromImage = async (file) => {
+        if (!file) return
+
+        try {
+            const reader = new BrowserMultiFormatReader()
+
+            const imageUrl = URL.createObjectURL(file)
+
+            const result = await reader.decodeFromImageUrl(imageUrl)
+
+            const value = result.getText()
+
+            setForm(prev => ({
+                ...prev,
+                isbn: value
+            }))
+            setScanningISBN(false)
+
+            URL.revokeObjectURL(imageUrl)
+
+        } catch (error) {
+            console.error('ISBN image scan error:', error)
+            alert('无法从图片中找到 ISBN 条码')
         }
     }
 
