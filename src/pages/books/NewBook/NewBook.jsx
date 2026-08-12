@@ -115,9 +115,13 @@ export default function NewBook() {
 
             const allVolumes = new Set(parsedVolumes)
 
-            // If "上" or "下" is entered,
-            // make sure both volumes exist in books.
-            if (parsedVolumes.some(volume => String(volume) === '上' || String(volume) === '下')) {
+            if (
+                parsedVolumes.some(
+                    volume =>
+                        String(volume).trim() === '上' ||
+                        String(volume).trim() === '下'
+                )
+            ) {
                 allVolumes.add('上')
                 allVolumes.add('下')
             }
