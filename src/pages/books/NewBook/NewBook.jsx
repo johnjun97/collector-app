@@ -134,6 +134,7 @@ export default function NewBook() {
                                 isbn: form.isbn.trim() || null,
                                 release_date: form.releaseDate || null,
                                 cover_image: coverPath,
+                                cover_image_url: form.coverUrl.trim() || null,
                                 created_by: user.id,
                             })
                             .select()
