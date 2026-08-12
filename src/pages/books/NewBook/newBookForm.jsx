@@ -490,7 +490,7 @@ export default function NewBookForm({
                         playsInline
                         style={{
                             width: '100%',
-                            maxWidth: '400px',
+                            maxWidth: '250px',
                             display: 'block',
                             marginTop: '10px'
                         }}
@@ -613,12 +613,6 @@ export default function NewBookForm({
 
                 </div>
             </div>
-
-            {detectedISBN && (
-                <div className="isbn-detected-message">
-                    已检测到 ISBN：{detectedISBN}
-                </div>
-            )}
 
             {
                 form.coverUrl && (
