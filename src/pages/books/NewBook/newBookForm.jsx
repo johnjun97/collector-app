@@ -89,14 +89,14 @@ export default function NewBookForm({
                     isbn: ''
                 }))
 
-                setLookupMessage('Google Books 找不到这本书')
+                setLookupMessage('Google Books: Books no found')
                 return
             }
 
             const info = data.items[0].volumeInfo
 
             if (!info.imageLinks) {
-                setIsbnLookupError('Google Books 找不到这本书的封面')
+                setIsbnLookupError('Google Books cover no found')
             }
 
             const rawTitle = info.title || ''
