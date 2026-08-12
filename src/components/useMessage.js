@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 
-export default function useMessage(duration = 3000) {
+export default function useMessage(duration = 5000) {
     const [message, setMessage] = useState('')
     const timerRef = useRef(null)
 

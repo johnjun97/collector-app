@@ -138,10 +138,21 @@ export default function NewBookForm({
                     converter(info.publisher || '') ||
                     prev.publisher,
 
-                releaseDate:
-                    info.publishedDate?.slice(0, 10) ||
-                    prev.releaseDate,
+                releaseDate: (() => {
+                    const date = info.publishedDate
 
+                    if (!date) return prev.releaseDate
+
+                    if (/^\d{4}$/.test(date)) {
+                        return `${date}-01-01`
+                    }
+
+                    if (/^\d{4}-\d{2}$/.test(date)) {
+                        return `${date}-01`
+                    }
+
+                    return date.slice(0, 10)
+                })(),
                 isbn: isbn13 || isbn10 || prev.isbn,
 
                 coverUrl:
