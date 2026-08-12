@@ -269,10 +269,14 @@ export default function NewBookForm({
                 isbn: isbn13 || isbn10 || prev.isbn,
 
                 coverUrl:
-                    info.imageLinks?.large ||
-                    info.imageLinks?.medium ||
-                    info.imageLinks?.thumbnail ||
-                    prev.coverUrl,
+                    (
+                        info.imageLinks?.extraLarge ||
+                        info.imageLinks?.large ||
+                        info.imageLinks?.medium ||
+                        info.imageLinks?.small ||
+                        info.imageLinks?.thumbnail ||
+                        prev.coverUrl
+                    )?.replace('&zoom=1', '&zoom=2'),
             }))
 
         } catch (error) {
