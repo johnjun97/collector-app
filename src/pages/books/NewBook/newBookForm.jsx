@@ -35,6 +35,7 @@ export default function NewBookForm({
     const [ownsBook, setOwnsBook] = useState(true)
     const [lookingUpISBN, setLookingUpISBN] = useState(false)
     const [scanningISBN, setScanningISBN] = useState(false)
+    const [detectedISBN, setDetectedISBN] = useState('')
 
     const videoRef = useRef(null)
     const scannerControlsRef = useRef(null)
@@ -68,12 +69,17 @@ export default function NewBookForm({
 
                             console.log('ISBN barcode detected:', value)
 
+                            setDetectedISBN(value)
+
                             setForm(prev => ({
                                 ...prev,
                                 isbn: value
                             }))
 
-                            setScanningISBN(false)
+                            setTimeout(() => {
+                                setScanningISBN(false)
+                                setDetectedISBN('')
+                            }, 1500)
                         }
                     }
                 )
@@ -575,18 +581,25 @@ export default function NewBookForm({
 
             {scanningISBN && (
                 <div className="isbn-scanner">
-                  <video
-    ref={videoRef}
-    autoPlay
-    muted
-    playsInline
-    style={{
-        width: '100%',
-        maxWidth: '400px',
-        display: 'block',
-        marginTop: '10px'
-    }}
-/>
+
+                    <video
+                        ref={videoRef}
+                        autoPlay
+                        muted
+                        playsInline
+                        style={{
+                            width: '100%',
+                            maxWidth: '400px',
+                            display: 'block',
+                            marginTop: '10px'
+                        }}
+                    />
+
+                    {detectedISBN && (
+                        <div className="isbn-detected-message">
+                            已检测到 ISBN：{detectedISBN}
+                        </div>
+                    )}
 
                     <button
                         type="button"
@@ -595,25 +608,28 @@ export default function NewBookForm({
                     >
                         取消扫描
                     </button>
+
                 </div>
             )}
 
-            {form.coverUrl && (
-                <div className="form-field">
-                    <label>Google Books 封面</label>
+            {
+                form.coverUrl && (
+                    <div className="form-field">
+                        <label>Google Books 封面</label>
 
-                    <img
-                        src={form.coverUrl}
-                        alt="Book cover"
-                        style={{
-                            width: '120px',
-                            height: 'auto',
-                            display: 'block',
-                            marginTop: '8px'
-                        }}
-                    />
-                </div>
-            )}
+                        <img
+                            src={form.coverUrl}
+                            alt="Book cover"
+                            style={{
+                                width: '120px',
+                                height: 'auto',
+                                display: 'block',
+                                marginTop: '8px'
+                            }}
+                        />
+                    </div>
+                )
+            }
 
             <SuggestionInput
                 id="title"
@@ -753,6 +769,6 @@ export default function NewBookForm({
                     {saving ? '保存中...' : '保存'}
                 </button>
             </div>
-        </form>
+        </form >
     )
 }
