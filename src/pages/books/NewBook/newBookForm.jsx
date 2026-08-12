@@ -95,8 +95,40 @@ export default function NewBookForm({
 
             const info = data.items[0].volumeInfo
 
+            const missingInfo = []
+
             if (!info.imageLinks) {
-                setIsbnLookupError('Google Books cover no found')
+                missingInfo.push('封面')
+            }
+
+            if (!info.authors?.length) {
+                missingInfo.push('作者')
+            }
+
+            if (!info.publisher) {
+                missingInfo.push('出版社')
+            }
+
+            if (!info.publishedDate) {
+                missingInfo.push('发售日期')
+            }
+
+            const rawTitle = info.title || ''
+
+            const volumeMatch = rawTitle.match(
+                /[\s]*[（(]([0-9]+|全|上|下)[）)]$/
+            )
+
+            if (!volumeMatch) {
+                missingInfo.push('集数')
+            }
+
+            if (missingInfo.length > 0) {
+                setIsbnLookupError(
+                    `Google Books 未提供：${missingInfo.join('、')}`
+                )
+            } else {
+                setIsbnLookupError('')
             }
 
             const rawTitle = info.title || ''
