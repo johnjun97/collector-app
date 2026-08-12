@@ -36,6 +36,7 @@ export default function NewBookForm({
     const [lookingUpISBN, setLookingUpISBN] = useState(false)
     const [scanningISBN, setScanningISBN] = useState(false)
     const [detectedISBN, setDetectedISBN] = useState('')
+    const [isbnLookupError, setIsbnLookupError] = useState('')
 
     const videoRef = useRef(null)
     const scannerControlsRef = useRef(null)
@@ -80,7 +81,12 @@ export default function NewBookForm({
             const data = await response.json()
 
             if (!data.items || data.items.length === 0) {
-                alert('Google Books 找不到这本书')
+                setIsbnLookupError('Google Books 找不到这本书')
+
+                setTimeout(() => {
+                    setIsbnLookupError('')
+                }, 3000)
+
                 return
             }
 
@@ -521,6 +527,12 @@ export default function NewBookForm({
             {detectedISBN && (
                 <div className="isbn-detected-message">
                     已检测到 ISBN：{detectedISBN}
+                </div>
+            )}
+
+            {isbnLookupError && (
+                <div className="isbn-detected-message isbn-lookup-error">
+                    {isbnLookupError}
                 </div>
             )}
 
