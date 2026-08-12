@@ -6,7 +6,7 @@ import './newBookForm.css'
 import HelpTooltip from '../../../components/HelpTooltip'
 import { useZxing } from 'react-zxing'
 import { BrowserMultiFormatReader } from '@zxing/browser'
-import Loading from '../../../components/loading'
+import Loading from '../../../components/Loading.jsx'
 
 const converter = OpenCC.Converter({ from: 'tw', to: 'cn' })
 
