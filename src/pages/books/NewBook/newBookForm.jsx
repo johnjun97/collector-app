@@ -178,7 +178,7 @@ export default function NewBookForm({
                 setLookupMessage('Google Books 查询超时，请稍后再试')
             } else {
                 console.error('Google Books lookup error:', error)
-                setLookupMessage('查询 Google Books 失败')
+                setLookupMessage('查询 Google Books 失败，please try again')
             }
         } finally {
             clearTimeout(timeoutId)

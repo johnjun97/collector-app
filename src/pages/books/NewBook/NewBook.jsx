@@ -100,158 +100,158 @@ export default function NewBook() {
             }
 
             // 4. Determine all volumes that should exist
-//
-// If the highest numeric volume is 3,
-// automatically create 1, 2, 3.
-//
-// Text volumes such as "全", "上", "下" are kept as-is.
-const numericVolumes = parsedVolumes.filter(
-    volume => Number.isInteger(Number(volume)) && Number(volume) > 0
-)
+            //
+            // If the highest numeric volume is 3,
+            // automatically create 1, 2, 3.
+            //
+            // Text volumes such as "全", "上", "下" are kept as-is.
+            const numericVolumes = parsedVolumes.filter(
+                volume => Number.isInteger(Number(volume)) && Number(volume) > 0
+            )
 
-const highestVolume = numericVolumes.length
-    ? Math.max(...numericVolumes.map(Number))
-    : null
-
-const allVolumes = new Set(parsedVolumes)
-
-if (highestVolume !== null) {
-    for (let i = 1; i <= highestVolume; i++) {
-        allVolumes.add(i)
-    }
-}
-
-// 5. Create / reuse each volume
-for (const volume of allVolumes) {
-
-    const volumeValue = String(volume)
-
-    // Was this volume explicitly entered by the user?
-    const isRequestedVolume = parsedVolumes.some(
-        item => String(item) === volumeValue
-    )
-
-    const edition = form.edition || '普通版'
-
-    const { data: existingBook, error: bookFindError } =
-        await supabase
-            .from('books')
-            .select('*')
-            .eq('series_id', series.id)
-            .eq('volume', volumeValue)
-            .eq('edition', edition)
-            .maybeSingle()
-
-    if (bookFindError) {
-        throw bookFindError
-    }
-
-    let book
-
-    if (existingBook) {
-        book = existingBook
-    } else {
-
-        // Only apply ISBN to the volume the user actually entered.
-        //
-        // Example:
-        // User adds Volume 3 with ISBN 978xxxx
-        //
-        // Volume 1 -> no ISBN
-        // Volume 2 -> no ISBN
-        // Volume 3 -> 978xxxx
-        const bookIsbn =
-            isRequestedVolume
-                ? form.isbn.trim() || null
+            const highestVolume = numericVolumes.length
+                ? Math.max(...numericVolumes.map(Number))
                 : null
 
-        const { data: newBook, error: insertError } =
-            await supabase
-                .from('books')
-                .insert({
-                    series_id: series.id,
-                    volume: volumeValue,
-                    edition,
-                    publisher: form.publisher.trim() || null,
-                    isbn: bookIsbn,
-                    release_date: isRequestedVolume
-                        ? form.releaseDate || null
-                        : null,
-                    cover_image: coverPath,
-                    cover_image_url: form.coverUrl.trim() || null,
-                    created_by: user.id,
-                })
-                .select()
-                .single()
+            const allVolumes = new Set(parsedVolumes)
 
-        if (insertError) {
-            throw insertError
-        }
+            if (highestVolume !== null) {
+                for (let i = 1; i <= highestVolume; i++) {
+                    allVolumes.add(i)
+                }
+            }
 
-        book = newBook
-    }
+            // 5. Create / reuse each volume
+            for (const volume of allVolumes) {
 
-    // 6. Add this volume to user's collection
-    //
-    // Explicitly entered volume:
-    //   use the checkbox value.
-    //
-    // Automatically-created previous volume:
-    //   mark as not owned, BUT don't overwrite an existing
-    //   user_books record.
-    if (isRequestedVolume) {
+                const volumeValue = String(volume)
 
-        const { error: userBookError } =
-            await supabase
-                .from('user_books')
-                .upsert(
-                    {
-                        user_id: user.id,
-                        book_id: book.id,
-                        is_owned: ownsBook,
-                        purchased_date: ownsBook
-                            ? form.purchasedDate || null
-                            : null,
-                        purchased_price: ownsBook
-                            ? form.purchasedPrice || null
-                            : null,
-                    },
-                    {
-                        onConflict: 'user_id,book_id'
-                    }
+                // Was this volume explicitly entered by the user?
+                const isRequestedVolume = parsedVolumes.some(
+                    item => String(item) === volumeValue
                 )
 
-        if (userBookError) {
-            throw userBookError
-        }
+                const edition = form.edition || '普通版'
 
-    } else {
+                const { data: existingBook, error: bookFindError } =
+                    await supabase
+                        .from('books')
+                        .select('*')
+                        .eq('series_id', series.id)
+                        .eq('volume', volumeValue)
+                        .eq('edition', edition)
+                        .maybeSingle()
 
-        // Automatically-created volume.
-        //
-        // If the user already has this book in user_books,
-        // don't overwrite their existing ownership status.
-        const { error: userBookError } =
-            await supabase
-                .from('user_books')
-                .upsert(
-                    {
-                        user_id: user.id,
-                        book_id: book.id,
-                        is_owned: false,
-                    },
-                    {
-                        onConflict: 'user_id,book_id',
-                        ignoreDuplicates: true
+                if (bookFindError) {
+                    throw bookFindError
+                }
+
+                let book
+
+                if (existingBook) {
+                    book = existingBook
+                } else {
+
+                    // Only apply ISBN to the volume the user actually entered.
+                    //
+                    // Example:
+                    // User adds Volume 3 with ISBN 978xxxx
+                    //
+                    // Volume 1 -> no ISBN
+                    // Volume 2 -> no ISBN
+                    // Volume 3 -> 978xxxx
+                    const bookIsbn =
+                        isRequestedVolume
+                            ? form.isbn.trim() || null
+                            : null
+
+                    const { data: newBook, error: insertError } =
+                        await supabase
+                            .from('books')
+                            .insert({
+                                series_id: series.id,
+                                volume: volumeValue,
+                                edition,
+                                publisher: form.publisher.trim() || null,
+                                isbn: bookIsbn,
+                                release_date: isRequestedVolume
+                                    ? form.releaseDate || null
+                                    : null,
+                                cover_image: coverPath,
+                                cover_image_url: form.coverUrl.trim() || null,
+                                created_by: user.id,
+                            })
+                            .select()
+                            .single()
+
+                    if (insertError) {
+                        throw insertError
                     }
-                )
 
-        if (userBookError) {
-            throw userBookError
-        }
-    }
-}
+                    book = newBook
+                }
 
+                // 6. Add this volume to user's collection
+                //
+                // Explicitly entered volume:
+                //   use the checkbox value.
+                //
+                // Automatically-created previous volume:
+                //   mark as not owned, BUT don't overwrite an existing
+                //   user_books record.
+                if (isRequestedVolume) {
+
+                    const { error: userBookError } =
+                        await supabase
+                            .from('user_books')
+                            .upsert(
+                                {
+                                    user_id: user.id,
+                                    book_id: book.id,
+                                    is_owned: ownsBook,
+                                    purchased_date: ownsBook
+                                        ? form.purchasedDate || null
+                                        : null,
+                                    purchased_price: ownsBook
+                                        ? form.purchasedPrice || null
+                                        : null,
+                                },
+                                {
+                                    onConflict: 'user_id,book_id'
+                                }
+                            )
+
+                    if (userBookError) {
+                        throw userBookError
+                    }
+
+                } else {
+
+                    // Automatically-created volume.
+                    //
+                    // If the user already has this book in user_books,
+                    // don't overwrite their existing ownership status.
+                    const { error: userBookError } =
+                        await supabase
+                            .from('user_books')
+                            .upsert(
+                                {
+                                    user_id: user.id,
+                                    book_id: book.id,
+                                    is_owned: false,
+                                },
+                                {
+                                    onConflict: 'user_id,book_id',
+                                    ignoreDuplicates: true
+                                }
+                            )
+
+                    if (userBookError) {
+                        throw userBookError
+                    }
+                }
+            }
+            navigate('/books')
         } catch (error) {
 
             debugError('Error saving book:', error)
