@@ -36,6 +36,8 @@ export default function NewBookForm({
     const [lookingUpISBN, setLookingUpISBN] = useState(false)
     const [scanningISBN, setScanningISBN] = useState(false)
     const [detectedISBN, setDetectedISBN] = useState('')
+    const [lookupMessage, setLookupMessage] = useState('')
+    const [lookupError, setLookupError] = useState(false)
     const [isbnLookupError, setIsbnLookupError] = useState('')
 
     const videoRef = useRef(null)
@@ -43,9 +45,13 @@ export default function NewBookForm({
 
     const lookupISBN = async (isbnValue = form.isbn) => {
         const isbn = isbnValue.trim()
+        setLookupMessage('')
+        setLookupError(false)
+        setIsbnLookupError('')
 
         if (!isbn) {
-            alert('请输入 ISBN')
+            setLookupMessage('请输入 ISBN')
+            setLookupError(true)
             return
         }
 
@@ -59,7 +65,6 @@ export default function NewBookForm({
             const apiKey = import.meta.env.VITE_GOOGLE_BOOKS_API_KEY
 
             console.log('API key exists:', !!apiKey)
-            console.log('API key:', apiKey)
 
             console.log('Starting Google Books request...')
             console.log(
@@ -81,16 +86,25 @@ export default function NewBookForm({
             const data = await response.json()
 
             if (!data.items || data.items.length === 0) {
-                setIsbnLookupError('Google Books 找不到这本书')
+                setForm(prev => ({
+                    ...prev,
+                    isbn: ''
+                }))
 
-                setTimeout(() => {
-                    setIsbnLookupError('')
-                }, 3000)
-
+                setLookupMessage('Google Books 找不到这本书')
+                setLookupError(true)
                 return
             }
 
             const info = data.items[0].volumeInfo
+
+            if (!info.imageLinks) {
+                setIsbnLookupError('Google Books 找不到这本书的封面')
+
+                setTimeout(() => {
+                    setIsbnLookupError('')
+                }, 3000)
+            }
 
             const rawTitle = info.title || ''
 
@@ -148,13 +162,21 @@ export default function NewBookForm({
             }))
 
         } catch (error) {
+
+            setForm(prev => ({
+                ...prev,
+                isbn: ''
+            }))
+
             if (error.name === 'AbortError') {
                 console.error('Google Books lookup timed out')
-                alert('Google Books 查询超时，请稍后再试')
+                setLookupMessage('Google Books 查询超时，请稍后再试')
             } else {
                 console.error('Google Books lookup error:', error)
-                alert('查询 Google Books 失败')
+                setLookupMessage('查询 Google Books 失败')
             }
+
+            setLookupError(true)
         } finally {
             clearTimeout(timeoutId)
             setLookingUpISBN(false)
@@ -219,7 +241,8 @@ export default function NewBookForm({
                 console.error('Barcode scanner error:', error)
 
                 if (!cancelled) {
-                    alert(`无法启动摄像头：${error.message}`)
+                    setLookupMessage(`无法启动摄像头：${error.message}`)
+                    setLookupError(true)
                     setScanningISBN(false)
                 }
             }
@@ -292,13 +315,23 @@ export default function NewBookForm({
                 ...prev,
                 isbn: value
             }))
+
             setScanningISBN(false)
+
+            lookupISBN(value)
 
             URL.revokeObjectURL(imageUrl)
 
         } catch (error) {
             console.error('ISBN image scan error:', error)
-            alert('无法从图片中找到 ISBN 条码')
+
+            setForm(prev => ({
+                ...prev,
+                isbn: ''
+            }))
+
+            setLookupMessage('无法从图片中找到 ISBN 条码')
+            setLookupError(true)
         }
     }
 
@@ -527,6 +560,12 @@ export default function NewBookForm({
             {detectedISBN && (
                 <div className="isbn-detected-message">
                     已检测到 ISBN：{detectedISBN}
+                </div>
+            )}
+
+            {lookupMessage && (
+                <div className={`isbn-detected-message ${lookupError ? 'isbn-lookup-error' : ''}`}>
+                    {lookupMessage}
                 </div>
             )}
 
