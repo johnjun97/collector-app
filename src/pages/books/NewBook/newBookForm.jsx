@@ -1,10 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../../../lib/supabaseClient'
 import OpenCC from 'opencc-js'
 import SuggestionInput from '../components/SuggestionInput'
 import './newBookForm.css'
 import HelpTooltip from '../../../components/HelpTooltip'
-import { useZxing } from 'react-zxing'
 import { BrowserMultiFormatReader } from '@zxing/browser'
 import Loading from '../../../components/Loading.jsx'
 
@@ -37,39 +36,76 @@ export default function NewBookForm({
     const [lookingUpISBN, setLookingUpISBN] = useState(false)
     const [scanningISBN, setScanningISBN] = useState(false)
 
+    const videoRef = useRef(null)
+    const scannerControlsRef = useRef(null)
+
+    useEffect(() => {
+        if (!scanningISBN) {
+            scannerControlsRef.current?.stop()
+            scannerControlsRef.current = null
+            return
+        }
+
+        let cancelled = false
+
+        const startScanner = async () => {
+            try {
+                const reader = new BrowserMultiFormatReader()
+
+                const controls = await reader.decodeFromConstraints(
+                    {
+                        audio: false,
+                        video: {
+                            facingMode: { ideal: 'environment' },
+                            width: { ideal: 1280 },
+                            height: { ideal: 720 }
+                        }
+                    },
+                    videoRef.current,
+                    (result, error) => {
+                        if (result) {
+                            const value = result.getText()
+
+                            console.log('ISBN barcode detected:', value)
+
+                            setForm(prev => ({
+                                ...prev,
+                                isbn: value
+                            }))
+
+                            setScanningISBN(false)
+                        }
+                    }
+                )
+
+                if (cancelled) {
+                    controls.stop()
+                } else {
+                    scannerControlsRef.current = controls
+                }
+
+            } catch (error) {
+                console.error('Barcode scanner error:', error)
+
+                if (!cancelled) {
+                    alert(`无法启动摄像头：${error.message}`)
+                    setScanningISBN(false)
+                }
+            }
+        }
+
+        startScanner()
+
+        return () => {
+            cancelled = true
+            scannerControlsRef.current?.stop()
+            scannerControlsRef.current = null
+        }
+    }, [scanningISBN])
+
     useEffect(() => {
         console.log('scanningISBN:', scanningISBN)
     }, [scanningISBN])
-
-    const { ref } = useZxing({
-        paused: !scanningISBN,
-
-        constraints: {
-            audio: false,
-            video: {
-                facingMode: { ideal: 'environment' },
-                width: { ideal: 1280 },
-                height: { ideal: 720 }
-            }
-        },
-
-        onDecodeResult(result) {
-            const value = result.getText()
-
-            console.log('ISBN barcode detected:', value)
-
-            setForm(prev => ({
-                ...prev,
-                isbn: value
-            }))
-
-            setScanningISBN(false)
-        },
-
-        onError(error) {
-            console.error('Barcode scanner error:', error)
-        }
-    })
 
     const [suggestions, setSuggestions] = useState({
         title: [],
@@ -539,18 +575,18 @@ export default function NewBookForm({
 
             {scanningISBN && (
                 <div className="isbn-scanner">
-                    <video
-                        ref={ref}
-                        autoPlay
-                        muted
-                        playsInline
-                        style={{
-                            width: '100%',
-                            maxWidth: '400px',
-                            display: 'block',
-                            marginTop: '10px'
-                        }}
-                    />
+                  <video
+    ref={videoRef}
+    autoPlay
+    muted
+    playsInline
+    style={{
+        width: '100%',
+        maxWidth: '400px',
+        display: 'block',
+        marginTop: '10px'
+    }}
+/>
 
                     <button
                         type="button"
