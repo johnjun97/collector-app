@@ -4,6 +4,8 @@ import OpenCC from 'opencc-js'
 import SuggestionInput from '../components/SuggestionInput'
 import './newBookForm.css'
 import HelpTooltip from '../../../components/HelpTooltip'
+import { useZxing } from 'react-zxing'
+import { BrowserMultiFormatReader } from '@zxing/browser'
 
 const converter = OpenCC.Converter({ from: 'tw', to: 'cn' })
 
@@ -26,10 +28,34 @@ export default function BookForm({
         purchasedDate: '',
         purchasedPrice: '',
         cover: null,
+        coverUrl: '',
     })
 
     const [saving, setSaving] = useState(false)
     const [ownsBook, setOwnsBook] = useState(true)
+    const [lookingUpISBN, setLookingUpISBN] = useState(false)
+    const [scanningISBN, setScanningISBN] = useState(false)
+
+    const { ref } = useZxing({
+        paused: !scanningISBN,
+        constraints: {
+            video: {
+                facingMode: 'environment'
+            }
+        },
+        formats: ['ean_13'],
+        onDecodeResult(result) {
+            const value = result.getText()
+
+            setForm(prev => ({
+                ...prev,
+                isbn: value
+            }))
+
+            setScanningISBN(false)
+        }
+    })
+
     const [suggestions, setSuggestions] = useState({
         title: [],
         edition: [],
@@ -51,6 +77,8 @@ export default function BookForm({
             releaseDate: initialData.release_date || '',
             purchasedDate: initialData.purchased_date || '',
             purchasedPrice: initialData.purchased_price || '',
+            cover: null,
+            coverUrl: initialData.cover_url || '',
         })
     }, [initialData])
 
@@ -64,6 +92,140 @@ export default function BookForm({
             ...form,
             [e.target.name]: value
         })
+    }
+
+    const scanISBNFromImage = async (file) => {
+        if (!file) return
+
+        try {
+            const reader = new BrowserMultiFormatReader()
+
+            const imageUrl = URL.createObjectURL(file)
+
+            const result = await reader.decodeFromImageUrl(imageUrl)
+
+            const value = result.getText()
+
+            setForm(prev => ({
+                ...prev,
+                isbn: value
+            }))
+
+            URL.revokeObjectURL(imageUrl)
+
+        } catch (error) {
+            console.error('ISBN image scan error:', error)
+            alert('无法从图片中找到 ISBN 条码')
+        }
+    }
+
+    const lookupISBN = async () => {
+        const isbn = form.isbn.trim()
+
+        if (!isbn) {
+            alert('请输入 ISBN')
+            return
+        }
+
+        setLookingUpISBN(true)
+
+        // Prevent Google Books from hanging forever
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 10000)
+
+        try {
+            const apiKey = import.meta.env.VITE_GOOGLE_BOOKS_API_KEY
+
+            console.log('API key exists:', !!apiKey)
+            console.log('API key:', apiKey)
+
+            console.log('Starting Google Books request...')
+            console.log(
+                `https://www.googleapis.com/books/v1/volumes?q=isbn:${encodeURIComponent(isbn)}&key=${apiKey}`
+            )
+            const response = await fetch(
+                `https://www.googleapis.com/books/v1/volumes?q=isbn:${encodeURIComponent(isbn)}&key=${apiKey}`,
+                {
+                    signal: controller.signal
+                }
+            )
+
+            if (!response.ok) {
+                throw new Error(
+                    `Google Books API 请求失败: ${response.status}`
+                )
+            }
+
+            const data = await response.json()
+
+            if (!data.items || data.items.length === 0) {
+                alert('Google Books 找不到这本书')
+                return
+            }
+
+            const info = data.items[0].volumeInfo
+
+            const rawTitle = info.title || ''
+
+            // Detect "(1)", "(2)", "(全)" etc. at the end
+            const volumeMatch = rawTitle.match(/\((\d+)\)$/)
+
+            const cleanTitle = volumeMatch
+                ? rawTitle.replace(/\s*\(\d+\)$/, '')
+                : rawTitle
+
+            const volume = volumeMatch
+                ? volumeMatch[1]
+                : ''
+
+            const isbn13 =
+                info.industryIdentifiers?.find(
+                    item => item.type === 'ISBN_13'
+                )?.identifier || ''
+
+            const isbn10 =
+                info.industryIdentifiers?.find(
+                    item => item.type === 'ISBN_10'
+                )?.identifier || ''
+
+            setForm(prev => ({
+                ...prev,
+
+                title: converter(cleanTitle) || prev.title,
+
+                volume: volume || prev.volume,
+
+                author:
+                    converter(info.authors?.join(', ') || '') ||
+                    prev.author,
+
+                publisher:
+                    converter(info.publisher || '') ||
+                    prev.publisher,
+
+                releaseDate:
+                    info.publishedDate?.slice(0, 10) ||
+                    prev.releaseDate,
+
+                isbn: isbn13 || isbn10 || prev.isbn,
+
+                coverUrl:
+                    info.imageLinks?.thumbnail ||
+                    prev.coverUrl,
+            }))
+
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                console.error('Google Books lookup timed out')
+                alert('Google Books 查询超时，请稍后再试')
+            } else {
+                console.error('Google Books lookup error:', error)
+                alert('查询 Google Books 失败')
+            }
+        } finally {
+            clearTimeout(timeoutId)
+            setLookingUpISBN(false)
+        }
     }
 
     const loadSuggestions = async () => {
@@ -254,9 +416,91 @@ export default function BookForm({
                     <option value="同人志">同人志</option>
                     <option value="其他">其他</option>
                 </select>
-
-
             </div>
+
+            <div className="form-field">
+                <label htmlFor="isbn">ISBN</label>
+
+                <div className="isbn-input-row">
+                    <input
+                        id="isbn"
+                        name="isbn"
+                        type="text"
+                        autoComplete="off"
+                        placeholder="请输入 ISBN"
+                        value={form.isbn}
+                        onChange={handleChange}
+                    />
+
+                    <button
+                        type="button"
+                        onClick={lookupISBN}
+                        disabled={lookingUpISBN}
+                    >
+                        {lookingUpISBN ? '查询中...' : 'Google Books 查询'}
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={() => setScanningISBN(true)}
+                        disabled={scanningISBN}
+                    >
+                        扫描 ISBN
+                    </button>
+
+                    <label className="scan-image-button">
+                        从相册选择
+                        <input
+                            type="file"
+                            accept="image/*"
+                            hidden
+                            onChange={(e) => {
+                                scanISBNFromImage(e.target.files?.[0])
+                                e.target.value = ''
+                            }}
+                        />
+                    </label>
+
+                </div>
+            </div>
+
+            {scanningISBN && (
+                <div className="isbn-scanner">
+                    <video
+                        ref={ref}
+                        style={{
+                            width: '100%',
+                            maxWidth: '400px',
+                            display: 'block',
+                            marginTop: '10px'
+                        }}
+                    />
+
+                    <button
+                        type="button"
+                        onClick={() => setScanningISBN(false)}
+                    >
+                        取消扫描
+                    </button>
+                </div>
+            )}
+
+            {form.coverUrl && (
+                <div className="form-field">
+                    <label>Google Books 封面</label>
+
+                    <img
+                        src={form.coverUrl}
+                        alt="Book cover"
+                        style={{
+                            width: '120px',
+                            height: 'auto',
+                            display: 'block',
+                            marginTop: '8px'
+                        }}
+                    />
+                </div>
+            )}
 
             <SuggestionInput
                 id="title"
@@ -324,19 +568,6 @@ export default function BookForm({
                     suggestions={suggestions.publisher}
                     onChange={handleChange}
                 />
-
-                <div className="form-field">
-                    <label htmlFor="isbn">ISBN</label>
-                    <input
-                        id="isbn"
-                        name="isbn"
-                        type="text"
-                        autoComplete="off"
-                        placeholder="请输入 ISBN"
-                        value={form.isbn}
-                        onChange={handleChange}
-                    />
-                </div>
 
                 <div className="form-field">
                     <label htmlFor="releaseDate">发售日期</label>

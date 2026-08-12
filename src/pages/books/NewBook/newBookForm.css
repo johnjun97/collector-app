@@ -158,3 +158,55 @@
     transition: opacity 0.15s;
     z-index: 10;
 }
+
+.isbn-input-row {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+}
+
+.isbn-input-row input {
+    flex: 1;
+    min-width: 0;
+}
+
+.isbn-input-row button,
+.scan-image-button {
+    padding: 0 16px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #f5f5f5;
+    color: #333;
+    font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.isbn-input-row button:hover:not(:disabled),
+.scan-image-button:hover {
+    background: #e9e9e9;
+    border-color: #aaa;
+}
+
+.isbn-input-row button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.scan-image-button input {
+    display: none;
+}
+
+.isbn-input-row button:hover:not(:disabled) {
+    background: #e9e9e9;
+    border-color: #aaa;
+}
+
+.isbn-input-row button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

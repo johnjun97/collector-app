@@ -11,6 +11,12 @@ export default function NewBook() {
 
     const handleSubmit = async (form, ownsBook, parsedVolumes) => {
 
+        console.log('handleSubmit called:', {
+    form,
+    ownsBook,
+    parsedVolumes
+})
+
         try {
             const title = form.title.trim()
 
