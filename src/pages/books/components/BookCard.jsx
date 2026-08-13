@@ -60,29 +60,31 @@ export default function BookCard({
         return String(b.volume).localeCompare(String(a.volume))
     })[0]
 
-    const coverVolume = [...book.allVolumes]
-        .filter((volume) => volume.cover_image)
-        .sort((a, b) => {
-            const aNum = Number(a.volume)
-            const bNum = Number(b.volume)
+const coverVolume = [...book.allVolumes]
+    .filter(
+        (volume) =>
+            volume.cover_image ||
+            volume.cover_image_url
+    )
+    .sort((a, b) => {
+        const aNum = Number(a.volume)
+        const bNum = Number(b.volume)
 
-            if (!isNaN(aNum) && !isNaN(bNum)) {
-                return bNum - aNum
-            }
+        if (!isNaN(aNum) && !isNaN(bNum)) {
+            return bNum - aNum
+        }
 
-            if (!isNaN(aNum)) return -1
-            if (!isNaN(bNum)) return 1
+        if (!isNaN(aNum)) return -1
+        if (!isNaN(bNum)) return 1
 
-            return String(b.volume).localeCompare(String(a.volume))
-        })[0]
+        return String(b.volume).localeCompare(String(a.volume))
+    })[0]
 
-    const coverPath = coverVolume?.cover_image
-
-    const coverUrl = coverPath
-        ? supabase.storage
-            .from('book-covers')
-            .getPublicUrl(coverPath).data.publicUrl
-        : null
+const coverUrl = coverVolume?.cover_image
+    ? supabase.storage
+        .from('book-covers')
+        .getPublicUrl(coverVolume.cover_image).data.publicUrl
+    : coverVolume?.cover_image_url || null
 
 
     return (

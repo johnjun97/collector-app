@@ -268,3 +268,18 @@
 .scan-image-button input {
     display: none;
 }
+
+.isbn-detected-message {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 6px;
+    background: #e8f5e9;
+    color: #2e7d32;
+    font-weight: 600;
+}
+
+.isbn-lookup-error {
+    color: #dc2626;
+    background: #fef2f2;
+    border-color: #fecaca;
+}

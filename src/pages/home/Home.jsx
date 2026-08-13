@@ -77,15 +77,16 @@ export default function Home() {
         return
       }
 
-      // 3. Calculate owned books
-      const ownedCount = userBooks.filter(
-        (book) => book.is_owned
-      ).length
+// 3. Calculate user's added books
+const totalCount = userBooks.length
 
-      const userBookCount = userBooks.length
+const ownedCount = userBooks.filter(
+  (book) => book.is_owned
+).length
 
+      // 4. Set ALL books statistics
       setBookStats({
-        total: userBookCount,
+        total: allBooks.length,
         owned: ownedCount
       })
 

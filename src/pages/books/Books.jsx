@@ -5,6 +5,7 @@ import { supabase } from '../../lib/supabaseClient'
 import { debugError } from '../../lib/debug'
 import BookCard from './components/BookCard'
 import { buildBooksBySeries } from './utils/bookUtils'
+import Loading from '../../components/Loading.jsx'
 import './Books.css'
 
 export default function Books() {
@@ -221,9 +222,7 @@ export default function Books() {
                 </div>
 
                 {loading ? (
-                    <div className="books-loading">
-                        Loading books...
-                    </div>
+                    <Loading text="正在加载" />
                 ) : filteredBooks.length === 0 ? (
                     <p>No matching books.</p>
                 ) : (
