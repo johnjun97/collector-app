@@ -8,6 +8,8 @@ export default function HelpTooltip({ children }) {
         e.preventDefault()
         e.stopPropagation()
 
+        console.log('TOOLTIP CLICK')
+
         setShowTooltip((prev) => !prev)
     }
 
@@ -38,9 +40,20 @@ export default function HelpTooltip({ children }) {
             </button>
 
             {showTooltip && (
-                <span className="help-tooltip-content">
-                    {children}
-                </span>
+                <div
+                    style={{
+                        position: 'fixed',
+                        bottom: '20px',
+                        left: '20px',
+                        right: '20px',
+                        background: 'red',
+                        color: 'white',
+                        padding: '20px',
+                        zIndex: 999999,
+                    }}
+                >
+                    TEST TOOLTIP
+                </div>
             )}
         </span>
     )
