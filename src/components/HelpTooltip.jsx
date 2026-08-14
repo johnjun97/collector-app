@@ -4,7 +4,10 @@ import './HelpTooltip.css'
 export default function HelpTooltip({ children }) {
     const [showTooltip, setShowTooltip] = useState(false)
 
-    const handleClick = () => {
+    const handlePointerUp = (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+
         setShowTooltip((prev) => !prev)
     }
 
@@ -29,7 +32,8 @@ export default function HelpTooltip({ children }) {
             <button
                 type="button"
                 className="help-tooltip-icon"
-                onClick={handleClick}
+                // onPointerUp={handlePointerUp}
+                onPointerUp={() => alert('TEST')}
             >
                 ?
             </button>

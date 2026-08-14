@@ -31,7 +31,11 @@
     cursor: pointer;
     pointer-events: auto;
     touch-action: manipulation;
+
     -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
 }
 
 .help-tooltip-content {
