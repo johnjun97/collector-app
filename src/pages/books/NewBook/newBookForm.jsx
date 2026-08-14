@@ -781,7 +781,6 @@ export default function NewBookForm({
                     onChange={handleChange}
                 />
             </div>
-
             <div className="ownership-field">
                 <label>
                     <input
@@ -791,6 +790,10 @@ export default function NewBookForm({
                     />
                     已入手
                 </label>
+
+                <HelpTooltip>
+                    勾选后，所有输入的集数都会标记为「已入手」。
+                </HelpTooltip>
             </div>
 
             <details className="optional-fields">
