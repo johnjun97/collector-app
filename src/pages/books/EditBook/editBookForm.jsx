@@ -5,12 +5,15 @@ import './editBookForm.css'
 import HelpTooltip from '../../../components/HelpTooltip'
 
 export default function editBookForm({
+    updatedByUser,
     batchOwnership,
     setBatchOwnership,
     batchVolumes,
     setBatchVolumes,
     cover,
     setCover,
+    removeCover,
+    setRemoveCover,
     series,
     book,
     userBookLoading,
@@ -493,15 +496,15 @@ export default function editBookForm({
                         </div>
 
                         <div className="form-field">
-                        <div className="form-field-label">
-    <label htmlFor="cover">
-        封面
-    </label>
+                            <div className="form-field-label">
+                                <label htmlFor="cover">
+                                    封面
+                                </label>
 
-    <HelpTooltip>
-        上传新封面将替换当前集数的封面。
-    </HelpTooltip>
-</div>
+                                <HelpTooltip>
+                                    上传新封面将替换当前集数的封面。
+                                </HelpTooltip>
+                            </div>
 
                             {cover ? (
                                 <img
@@ -509,6 +512,10 @@ export default function editBookForm({
                                     alt="新封面预览"
                                     className="current-cover-preview"
                                 />
+                            ) : removeCover ? (
+                                <div className="no-cover">
+                                    封面将被移除
+                                </div>
                             ) : currentCover ? (
                                 <img
                                     src={currentCover}
@@ -530,6 +537,26 @@ export default function editBookForm({
                                     setCover(e.target.files?.[0] || null)
                                 }
                             />
+
+                            {book.cover_image && !cover && !removeCover && (
+                                <button
+                                    type="button"
+                                    className="remove-cover-button"
+                                    onClick={() => setRemoveCover(true)}
+                                >
+                                    移除封面
+                                </button>
+                            )}
+
+                            {removeCover && (
+                                <button
+                                    type="button"
+                                    className="remove-cover-button"
+                                    onClick={() => setRemoveCover(false)}
+                                >
+                                    取消移除
+                                </button>
+                            )}
                         </div>
 
                     </details>
@@ -543,6 +570,12 @@ export default function editBookForm({
                         >
                             {saving ? '保存中...' : '保存'}
                         </button>
+
+                        {updatedByUser && (
+                            <div className="updated-by">
+                                最后更新：{updatedByUser.display_name || updatedByUser.email}
+                            </div>
+                        )}
 
                     </div>
 

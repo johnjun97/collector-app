@@ -13,10 +13,12 @@ export default function EditBook() {
 
     const [book, setBook] = useState(null)
     const [series, setSeries] = useState(null)
+    const [updatedByUser, setUpdatedByUser] = useState(null)
     const [volumes, setVolumes] = useState([])
     const [batchVolumes, setBatchVolumes] = useState('')
     const [batchOwnership, setBatchOwnership] = useState({})
     const [cover, setCover] = useState(null)
+    const [removeCover, setRemoveCover] = useState(false)
     const [ownsBook, setOwnsBook] = useState(false)
     const [purchasedDate, setPurchasedDate] = useState('')
     const [purchasedPrice, setPurchasedPrice] = useState('')
@@ -35,9 +37,9 @@ export default function EditBook() {
                 } = await supabase
                     .from('books')
                     .select(`
-                        *,
-                        series:book_series(*)
-                    `)
+        *,
+        series:book_series(*)
+    `)
                     .eq('id', id)
                     .single()
 
@@ -47,6 +49,26 @@ export default function EditBook() {
 
                 setBook(currentBook)
                 setSeries(currentBook.series)
+
+                console.log('updated_by:', currentBook.updated_by)
+
+                if (currentBook.updated_by) {
+
+                    const { data: updatedUser, error: updatedUserError } =
+                        await supabase
+                            .from('users')
+                            .select('id, display_name, email')
+                            .eq('id', currentBook.updated_by)
+                            .maybeSingle()
+
+                    if (updatedUserError) {
+                        throw updatedUserError
+                    }
+
+                    setUpdatedByUser(updatedUser)
+                } else {
+                    setUpdatedByUser(null)
+                }
 
                 // Get all volumes in this series
                 const {
@@ -260,6 +282,21 @@ export default function EditBook() {
 
         try {
 
+            const {
+                data: { user },
+                error: userError
+            } = await supabase.auth.getUser()
+
+            if (userError) {
+                throw userError
+            }
+
+            if (!user) {
+                throw new Error('User is not logged in')
+            }
+
+            const oldCoverPath = book.cover_image || null
+
             let coverPath = book.cover_image || null
 
             if (cover) {
@@ -276,6 +313,8 @@ export default function EditBook() {
                 }
 
                 coverPath = fileName
+            } else if (removeCover) {
+                coverPath = null
             }
 
             // Batch update ownership
@@ -458,6 +497,7 @@ export default function EditBook() {
                     title: series.title.trim(),
                     author: series.author || null,
                     subcategory: series.subcategory,
+                    updated_by: user.id,
                 })
                 .eq('id', series.id)
 
@@ -466,19 +506,28 @@ export default function EditBook() {
             }
 
             // Update volume information
+            const bookUpdates = {
+                volume: book.volume,
+                edition: book.edition || '普通版',
+                publisher: book.publisher || null,
+                isbn: book.isbn || null,
+                release_date: book.release_date || null,
+                updated_by: user.id,
+            }
+
+            if (cover) {
+                bookUpdates.cover_image = coverPath
+                bookUpdates.cover_image_updated_by = user.id
+            } else if (removeCover) {
+                bookUpdates.cover_image = null
+                bookUpdates.cover_image_updated_by = user.id
+            }
+
             const {
                 error: bookError
             } = await supabase
                 .from('books')
-                .update({
-                    volume: book.volume,
-                    edition: book.edition || '普通版',
-                    publisher: book.publisher || null,
-                    isbn: book.isbn || null,
-                    release_date: book.release_date || null,
-                    cover_image: coverPath,
-                    cover_image_url: book.cover_image_url || null,
-                })
+                .update(bookUpdates)
                 .eq('id', book.id)
 
             if (bookError) {
@@ -487,7 +536,7 @@ export default function EditBook() {
 
             // Update ownership for single-book edit only
             // Update ownership for single-book edit only
-if (!ownershipChanges && parsedBatchVolumes.length === 0) {
+            if (!ownershipChanges && parsedBatchVolumes.length === 0) {
 
                 const {
                     data: { user }
@@ -565,6 +614,8 @@ if (!ownershipChanges && parsedBatchVolumes.length === 0) {
                 throw new Error('你无法删除其他用户创建的书籍集数。')
             }
 
+            const oldCoverPath = book.cover_image || null
+
             const { error: bookError } =
                 await supabase
                     .from('books')
@@ -573,6 +624,20 @@ if (!ownershipChanges && parsedBatchVolumes.length === 0) {
 
             if (bookError) {
                 throw bookError
+            }
+
+            if (oldCoverPath) {
+                const { error: deleteCoverError } = await supabase
+                    .storage
+                    .from('book-covers')
+                    .remove([oldCoverPath])
+
+                if (deleteCoverError) {
+                    console.error(
+                        'Failed to delete old cover:',
+                        deleteCoverError
+                    )
+                }
             }
 
             navigate('/books')
@@ -694,11 +759,14 @@ if (!ownershipChanges && parsedBatchVolumes.length === 0) {
                     }}
                 >
                     <EditBookForm
+                        updatedByUser={updatedByUser}
                         setBatchVolumes={setBatchVolumes}
                         batchOwnership={batchOwnership}
                         setBatchOwnership={setBatchOwnership}
                         cover={cover}
                         setCover={setCover}
+                        removeCover={removeCover}
+                        setRemoveCover={setRemoveCover}
                         series={series}
                         book={book}
                         batchVolumes={batchVolumes}
