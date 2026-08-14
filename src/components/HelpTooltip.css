@@ -8,8 +8,9 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 18px;
-    height: 18px;
+
+    width: 24px;
+    height: 24px;
     padding: 0;
 
     border: 1px solid #999;
@@ -23,7 +24,9 @@
     font-weight: 600;
     line-height: 1;
 
-    cursor: help;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .help-tooltip-content {

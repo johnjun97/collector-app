@@ -493,12 +493,15 @@ export default function editBookForm({
                         </div>
 
                         <div className="form-field">
-                            <label htmlFor="cover">
-                                封面
-                                <HelpTooltip>
-                                    上传新封面将替换当前集数的封面。
-                                </HelpTooltip>
-                            </label>
+                        <div className="form-field-label">
+    <label htmlFor="cover">
+        封面
+    </label>
+
+    <HelpTooltip>
+        上传新封面将替换当前集数的封面。
+    </HelpTooltip>
+</div>
 
                             {cover ? (
                                 <img
