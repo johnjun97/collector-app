@@ -64,3 +64,15 @@
         max-width: none;
     }
 }
+
+.help-tooltip {
+    position: relative;
+    z-index: 9999;
+}
+
+.help-tooltip-icon {
+    position: relative;
+    z-index: 10000;
+    pointer-events: auto;
+    touch-action: manipulation;
+}

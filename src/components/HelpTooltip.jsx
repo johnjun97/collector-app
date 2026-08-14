@@ -17,6 +17,7 @@ export default function HelpTooltip({ children }) {
                 type="button"
                 className="help-tooltip-icon"
                 onClick={handleClick}
+                onTouchEnd={handleClick}
             >
                 ?
             </button>
