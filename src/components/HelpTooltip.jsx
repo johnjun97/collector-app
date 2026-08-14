@@ -9,9 +9,7 @@ export default function HelpTooltip({ children }) {
             <button
                 type="button"
                 className="help-tooltip-icon"
-                onClick={() => {
-                    setShowTooltip((prev) => !prev)
-                }}
+                onClick={() => setShowTooltip((prev) => !prev)}
             >
                 ?
             </button>
