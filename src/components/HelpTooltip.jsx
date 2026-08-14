@@ -39,22 +39,11 @@ export default function HelpTooltip({ children }) {
                 ?
             </button>
 
-            {showTooltip && (
-                <div
-                    style={{
-                        position: 'fixed',
-                        bottom: '20px',
-                        left: '20px',
-                        right: '20px',
-                        background: 'red',
-                        color: 'white',
-                        padding: '20px',
-                        zIndex: 999999,
-                    }}
-                >
-                    TEST TOOLTIP
-                </div>
-            )}
+{showTooltip && (
+    <span className="help-tooltip-content">
+        {children}
+    </span>
+)}
         </span>
     )
 }

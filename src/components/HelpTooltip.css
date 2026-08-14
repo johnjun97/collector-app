@@ -70,14 +70,13 @@
         left: 12px;
         right: 12px;
         bottom: 12px;
-
         width: auto;
         max-width: none;
-
-        z-index: 10000;
+        z-index: 999999;
     }
 
+
     .help-tooltip-icon {
-        z-index: 10001;
+        z-index: 1000000;
     }
 }

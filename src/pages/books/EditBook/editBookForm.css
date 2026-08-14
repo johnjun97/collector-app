@@ -171,9 +171,13 @@ overflow: visible;
     pointer-events: none;
 }
 
-.book-edit-form>* {
+.book-edit-form > * {
     position: relative;
     z-index: 1;
+}
+
+.book-edit-form .help-tooltip {
+    z-index: 999999;
 }
 
 .book-edit-form .form-field:has(.series-suggestions) {
