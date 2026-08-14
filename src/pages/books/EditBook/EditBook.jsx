@@ -14,6 +14,7 @@ export default function EditBook() {
     const [book, setBook] = useState(null)
     const [series, setSeries] = useState(null)
     const [updatedByUser, setUpdatedByUser] = useState(null)
+    const [coverUpdatedByUser, setCoverUpdatedByUser] = useState(null)
     const [volumes, setVolumes] = useState([])
     const [batchVolumes, setBatchVolumes] = useState('')
     const [batchOwnership, setBatchOwnership] = useState({})
@@ -56,7 +57,7 @@ export default function EditBook() {
 
                     const { data: updatedUser, error: updatedUserError } =
                         await supabase
-                            .from('users')
+                            .from('profiles')
                             .select('id, display_name, email')
                             .eq('id', currentBook.updated_by)
                             .maybeSingle()
@@ -66,8 +67,27 @@ export default function EditBook() {
                     }
 
                     setUpdatedByUser(updatedUser)
+                    console.log('updatedByUser:', updatedUser)
                 } else {
                     setUpdatedByUser(null)
+                }
+
+                if (currentBook.cover_image_updated_by) {
+
+                    const { data: coverUpdatedUser, error: coverUpdatedUserError } =
+                        await supabase
+                            .from('profiles')
+                            .select('id, display_name, email')
+                            .eq('id', currentBook.cover_image_updated_by)
+                            .maybeSingle()
+
+                    if (coverUpdatedUserError) {
+                        throw coverUpdatedUserError
+                    }
+
+                    setCoverUpdatedByUser(coverUpdatedUser)
+                } else {
+                    setCoverUpdatedByUser(null)
                 }
 
                 // Get all volumes in this series
@@ -760,6 +780,7 @@ export default function EditBook() {
                 >
                     <EditBookForm
                         updatedByUser={updatedByUser}
+                        coverUpdatedByUser={coverUpdatedByUser}
                         setBatchVolumes={setBatchVolumes}
                         batchOwnership={batchOwnership}
                         setBatchOwnership={setBatchOwnership}

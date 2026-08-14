@@ -6,6 +6,7 @@ import HelpTooltip from '../../../components/HelpTooltip'
 
 export default function editBookForm({
     updatedByUser,
+    coverUpdatedByUser,
     batchOwnership,
     setBatchOwnership,
     batchVolumes,
@@ -504,6 +505,12 @@ export default function editBookForm({
                                 <HelpTooltip>
                                     上传新封面将替换当前集数的封面。
                                 </HelpTooltip>
+
+                                {coverUpdatedByUser && (
+                                    <span className="cover-updated-by">
+                                        最后更新：{coverUpdatedByUser.display_name || coverUpdatedByUser.email}
+                                    </span>
+                                )}
                             </div>
 
                             {cover ? (
@@ -571,11 +578,11 @@ export default function editBookForm({
                             {saving ? '保存中...' : '保存'}
                         </button>
 
-                        {updatedByUser && (
+                        {/* {updatedByUser && (
                             <div className="updated-by">
                                 最后更新：{updatedByUser.display_name || updatedByUser.email}
                             </div>
-                        )}
+                        )} */}
 
                     </div>
 
