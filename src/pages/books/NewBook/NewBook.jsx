@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { supabase } from '../../../lib/supabaseClient'
 import { debugError } from '../../../lib/debug'
 import Navbar from '../../../components/Navbar'
@@ -8,6 +8,9 @@ import './NewBook.css'
 export default function NewBook() {
 
     const navigate = useNavigate()
+    const location = useLocation()
+
+    const initialData = location.state?.initialData || null
 
     const handleSubmit = async (form, ownsBook, parsedVolumes) => {
 
@@ -296,6 +299,7 @@ export default function NewBook() {
                 <div className="new-book-form-container">
 
                     <NewBookForm
+                        initialData={initialData}
                         onSubmit={handleSubmit}
                         onCancel={() => navigate('/books')}
                     />

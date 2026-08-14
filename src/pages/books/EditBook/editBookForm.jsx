@@ -28,8 +28,6 @@ export default function editBookForm({
     handleSubmit,
     navigate
 }) {
-
-    const [showBatchAdd, setShowBatchAdd] = React.useState(false)
     const [currentCoverUrl, setCurrentCoverUrl] = useState(null)
 
     useEffect(() => {
@@ -237,18 +235,20 @@ export default function editBookForm({
                             type="button"
                             className="batch-add-button"
                             onClick={() => {
-                                const nextState = !showBatchAdd
-
-                                setShowBatchAdd(nextState)
-
-                                if (nextState) {
-                                    setShowOwnershipBatchEdit(false)
-                                } else {
-                                    setBatchVolumes('')
-                                }
+                                navigate('/books/new', {
+                                    state: {
+                                        initialData: {
+                                            subcategory: series.subcategory || '漫画',
+                                            title: series.title || '',
+                                            author: series.author || '',
+                                            publisher: book.publisher || '',
+                                            edition: book.edition || '普通版',
+                                        }
+                                    }
+                                })
                             }}
                         >
-                            {showBatchAdd ? '新增集数' : '新增集数'}
+                            新增集数
                         </button>
 
                         <HelpTooltip>
@@ -261,7 +261,7 @@ export default function editBookForm({
                 </div>
 
                 <div
-                    className={`volume-buttons ${showBatchAdd || showOwnershipBatchEdit
+                    className={`volume-buttons ${showOwnershipBatchEdit
                         ? 'batch-edit-active'
                         : ''
                         }`}
@@ -296,7 +296,7 @@ export default function editBookForm({
                                     volume.isOwned ? 'owned' : ''
                                 ].join(' ')}
                                 onClick={() => {
-                                    if (!showBatchAdd && !showOwnershipBatchEdit) {
+                                    if (!showOwnershipBatchEdit) {
                                         handleVolumeChange(volume)
                                     }
                                 }}
@@ -311,17 +311,6 @@ export default function editBookForm({
                         ))}
                 </div>
             </div>
-
-            {showBatchAdd && (
-                <div className="form-field">
-                    <input
-                        type="text"
-                        placeholder="例如：1、2、3、全 或 1-5、8、11-13"
-                        value={batchVolumes}
-                        onChange={(e) => setBatchVolumes(e.target.value)}
-                    />
-                </div>
-            )}
 
             {userBookLoading ? (
                 <div className="form-field" >
@@ -352,9 +341,8 @@ export default function editBookForm({
 
                                     setShowOwnershipBatchEdit(nextState)
 
-                                    if (nextState) {
-                                        setShowBatchAdd(false)
 
+                                    if (nextState) {
                                         const initialOwnership = {}
 
                                         volumes.forEach((volume) => {

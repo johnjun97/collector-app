@@ -304,12 +304,6 @@ export default function EditBook() {
                                 user_id: user.id,
                                 book_id: volume.id,
                                 is_owned: isOwned,
-                                purchased_date: isOwned
-                                    ? null
-                                    : null,
-                                purchased_price: isOwned
-                                    ? null
-                                    : null,
                             },
                             {
                                 onConflict: 'user_id,book_id'
@@ -493,7 +487,7 @@ export default function EditBook() {
 
             // Update ownership for single-book edit only
             // Update ownership for single-book edit only
-            if (parsedBatchVolumes.length === 0) {
+if (!ownershipChanges && parsedBatchVolumes.length === 0) {
 
                 const {
                     data: { user }

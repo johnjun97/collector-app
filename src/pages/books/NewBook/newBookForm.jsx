@@ -13,7 +13,6 @@ const converter = OpenCC.Converter({ from: 'tw', to: 'cn' })
 export default function NewBookForm({
     initialData,
     onSubmit,
-    onBatchAdd,
     onCancel
 }) {
 
