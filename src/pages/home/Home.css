@@ -43,6 +43,50 @@
     font-size: 14px;
 }
 
+.contribution-header {
+    width: 100%;
+    border: none;
+    background: none;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.contribution-header:hover {
+    background: #fafafa;
+}
+
+.contribution-arrow {
+    color: #666;
+    font-size: 12px;
+}
+
+.contribution-list {
+    border-top: 1px solid #eeeeee;
+}
+
+.contribution-list>div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 28px;
+    border-bottom: 1px solid #eeeeee;
+}
+
+.contribution-list>div:last-child {
+    border-bottom: none;
+}
+
+.contribution-list span {
+    color: #555;
+    font-size: 14px;
+}
+
+.contribution-list strong {
+    font-size: 16px;
+    font-weight: 600;
+}
+
 .progress-container {
     height: 8px;
     margin: 0 28px 24px;

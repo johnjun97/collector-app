@@ -8,15 +8,19 @@ export default function Home() {
 
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [contributionExpanded, setContributionExpanded] = useState(false)
 
   const [bookStats, setBookStats] = useState({
     total: 0,
     owned: 0
   })
 
-  const [userBookStats, setUserBookStats] = useState({
-    total: 0,
-    owned: 0
+  const [contributionStats, setContributionStats] = useState({
+    createdBookSeries: 0,
+    updatedBookSeries: 0,
+    createdBooks: 0,
+    updatedBooks: 0,
+    uploadedCoverImage: 0
   })
 
   useEffect(() => {
@@ -77,14 +81,56 @@ export default function Home() {
         return
       }
 
-// 3. Calculate user's added books
-const totalCount = userBooks.length
+      // 3. Calculate user's added books
+      const totalCount = userBooks.length
 
-const ownedCount = userBooks.filter(
-  (book) => book.is_owned
-).length
+      const ownedCount = userBooks.filter(
+        (book) => book.is_owned
+      ).length
 
-      // 4. Set ALL books statistics
+      // 4. Get user's contribution counts
+      const [
+        { count: createdBookSeries },
+        { count: updatedBookSeries },
+        { count: createdBooks },
+        { count: updatedBooks },
+        { count: uploadedCoverImage }
+      ] = await Promise.all([
+        supabase
+          .from('book_series')
+          .select('id', { count: 'exact', head: true })
+          .eq('created_by', user.id),
+
+        supabase
+          .from('book_series')
+          .select('id', { count: 'exact', head: true })
+          .eq('updated_by', user.id),
+
+        supabase
+          .from('books')
+          .select('id', { count: 'exact', head: true })
+          .eq('created_by', user.id),
+
+        supabase
+          .from('books')
+          .select('id', { count: 'exact', head: true })
+          .eq('updated_by', user.id),
+
+        supabase
+          .from('books')
+          .select('id', { count: 'exact', head: true })
+          .eq('cover_image_updated_by', user.id)
+      ])
+
+      setContributionStats({
+        createdBookSeries: createdBookSeries ?? 0,
+        updatedBookSeries: updatedBookSeries ?? 0,
+        createdBooks: createdBooks ?? 0,
+        updatedBooks: updatedBooks ?? 0,
+        uploadedCoverImage: uploadedCoverImage ?? 0
+      })
+
+      // 5. Set ALL books statistics
       setBookStats({
         total: allBooks.length,
         owned: ownedCount
@@ -149,6 +195,68 @@ const ownedCount = userBooks.filter(
 
         </div>
 
+        <div className="dashboard-card">
+
+          <div className="dashboard-card contribution-card">
+
+            <button
+              className="dashboard-card-header contribution-header"
+              onClick={() =>
+                setContributionExpanded(!contributionExpanded)
+              }
+            >
+              <div>
+                <h2>贡献</h2>
+
+                <span>
+                  Total contribution point = {
+                    contributionStats.createdBookSeries +
+                    contributionStats.updatedBookSeries +
+                    contributionStats.createdBooks +
+                    contributionStats.updatedBooks +
+                    contributionStats.uploadedCoverImage
+                  }
+                </span>
+              </div>
+
+              <span className="contribution-arrow">
+                {contributionExpanded ? '▲' : '▼'}
+              </span>
+            </button>
+
+            {contributionExpanded && (
+              <div className="contribution-list">
+
+                <div>
+                  <span>Created book_series</span>
+                  <strong>{contributionStats.createdBookSeries}</strong>
+                </div>
+
+                <div>
+                  <span>Last updated book_series</span>
+                  <strong>{contributionStats.updatedBookSeries}</strong>
+                </div>
+
+                <div>
+                  <span>Created books</span>
+                  <strong>{contributionStats.createdBooks}</strong>
+                </div>
+
+                <div>
+                  <span>Last updated books</span>
+                  <strong>{contributionStats.updatedBooks}</strong>
+                </div>
+
+                <div>
+                  <span>Last uploaded cover image</span>
+                  <strong>{contributionStats.uploadedCoverImage}</strong>
+                </div>
+
+              </div>
+            )}
+
+          </div>
+        </div>
       </main>
     </>
   )
