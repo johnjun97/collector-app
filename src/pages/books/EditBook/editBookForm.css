@@ -23,8 +23,8 @@
 .volume-field-header {
     display: flex;
     align-items: center;
-justify-content: flex-start;
-gap: 12px;
+    justify-content: flex-start;
+    gap: 12px;
     margin-bottom: 8px;
 }
 
@@ -170,7 +170,44 @@ gap: 12px;
     z-index: 0;
 }
 
-.book-edit-form > * {
+.book-edit-form>* {
     position: relative;
     z-index: 1;
+}
+
+.book-edit-form .form-field:has(.series-suggestions) {
+    z-index: 1000;
+}
+
+.series-input-wrapper {
+    position: relative;
+    z-index: 10;
+}
+
+.series-suggestions {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    max-height: 240px;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+}
+
+.series-suggestions button {
+    display: block;
+    width: 100%;
+    padding: 8px 10px;
+    border: none;
+    background: #fff;
+    text-align: left;
+    cursor: pointer;
+}
+
+.series-suggestions button:hover {
+    background: #f5f5f5;
 }
