@@ -62,12 +62,15 @@
 
 @media (max-width: 600px) {
     .help-tooltip-content {
-        position: absolute;
-        top: calc(100% + 8px);
-        right: 0;
-        left: auto;
+        position: fixed;
 
-        width: 260px;
-        max-width: calc(100vw - 24px);
+        top: auto;
+        bottom: auto;
+
+        left: 12px;
+        right: 12px;
+
+        width: auto;
+        max-width: none;
     }
 }
