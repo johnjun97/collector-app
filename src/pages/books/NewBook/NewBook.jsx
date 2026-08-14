@@ -199,19 +199,22 @@ export default function NewBook() {
                     const { data: newBook, error: insertError } =
                         await supabase
                             .from('books')
-                            .insert({
-                                series_id: series.id,
-                                volume: volumeValue,
-                                edition,
-                                publisher: form.publisher.trim() || null,
-                                isbn: bookIsbn,
-                                release_date: isRequestedVolume
-                                    ? form.releaseDate || null
-                                    : null,
-                                cover_image: coverPath,
-                                cover_image_url: form.coverUrl.trim() || null,
-                                created_by: user.id,
-                            })
+                         .insert({
+    series_id: series.id,
+    volume: volumeValue,
+    edition,
+    publisher: form.publisher.trim() || null,
+    isbn: bookIsbn,
+    release_date: isRequestedVolume
+        ? form.releaseDate || null
+        : null,
+    cover_image: coverPath,
+    cover_image_url: form.coverUrl.trim() || null,
+
+    created_by: user.id,
+    updated_by: user.id,
+    cover_image_updated_by: coverPath ? user.id : null,
+})
                             .select()
                             .single()
 
