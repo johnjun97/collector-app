@@ -1,24 +1,31 @@
+import { useState } from 'react'
 import './HelpTooltip.css'
 
 export default function HelpTooltip({ children }) {
+    const [showTooltip, setShowTooltip] = useState(false)
+
     const handleClick = (e) => {
         e.preventDefault()
         e.stopPropagation()
+
+        setShowTooltip((prev) => !prev)
     }
 
     return (
-        <span
-            className="help-tooltip"
-            onClick={handleClick}
-            onTouchStart={handleClick}
-        >
-            <span className="help-tooltip-icon">
+        <span className="help-tooltip">
+            <button
+                type="button"
+                className="help-tooltip-icon"
+                onClick={handleClick}
+            >
                 ?
-            </span>
+            </button>
 
-            <span className="help-tooltip-content">
-                {children}
-            </span>
+            {showTooltip && (
+                <span className="help-tooltip-content">
+                    {children}
+                </span>
+            )}
         </span>
     )
 }
