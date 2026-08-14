@@ -32,8 +32,7 @@ export default function HelpTooltip({ children }) {
             <button
                 type="button"
                 className="help-tooltip-icon"
-                // onPointerUp={handlePointerUp}
-                onPointerUp={() => alert('TEST')}
+                onPointerUp={handlePointerUp}
             >
                 ?
             </button>
