@@ -63,7 +63,6 @@
 @media (max-width: 600px) {
     .help-tooltip-content {
         position: fixed;
-
         left: 12px;
         right: 12px;
         bottom: 12px;
@@ -71,6 +70,10 @@
         width: auto;
         max-width: none;
 
-        box-sizing: border-box;
+        z-index: 10000;
+    }
+
+    .help-tooltip-icon {
+        z-index: 10001;
     }
 }
