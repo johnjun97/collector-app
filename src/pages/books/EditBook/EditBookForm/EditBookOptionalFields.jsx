@@ -1,5 +1,5 @@
-import SuggestionInput from '../components/SuggestionInput'
-import HelpTooltip from '../../../components/HelpTooltip'
+import SuggestionInput from '../../components/SuggestionInput'
+import HelpTooltip from '../../../../components/HelpTooltip'
 
 export default function EditBookOptionalFields({
     book,
@@ -116,7 +116,7 @@ export default function EditBookOptionalFields({
 
                     {coverUpdatedByUser && (
                         <span className="cover-updated-by">
-                            最后更新：
+                             更新by：
                             {coverUpdatedByUser.display_name ||
                                 coverUpdatedByUser.email}
                         </span>

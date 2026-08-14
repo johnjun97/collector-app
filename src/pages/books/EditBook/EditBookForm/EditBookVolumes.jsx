@@ -1,4 +1,4 @@
-import HelpTooltip from '../../../components/HelpTooltip'
+import HelpTooltip from '../../../../components/HelpTooltip'
 
 export default function EditBookVolumes({
     series,

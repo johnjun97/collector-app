@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import { supabase } from '../../../lib/supabaseClient'
-import SuggestionInput from '../components/SuggestionInput'
+import { supabase } from '../../../../lib/supabaseClient'
+import SuggestionInput from '../../components/SuggestionInput'
 import './editBookForm.css'
-import HelpTooltip from '../../../components/HelpTooltip'
+import HelpTooltip from '../../../../components/HelpTooltip'
 import EditBookOwnership from './EditBookOwnership'
 import EditBookVolumes from './EditBookVolumes'
 import EditBookOptionalFields from './EditBookOptionalFields'
@@ -285,12 +285,6 @@ export default function editBookForm({
                         >
                             {saving ? '保存中...' : '保存'}
                         </button>
-
-                        {/* {updatedByUser && (
-                            <div className="updated-by">
-                                最后更新：{updatedByUser.display_name || updatedByUser.email}
-                            </div>
-                        )} */}
 
                     </div>
 
