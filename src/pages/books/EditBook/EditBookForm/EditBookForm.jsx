@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { supabase } from '../../../../lib/supabaseClient'
 import SuggestionInput from '../../components/SuggestionInput'
-import './editBookForm.css'
+import './EditBookForm.css'
 import HelpTooltip from '../../../../components/HelpTooltip'
 import EditBookOwnership from './EditBookOwnership'
 import EditBookVolumes from './EditBookVolumes'
@@ -287,7 +287,7 @@ export default function editBookForm({
                         </button>
 
                     </div>
-// for push
+                    
                 </>
             )
             }
