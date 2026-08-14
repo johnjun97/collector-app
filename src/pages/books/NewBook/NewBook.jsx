@@ -46,6 +46,20 @@ export default function NewBook() {
                 throw seriesFindError
             }
 
+            // Get current user
+            const {
+                data: { user },
+                error: userError
+            } = await supabase.auth.getUser()
+
+            if (userError) {
+                throw userError
+            }
+
+            if (!user) {
+                throw new Error('User is not logged in')
+            }
+
             let coverPath = null
 
             if (form.cover) {
@@ -68,7 +82,22 @@ export default function NewBook() {
 
             // 2. Use existing series or create a new one
             if (existingSeries) {
-                series = existingSeries
+                const { data: updatedSeries, error: seriesUpdateError } =
+                    await supabase
+                        .from('book_series')
+                        .update({
+                            updated_by: user.id,
+                            updated_at: new Date().toISOString(),
+                        })
+                        .eq('id', existingSeries.id)
+                        .select()
+                        .single()
+
+                if (seriesUpdateError) {
+                    throw seriesUpdateError
+                }
+
+                series = updatedSeries
             } else {
                 const { data: newSeries, error: seriesInsertError } =
                     await supabase
@@ -77,6 +106,8 @@ export default function NewBook() {
                             title,
                             author: form.author.trim() || null,
                             subcategory: form.subcategory || '漫画',
+                            created_by: user.id,
+                            updated_by: user.id,
                         })
                         .select()
                         .single()
@@ -86,20 +117,6 @@ export default function NewBook() {
                 }
 
                 series = newSeries
-            }
-
-            // 3. Get current user
-            const {
-                data: { user },
-                error: userError
-            } = await supabase.auth.getUser()
-
-            if (userError) {
-                throw userError
-            }
-
-            if (!user) {
-                throw new Error('User is not logged in')
             }
 
             // 4. Determine all volumes that should exist
