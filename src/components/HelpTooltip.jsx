@@ -49,7 +49,7 @@ export default function HelpTooltip({ children }) {
                         padding: '15px',
                         background: '#333',
                         color: '#fff',
-                        zIndex: 9999999,
+zIndex: 2147483647,
                         borderRadius: '8px',
                     }}
                 >
