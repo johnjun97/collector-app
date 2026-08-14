@@ -2,9 +2,13 @@
     position: relative;
     display: inline-block;
     margin-left: 6px;
+    z-index: 9999;
 }
 
 .help-tooltip-icon {
+    position: relative;
+    z-index: 9999;
+
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -25,6 +29,7 @@
     line-height: 1;
 
     cursor: pointer;
+    pointer-events: auto;
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
 }
@@ -52,27 +57,18 @@
     overflow-wrap: break-word;
     word-break: break-word;
 
-    z-index: 100;
+    z-index: 10000;
 }
 
 @media (max-width: 600px) {
     .help-tooltip-content {
         position: fixed;
+        top: auto;
         right: 12px;
+        bottom: 12px;
         left: 12px;
+
         width: auto;
         max-width: none;
     }
-}
-
-.help-tooltip {
-    position: relative;
-    z-index: 9999;
-}
-
-.help-tooltip-icon {
-    position: relative;
-    z-index: 10000;
-    pointer-events: auto;
-    touch-action: manipulation;
 }
