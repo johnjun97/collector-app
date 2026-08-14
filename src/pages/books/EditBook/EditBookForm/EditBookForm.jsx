@@ -174,6 +174,7 @@ export default function editBookForm({
     }
 
     const currentCover = getCurrentCover()
+    const isGoogleCover = !!book?.cover_image_url
 
     return (
         <form
@@ -275,6 +276,7 @@ export default function editBookForm({
                         removeCover={removeCover}
                         setRemoveCover={setRemoveCover}
                         currentCover={currentCover}
+                                            isGoogleCover={isGoogleCover}
                     />
 
                     <div className="form-actions">

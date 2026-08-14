@@ -16,6 +16,7 @@ export default function EditBookOptionalFields({
     removeCover,
     setRemoveCover,
     currentCover,
+    isGoogleCover
 }) {
     return (
         <details className="optional-fields">
@@ -114,9 +115,14 @@ export default function EditBookOptionalFields({
                         上传新封面将替换当前集数的封面。
                     </HelpTooltip>
 
+{isGoogleCover && (
+    <span className="cover-provided-by-google">
+        (Provided by Google API)
+    </span>
+)}
                     {coverUpdatedByUser && (
                         <span className="cover-updated-by">
-                             更新by：
+                            更新by：
                             {coverUpdatedByUser.display_name ||
                                 coverUpdatedByUser.email}
                         </span>

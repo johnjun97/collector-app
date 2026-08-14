@@ -15,7 +15,9 @@
     gap: 8px;
 }
 
-/* // for push */
+.cover-provided-by-google {
+    margin-left: 6px;
+}
 
 .checkbox-label input[type="checkbox"] {
     width: auto;
