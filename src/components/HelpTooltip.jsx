@@ -8,8 +8,6 @@ export default function HelpTooltip({ children }) {
         e.preventDefault()
         e.stopPropagation()
 
-        console.log('TOOLTIP CLICK')
-
         setShowTooltip((prev) => !prev)
     }
 
@@ -30,20 +28,22 @@ export default function HelpTooltip({ children }) {
     }, [showTooltip])
 
     return (
-        <span className="help-tooltip">
-            <button
-                type="button"
-                className="help-tooltip-icon"
-                onPointerUp={handlePointerUp}
-            >
-                ?
-            </button>
+        <>
+            <span className="help-tooltip">
+                <button
+                    type="button"
+                    className="help-tooltip-icon"
+                    onPointerUp={handlePointerUp}
+                >
+                    ?
+                </button>
+            </span>
 
-{showTooltip && (
-    <span className="help-tooltip-content">
-        {children}
-    </span>
-)}
-        </span>
+            {showTooltip && (
+                <div className="help-tooltip-content">
+                    {children}
+                </div>
+            )}
+        </>
     )
 }

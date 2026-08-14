@@ -176,10 +176,6 @@ overflow: visible;
     z-index: 1;
 }
 
-.book-edit-form .help-tooltip {
-    z-index: 999999;
-}
-
 .book-edit-form .form-field:has(.series-suggestions) {
     z-index: 1000;
 }
