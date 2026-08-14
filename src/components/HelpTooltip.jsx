@@ -40,7 +40,19 @@ export default function HelpTooltip({ children }) {
             </span>
 
             {showTooltip && (
-                <div className="help-tooltip-content">
+                <div
+                    style={{
+                        position: 'fixed',
+                        left: '12px',
+                        right: '12px',
+                        bottom: '12px',
+                        padding: '15px',
+                        background: '#333',
+                        color: '#fff',
+                        zIndex: 9999999,
+                        borderRadius: '8px',
+                    }}
+                >
                     {children}
                 </div>
             )}
