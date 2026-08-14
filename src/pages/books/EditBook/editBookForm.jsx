@@ -3,6 +3,9 @@ import { supabase } from '../../../lib/supabaseClient'
 import SuggestionInput from '../components/SuggestionInput'
 import './editBookForm.css'
 import HelpTooltip from '../../../components/HelpTooltip'
+import EditBookOwnership from './EditBookOwnership'
+import EditBookVolumes from './EditBookVolumes'
+import EditBookOptionalFields from './EditBookOptionalFields'
 
 export default function editBookForm({
     updatedByUser,
@@ -32,6 +35,10 @@ export default function editBookForm({
     handleSubmit,
     navigate
 }) {
+
+    const [showOwnershipBatchEdit, setShowOwnershipBatchEdit] =
+        useState(false)
+
     const [currentCoverUrl, setCurrentCoverUrl] = useState(null)
 
     useEffect(() => {
@@ -47,9 +54,6 @@ export default function editBookForm({
 
         setCurrentCoverUrl(data.publicUrl)
     }, [book?.cover_image])
-
-    const [showOwnershipBatchEdit, setShowOwnershipBatchEdit] =
-        React.useState(false)
 
     const [suggestions, setSuggestions] = useState({
         title: [],
@@ -230,91 +234,14 @@ export default function editBookForm({
                 onChange={handleSeriesChange}
             />
 
-            <div className="form-field">
-                <div className="volume-field-header">
-                    <label>集数</label>
-
-                    <div className="batch-add-wrapper">
-                        <button
-                            type="button"
-                            className="batch-add-button"
-                            onClick={() => {
-                                navigate('/books/new', {
-                                    state: {
-                                        initialData: {
-                                            subcategory: series.subcategory || '漫画',
-                                            title: series.title || '',
-                                            author: series.author || '',
-                                            publisher: book.publisher || '',
-                                            edition: book.edition || '普通版',
-                                        }
-                                    }
-                                })
-                            }}
-                        >
-                            新增集数
-                        </button>
-
-                        <HelpTooltip>
-                            购买日期和购买价格如有填写，
-                            将应用于所有批量新增的集数。
-                            留空则不会修改已有集数的相关资料。
-                        </HelpTooltip>
-
-                    </div>
-                </div>
-
-                <div
-                    className={`volume-buttons ${showOwnershipBatchEdit
-                        ? 'batch-edit-active'
-                        : ''
-                        }`}
-                >
-                    {[...volumes]
-                        .sort((a, b) => {
-                            const aNum = Number(a.volume)
-                            const bNum = Number(b.volume)
-
-                            if (!isNaN(aNum) && !isNaN(bNum) && aNum !== bNum) {
-                                return aNum - bNum
-                            }
-
-                            const aIsNormal =
-                                !a.edition || a.edition === '普通版'
-
-                            const bIsNormal =
-                                !b.edition || b.edition === '普通版'
-
-                            if (aIsNormal && !bIsNormal) return -1
-                            if (!aIsNormal && bIsNormal) return 1
-
-                            return String(a.edition || '')
-                                .localeCompare(String(b.edition || ''))
-                        })
-                        .map((volume) => (
-                            <button
-                                key={volume.id}
-                                type="button"
-                                className={[
-                                    book.id === volume.id ? 'active' : '',
-                                    volume.isOwned ? 'owned' : ''
-                                ].join(' ')}
-                                onClick={() => {
-                                    if (!showOwnershipBatchEdit) {
-                                        handleVolumeChange(volume)
-                                    }
-                                }}
-                            >
-                                {volume.volume}
-                                {volume.edition && volume.edition !== '普通版' && (
-                                    <span className="volume-edition">
-                                        {' '}({volume.edition})
-                                    </span>
-                                )}
-                            </button>
-                        ))}
-                </div>
-            </div>
+            <EditBookVolumes
+                series={series}
+                book={book}
+                volumes={volumes}
+                showOwnershipBatchEdit={showOwnershipBatchEdit}
+                handleVolumeChange={handleVolumeChange}
+                navigate={navigate}
+            />
 
             {userBookLoading ? (
                 <div className="form-field" >
@@ -323,251 +250,32 @@ export default function editBookForm({
             ) : (
                 <>
 
-                    <div className="form-field">
-                        <div className="ownership-field-header">
-                            <label className="checkbox-label">
-                                <input
-                                    type="checkbox"
-                                    checked={ownsBook}
-                                    onChange={(e) =>
-                                        setOwnsBook(e.target.checked)
-                                    }
-                                />
-                                已入手
-                            </label>
+                    <EditBookOwnership
+                        ownsBook={ownsBook}
+                        setOwnsBook={setOwnsBook}
+                        volumes={volumes}
+                        batchOwnership={batchOwnership}
+                        setBatchOwnership={setBatchOwnership}
+                        showOwnershipBatchEdit={showOwnershipBatchEdit}
+                        setShowOwnershipBatchEdit={setShowOwnershipBatchEdit}
+                    />
 
-                            <button
-                                type="button"
-                                className={`batch-add-button ${showOwnershipBatchEdit ? 'active' : ''
-                                    }`}
-                                onClick={() => {
-                                    const nextState = !showOwnershipBatchEdit
-
-                                    setShowOwnershipBatchEdit(nextState)
-
-
-                                    if (nextState) {
-                                        const initialOwnership = {}
-
-                                        volumes.forEach((volume) => {
-                                            initialOwnership[volume.id] =
-                                                volume.isOwned === true
-                                        })
-
-                                        setBatchOwnership(initialOwnership)
-                                    }
-                                }}
-                            >
-                                {showOwnershipBatchEdit
-                                    ? '关闭批量编辑'
-                                    : '批量编辑'}
-                            </button>
-
-                        </div>
-                    </div>
-
-                    {showOwnershipBatchEdit && (
-                        <div className="ownership-batch-list">
-                            {volumes.map((volume) => (
-                                <label
-                                    key={volume.id}
-                                    className={`ownership-batch-item ${batchOwnership[volume.id]
-                                        ? 'owned'
-                                        : ''
-                                        }`}
-                                >
-                                    <input
-                                        type="checkbox"
-                                        checked={
-                                            batchOwnership[volume.id] === true
-                                        }
-                                        onChange={(e) => {
-                                            setBatchOwnership({
-                                                ...batchOwnership,
-                                                [volume.id]: e.target.checked
-                                            })
-                                        }}
-                                    />
-
-                                    <span>
-                                        第{volume.volume}集
-
-                                        {volume.edition &&
-                                            volume.edition !== '普通版' && (
-                                                <>
-                                                    {' '}
-                                                    ({volume.edition})
-                                                </>
-                                            )}
-                                    </span>
-                                </label>
-                            ))}
-                        </div>
-                    )}
-
-                    <details className="optional-fields">
-                        <summary>其他资料（选填）</summary>
-
-                        {/* 版本 */}
-                        <SuggestionInput
-                            id="edition"
-                            name="edition"
-                            label="版本"
-                            placeholder="例如：普通版、限定版、特装版"
-                            value={book.edition ?? ''}
-                            suggestions={suggestions.edition}
-                            onChange={handleBookChange}
-                        />
-
-                        {/* 购买日期和价格 */}
-                        {ownsBook && (
-                            <>
-                                <div className="form-field">
-                                    <label htmlFor="purchasedDate">
-                                        购买日期
-                                    </label>
-
-                                    <input
-                                        id="purchasedDate"
-                                        type="date"
-                                        value={purchasedDate}
-                                        onChange={(e) =>
-                                            setPurchasedDate(e.target.value)
-                                        }
-                                    />
-                                </div>
-
-                                <div className="form-field">
-                                    <label htmlFor="purchasedPrice">
-                                        购买价格
-                                    </label>
-
-                                    <input
-                                        id="purchasedPrice"
-                                        type="number"
-                                        step="0.01"
-                                        min="0"
-                                        value={purchasedPrice}
-                                        onChange={(e) =>
-                                            setPurchasedPrice(e.target.value)
-                                        }
-                                    />
-                                </div>
-                            </>
-                        )}
-
-                        {/* 出版社 */}
-                        <SuggestionInput
-                            id="publisher"
-                            name="publisher"
-                            label="出版社"
-                            placeholder="请输入出版社"
-                            value={book.publisher || ''}
-                            suggestions={suggestions.publisher}
-                            onChange={handleBookChange}
-                        />
-
-                        {/* ISBN */}
-                        <div className="form-field">
-                            <label htmlFor="isbn">ISBN</label>
-
-                            <input
-                                id="isbn"
-                                name="isbn"
-                                type="text"
-                                value={book.isbn || ''}
-                                onChange={handleBookChange}
-                                autoComplete="off"
-                            />
-                        </div>
-
-                        {/* 发售日期 */}
-                        <div className="form-field">
-                            <label htmlFor="release_date">
-                                发售日期
-                            </label>
-
-                            <input
-                                id="release_date"
-                                name="release_date"
-                                type="date"
-                                value={book.release_date || ''}
-                                onChange={handleBookChange}
-                            />
-                        </div>
-
-                        <div className="form-field">
-                            <div className="form-field-label">
-                                <label htmlFor="cover">
-                                    封面
-                                </label>
-
-                                <HelpTooltip>
-                                    上传新封面将替换当前集数的封面。
-                                </HelpTooltip>
-
-                                {coverUpdatedByUser && (
-                                    <span className="cover-updated-by">
-                                        最后更新：{coverUpdatedByUser.display_name || coverUpdatedByUser.email}
-                                    </span>
-                                )}
-                            </div>
-
-                            {cover ? (
-                                <img
-                                    src={URL.createObjectURL(cover)}
-                                    alt="新封面预览"
-                                    className="current-cover-preview"
-                                />
-                            ) : removeCover ? (
-                                <div className="no-cover">
-                                    封面将被移除
-                                </div>
-                            ) : currentCover ? (
-                                <img
-                                    src={currentCover}
-                                    alt="当前封面"
-                                    className="current-cover-preview"
-                                    onClick={() => window.open(currentCover, '_blank')}
-                                />
-                            ) : (
-                                <div className="no-cover">
-                                    暂无封面
-                                </div>
-                            )}
-
-                            <input
-                                id="cover"
-                                type="file"
-                                accept="image/jpeg,image/png,image/webp"
-                                onChange={(e) =>
-                                    setCover(e.target.files?.[0] || null)
-                                }
-                            />
-
-                            {book.cover_image && !cover && !removeCover && (
-                                <button
-                                    type="button"
-                                    className="remove-cover-button"
-                                    onClick={() => setRemoveCover(true)}
-                                >
-                                    移除封面
-                                </button>
-                            )}
-
-                            {removeCover && (
-                                <button
-                                    type="button"
-                                    className="remove-cover-button"
-                                    onClick={() => setRemoveCover(false)}
-                                >
-                                    取消移除
-                                </button>
-                            )}
-                        </div>
-
-                    </details>
-
+                    <EditBookOptionalFields
+                        book={book}
+                        suggestions={suggestions}
+                        handleBookChange={handleBookChange}
+                        ownsBook={ownsBook}
+                        purchasedDate={purchasedDate}
+                        setPurchasedDate={setPurchasedDate}
+                        purchasedPrice={purchasedPrice}
+                        setPurchasedPrice={setPurchasedPrice}
+                        coverUpdatedByUser={coverUpdatedByUser}
+                        cover={cover}
+                        setCover={setCover}
+                        removeCover={removeCover}
+                        setRemoveCover={setRemoveCover}
+                        currentCover={currentCover}
+                    />
 
                     <div className="form-actions">
 
