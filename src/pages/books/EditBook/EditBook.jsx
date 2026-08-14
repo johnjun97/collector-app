@@ -5,7 +5,7 @@ import { debugError } from '../../../lib/debug'
 import Navbar from '../../../components/Navbar'
 import './EditBook.css'
 import Loading from '../../../components/Loading.jsx'
-import EditBookForm from './EditBookForm/EditBookForm'
+import EditBookForm from './EditBookForm/EditBookForm.jsx'
 
 export default function EditBook() {
     const { id } = useParams()
