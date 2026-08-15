@@ -28,15 +28,25 @@ export default function EditBookOptionalFields({
         <details className="optional-fields">
             <summary>其他资料（选填）</summary>
 
-<SuggestionInput
-    id="publisher"
-    name="publisher"
-    label="出版社"
-    placeholder="请输入出版社"
-    value={publisherName}
-    suggestions={suggestions.publisher}
-    onChange={(e) => setPublisherName(e.target.value)}
-/>
+            <SuggestionInput
+                id="publisher"
+                name="publisher"
+                label="出版社"
+                placeholder="请输入出版社"
+                value={publisherName}
+                suggestions={suggestions.publisher}
+                onChange={(e) => setPublisherName(e.target.value)}
+            />
+
+            <SuggestionInput
+                id="edition"
+                name="edition"
+                label="版本"
+                placeholder="例如：普通版、限定版、特装版"
+                value={book.edition || ''}
+                suggestions={suggestions.edition}
+                onChange={handleBookChange}
+            />
 
             {ownsBook && (
                 <>

@@ -262,6 +262,14 @@ overflow: visible;
     background: #f5f5f5;
 }
 
+.optional-fields .form-field:has(.series-suggestions) {
+    position: relative;
+    z-index: 1000;
+}
+
+.optional-fields .series-suggestions {
+    z-index: 1001;
+}
 .form-field-label {
     display: flex;
     align-items: center;
