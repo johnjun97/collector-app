@@ -1,5 +1,7 @@
 .edit-book-page {
+    max-width: 800px;
     min-height: calc(100vh - 64px);
+    margin: 0 auto;
     padding: 24px;
     position: relative;
 

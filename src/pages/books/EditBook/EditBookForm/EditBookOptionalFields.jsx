@@ -82,18 +82,18 @@ export default function EditBookOptionalFields({
                 onChange={handleBookChange}
             />
 
-<ISBNLookup
-    isbn={book.isbn || ''}
-    onISBNChange={(value) =>
-        handleBookChange({
-            target: {
-                name: 'isbn',
-                value
-            }
-        })
-    }
-    onBookData={onISBNBookData}
-/>
+            <ISBNLookup
+                isbn={book.isbn || ''}
+                onISBNChange={(value) =>
+                    handleBookChange({
+                        target: {
+                            name: 'isbn',
+                            value
+                        }
+                    })
+                }
+                onBookData={onISBNBookData}
+            />
 
             <div className="form-field">
                 <label htmlFor="release_date">

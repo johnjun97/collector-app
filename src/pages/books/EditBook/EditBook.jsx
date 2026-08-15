@@ -228,21 +228,21 @@ export default function EditBook() {
     }
 
     const handleISBNBookData = (bookData) => {
-    setBook(prev => ({
-        ...prev,
-        isbn: bookData.isbn || prev.isbn,
-        publisher: bookData.publisher || prev.publisher,
-        release_date: bookData.releaseDate || prev.release_date,
-        cover_image_url: bookData.coverUrl || prev.cover_image_url,
-        volume: bookData.volume || prev.volume,
-    }))
+        setBook(prev => ({
+            ...prev,
+            isbn: bookData.isbn || prev.isbn,
+            publisher: bookData.publisher || prev.publisher,
+            release_date: bookData.releaseDate || prev.release_date,
+            cover_image_url: bookData.coverUrl || prev.cover_image_url,
+            volume: bookData.volume || prev.volume,
+        }))
 
-    setSeries(prev => ({
-        ...prev,
-        title: bookData.title || prev.title,
-        author: bookData.author || prev.author,
-    }))
-}
+        setSeries(prev => ({
+            ...prev,
+            title: bookData.title || prev.title,
+            author: bookData.author || prev.author,
+        }))
+    }
 
     const handleVolumeChange = async (volume) => {
         setBook(volume)
@@ -692,34 +692,34 @@ export default function EditBook() {
                 throw bookError
             }
 
-if (oldCoverPath) {
-    const { data: stillUsed, error: checkCoverError } =
-        await supabase
-            .from('books')
-            .select('id')
-            .eq('cover_image', oldCoverPath)
-            .limit(1)
+            if (oldCoverPath) {
+                const { data: stillUsed, error: checkCoverError } =
+                    await supabase
+                        .from('books')
+                        .select('id')
+                        .eq('cover_image', oldCoverPath)
+                        .limit(1)
 
-    if (checkCoverError) {
-        console.error(
-            'Failed to check old cover usage:',
-            checkCoverError
-        )
-    } else if (!stillUsed?.length) {
-        const { error: deleteCoverError } =
-            await supabase
-                .storage
-                .from('book-covers')
-                .remove([oldCoverPath])
+                if (checkCoverError) {
+                    console.error(
+                        'Failed to check old cover usage:',
+                        checkCoverError
+                    )
+                } else if (!stillUsed?.length) {
+                    const { error: deleteCoverError } =
+                        await supabase
+                            .storage
+                            .from('book-covers')
+                            .remove([oldCoverPath])
 
-        if (deleteCoverError) {
-            console.error(
-                'Failed to delete old cover:',
-                deleteCoverError
-            )
-        }
-    }
-}
+                    if (deleteCoverError) {
+                        console.error(
+                            'Failed to delete old cover:',
+                            deleteCoverError
+                        )
+                    }
+                }
+            }
 
             navigate('/books')
 
