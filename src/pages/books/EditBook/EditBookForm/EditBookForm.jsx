@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { supabase } from '../../../../lib/supabaseClient'
 import SuggestionInput from '../../components/SuggestionInput'
 import './EditBookForm.css'
+import ISBNLookup from '../../../../components/ISBNLookup/ISBNLookup'
 import HelpTooltip from '../../../../components/HelpTooltip'
 import EditBookOwnership from './EditBookOwnership'
 import EditBookVolumes from './EditBookVolumes'
@@ -31,6 +32,7 @@ export default function editBookForm({
     saving,
     handleSeriesChange,
     handleBookChange,
+    onISBNBookData,
     handleVolumeChange,
     handleSubmit,
     navigate
@@ -247,6 +249,76 @@ export default function editBookForm({
     const isGoogleCover =
         !book?.cover_image && !!book?.cover_image_url
 
+    const handleISBNBookData = (data) => {
+        // ISBN
+        handleBookChange({
+            target: {
+                name: 'isbn',
+                value: data.isbn
+            }
+        })
+
+        // Publisher
+        if (data.publisher) {
+            handleBookChange({
+                target: {
+                    name: 'publisher',
+                    value: data.publisher
+                }
+            })
+        }
+
+        // Release date
+        if (data.releaseDate) {
+            handleBookChange({
+                target: {
+                    name: 'release_date',
+                    value: data.releaseDate
+                }
+            })
+        }
+
+        // Title
+        if (data.title) {
+            handleSeriesChange({
+                target: {
+                    name: 'title',
+                    value: data.title
+                }
+            })
+        }
+
+        // Author
+        if (data.author) {
+            handleSeriesChange({
+                target: {
+                    name: 'author',
+                    value: data.author
+                }
+            })
+        }
+
+        // Volume
+        if (data.volume) {
+            handleVolumeChange({
+                target: {
+                    name: 'volume',
+                    value: data.volume
+                }
+            })
+        }
+
+        // Google Books cover
+        if (data.coverUrl) {
+            handleBookChange({
+                target: {
+                    name: 'cover_image_url',
+                    value: data.coverUrl
+                }
+            })
+        }
+    }
+
     return (
         <form
             className="book-edit-form"
@@ -335,6 +407,7 @@ export default function editBookForm({
                     <EditBookOptionalFields
                         book={book}
                         suggestions={suggestions}
+                        onISBNBookData={onISBNBookData}
                         handleBookChange={handleBookChange}
                         ownsBook={ownsBook}
                         purchasedDate={purchasedDate}

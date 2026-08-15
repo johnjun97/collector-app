@@ -227,6 +227,23 @@ export default function EditBook() {
         })
     }
 
+    const handleISBNBookData = (bookData) => {
+    setBook(prev => ({
+        ...prev,
+        isbn: bookData.isbn || prev.isbn,
+        publisher: bookData.publisher || prev.publisher,
+        release_date: bookData.releaseDate || prev.release_date,
+        cover_image_url: bookData.coverUrl || prev.cover_image_url,
+        volume: bookData.volume || prev.volume,
+    }))
+
+    setSeries(prev => ({
+        ...prev,
+        title: bookData.title || prev.title,
+        author: bookData.author || prev.author,
+    }))
+}
+
     const handleVolumeChange = async (volume) => {
         setBook(volume)
         await getUserBook(volume.id)

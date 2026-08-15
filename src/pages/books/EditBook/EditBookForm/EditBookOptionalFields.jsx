@@ -1,9 +1,11 @@
 import SuggestionInput from '../../components/SuggestionInput'
+import ISBNLookup from '../../../../components/ISBNLookup/ISBNLookup'
 import HelpTooltip from '../../../../components/HelpTooltip'
 
 export default function EditBookOptionalFields({
     book,
     suggestions,
+    onISBNBookData,
     handleBookChange,
     ownsBook,
     purchasedDate,
@@ -80,18 +82,18 @@ export default function EditBookOptionalFields({
                 onChange={handleBookChange}
             />
 
-            <div className="form-field">
-                <label htmlFor="isbn">ISBN</label>
-
-                <input
-                    id="isbn"
-                    name="isbn"
-                    type="text"
-                    value={book.isbn || ''}
-                    onChange={handleBookChange}
-                    autoComplete="off"
-                />
-            </div>
+<ISBNLookup
+    isbn={book.isbn || ''}
+    onISBNChange={(value) =>
+        handleBookChange({
+            target: {
+                name: 'isbn',
+                value
+            }
+        })
+    }
+    onBookData={onISBNBookData}
+/>
 
             <div className="form-field">
                 <label htmlFor="release_date">
@@ -163,46 +165,46 @@ export default function EditBookOptionalFields({
                     </div>
                 )}
 
-           <div className="cover-actions">
-    <label
-        htmlFor="cover"
-        className="upload-cover-button"
-    >
-        选择新封面
-    </label>
+                <div className="cover-actions">
+                    <label
+                        htmlFor="cover"
+                        className="upload-cover-button"
+                    >
+                        选择新封面
+                    </label>
 
-    <input
-        id="cover"
-        className="cover-file-input"
-        type="file"
-        accept="image/jpeg,image/png,image/webp"
-        onChange={(e) =>
-            setCover(e.target.files?.[0] || null)
-        }
-    />
+                    <input
+                        id="cover"
+                        className="cover-file-input"
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        onChange={(e) =>
+                            setCover(e.target.files?.[0] || null)
+                        }
+                    />
 
-    {book.cover_image &&
-        !cover &&
-        !removeCover && (
-            <button
-                type="button"
-                className="remove-cover-button"
-                onClick={() => setRemoveCover(true)}
-            >
-                移除封面
-            </button>
-        )}
+                    {book.cover_image &&
+                        !cover &&
+                        !removeCover && (
+                            <button
+                                type="button"
+                                className="remove-cover-button"
+                                onClick={() => setRemoveCover(true)}
+                            >
+                                移除封面
+                            </button>
+                        )}
 
-    {removeCover && (
-        <button
-            type="button"
-            className="remove-cover-button"
-            onClick={() => setRemoveCover(false)}
-        >
-            取消移除
-        </button>
-    )}
-</div>
+                    {removeCover && (
+                        <button
+                            type="button"
+                            className="remove-cover-button"
+                            onClick={() => setRemoveCover(false)}
+                        >
+                            取消移除
+                        </button>
+                    )}
+                </div>
             </div>
         </details>
     )
