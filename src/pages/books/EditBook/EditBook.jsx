@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../../../lib/supabaseClient'
-import { debugError } from '../../../lib/debug'
+import { debugLog, debugError } from '../../../lib/debug'
 import Navbar from '../../../components/Navbar'
 import './EditBook.css'
 import Loading from '../../../components/Loading.jsx'
