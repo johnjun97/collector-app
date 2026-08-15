@@ -2,3 +2,13 @@ body {
   margin: 0;
   font-family: system-ui, sans-serif;
 }
+
+/* Prevent accidental text selection on interactive UI */
+button,
+nav,
+.navbar,
+.navbar a {
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+}
