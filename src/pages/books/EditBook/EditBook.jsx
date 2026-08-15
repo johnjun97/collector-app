@@ -592,61 +592,25 @@ export default function EditBook() {
                 bookUpdates.cover_image_updated_by = user.id
             } else if (removeCover) {
                 bookUpdates.cover_image = null
-                bookUpdates.cover_image_updated_by = user.id
+                bookUpdates.cover_image_updated_by = null
             }
 
             const {
+                data: updatedBook,
                 error: bookError
             } = await supabase
                 .from('books')
                 .update(bookUpdates)
                 .eq('id', book.id)
+                .select('id, cover_image, cover_image_url')
+                .single()
+
+            debugLog('Updated book cover:', updatedBook)
 
             if (bookError) {
                 throw bookError
             }
 
-            // Delete old cover if it is no longer used
-            if (oldCoverPath && oldCoverPath !== coverPath) {
-                const { data: stillUsed, error: checkCoverError } = await supabase
-                    .from('books')
-                    .select('id')
-                    .eq('cover_image', oldCoverPath)
-                    .limit(1)
-
-                if (checkCoverError) {
-                    console.error(
-                        'Failed to check old cover usage:',
-                        checkCoverError
-                    )
-                } else if (!stillUsed?.length) {
-                    const {
-                        data: deleteCoverData,
-                        error: deleteCoverError
-                    } = await supabase
-                        .storage
-                        .from('book-covers')
-                        .remove([oldCoverPath])
-
-                    debugLog('Delete old cover result:', {
-                        path: oldCoverPath,
-                        data: deleteCoverData,
-                        error: deleteCoverError
-                    })
-                    debugLog('Delete old cover:', oldCoverPath)
-                    debugLog('Delete old cover error:', deleteCoverError)
-
-                    if (deleteCoverError) {
-                        console.error(
-                            'Failed to delete old cover:',
-                            deleteCoverError
-                        )
-                    }
-                }
-            }
-
-
-            // Update ownership for single-book edit only
             // Update ownership for single-book edit only
             if (!ownershipChanges && parsedBatchVolumes.length === 0) {
 
@@ -728,6 +692,7 @@ export default function EditBook() {
 
             const oldCoverPath = book.cover_image || null
 
+
             const { error: bookError } =
                 await supabase
                     .from('books')
@@ -736,35 +701,6 @@ export default function EditBook() {
 
             if (bookError) {
                 throw bookError
-            }
-
-            if (oldCoverPath) {
-                const { data: stillUsed, error: checkCoverError } =
-                    await supabase
-                        .from('books')
-                        .select('id')
-                        .eq('cover_image', oldCoverPath)
-                        .limit(1)
-
-                if (checkCoverError) {
-                    console.error(
-                        'Failed to check old cover usage:',
-                        checkCoverError
-                    )
-                } else if (!stillUsed?.length) {
-                    const { error: deleteCoverError } =
-                        await supabase
-                            .storage
-                            .from('book-covers')
-                            .remove([oldCoverPath])
-
-                    if (deleteCoverError) {
-                        console.error(
-                            'Failed to delete old cover:',
-                            deleteCoverError
-                        )
-                    }
-                }
             }
 
             navigate('/books')

@@ -2,7 +2,7 @@ const DEBUG_MODE = import.meta.env.VITE_DEBUG_MODE === 'true'
 
 export const debugLog = (...args) => {
     if (DEBUG_MODE) {
-        debugLog(...args)
+        console.log(...args)
     }
 }
 
