@@ -17,3 +17,6 @@ export const debugError = (...args) => {
         console.error(...args)
     }
 }
+
+// use this to import 
+// import { debugLog, debugError } from '../../../lib/debug'

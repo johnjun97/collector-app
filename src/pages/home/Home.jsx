@@ -81,11 +81,32 @@ export default function Home() {
         return
       }
 
-      // 3. Calculate user's added books
-      const totalCount = userBooks.length
+      // 3. Calculate books belonging to series added by the user
 
-      const ownedCount = userBooks.filter(
-        (book) => book.is_owned
+      const userBookIds = new Set(
+        userBooks.map(book => book.book_id)
+      )
+
+      const userSeriesIds = new Set(
+        allBooks
+          .filter(book => userBookIds.has(book.id))
+          .map(book => book.series_id)
+      )
+
+      const userSeriesBooks = allBooks.filter(
+        book => userSeriesIds.has(book.series_id)
+      )
+
+      const totalCount = userSeriesBooks.length
+
+      const ownedBookIds = new Set(
+        userBooks
+          .filter(book => book.is_owned)
+          .map(book => book.book_id)
+      )
+
+      const ownedCount = userSeriesBooks.filter(
+        book => ownedBookIds.has(book.id)
       ).length
 
       // 4. Get user's contribution counts
@@ -132,7 +153,7 @@ export default function Home() {
 
       // 5. Set ALL books statistics
       setBookStats({
-        total: allBooks.length,
+        total: totalCount,
         owned: ownedCount
       })
 

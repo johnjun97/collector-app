@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import { supabase } from '../../../lib/supabaseClient'
-import { debugError } from '../../../lib/debug'
+import { debugLog, debugError } from '../../../lib/debug'
 import Navbar from '../../../components/Navbar'
 import NewBookForm from './newBookForm'
 import './NewBook.css'
