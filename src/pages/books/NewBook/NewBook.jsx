@@ -12,7 +12,12 @@ export default function NewBook() {
 
     const initialData = location.state?.initialData || null
 
-    const handleSubmit = async (form, ownsBook, parsedVolumes) => {
+    const handleSubmit = async (
+        form,
+        ownsBook,
+        parsedVolumes,
+        batchMode
+    ) => {
 
         console.log('handleSubmit called:', {
             form,
@@ -58,6 +63,45 @@ export default function NewBook() {
 
             if (!user) {
                 throw new Error('User is not logged in')
+            }
+
+            // Find or create publisher
+            let publisherId = null
+
+            const publisherName = form.publisher?.trim()
+
+            if (publisherName) {
+                const { data: existingPublisher, error: publisherFindError } =
+                    await supabase
+                        .from('publishers')
+                        .select('id')
+                        .eq('name', publisherName)
+                        .maybeSingle()
+
+                if (publisherFindError) {
+                    throw publisherFindError
+                }
+
+                if (existingPublisher) {
+                    publisherId = existingPublisher.id
+                } else {
+                    const { data: newPublisher, error: publisherInsertError } =
+                        await supabase
+                            .from('publishers')
+                            .insert({
+                                name: publisherName,
+                                created_by: user.id,
+                                updated_by: user.id,
+                            })
+                            .select('id')
+                            .single()
+
+                    if (publisherInsertError) {
+                        throw publisherInsertError
+                    }
+
+                    publisherId = newPublisher.id
+                }
             }
 
             let coverPath = null
@@ -199,22 +243,27 @@ export default function NewBook() {
                     const { data: newBook, error: insertError } =
                         await supabase
                             .from('books')
-                         .insert({
-    series_id: series.id,
-    volume: volumeValue,
-    edition,
-    publisher: form.publisher.trim() || null,
-    isbn: bookIsbn,
-    release_date: isRequestedVolume
-        ? form.releaseDate || null
-        : null,
-    cover_image: coverPath,
-    cover_image_url: form.coverUrl.trim() || null,
+                            .insert({
+                                series_id: series.id,
+                                volume: volumeValue,
+                                edition,
+                                publisher_id: publisherId,
+                                isbn: bookIsbn,
+                                release_date: isRequestedVolume
+                                    ? form.releaseDate || null
+                                    : null,
+                                cover_image: batchMode ? null : coverPath,
+                                cover_image_url: batchMode
+                                    ? null
+                                    : form.coverUrl.trim() || null,
 
-    created_by: user.id,
-    updated_by: user.id,
-    cover_image_updated_by: coverPath ? user.id : null,
-})
+                                created_by: user.id,
+                                updated_by: user.id,
+                                cover_image_updated_by:
+                                    !batchMode && coverPath
+                                        ? user.id
+                                        : null,
+                            })
                             .select()
                             .single()
 

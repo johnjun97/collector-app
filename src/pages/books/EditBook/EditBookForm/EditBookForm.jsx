@@ -11,6 +11,8 @@ import EditBookOptionalFields from './EditBookOptionalFields'
 export default function editBookForm({
     updatedByUser,
     coverUpdatedByUser,
+    publisherName,
+    setPublisherName,
     batchOwnership,
     setBatchOwnership,
     batchVolumes,
@@ -32,7 +34,6 @@ export default function editBookForm({
     saving,
     handleSeriesChange,
     handleBookChange,
-    onISBNBookData,
     handleVolumeChange,
     handleSubmit,
     navigate
@@ -65,41 +66,57 @@ export default function editBookForm({
     })
 
     const loadSuggestions = async () => {
-        const { data, error } = await supabase
-            .from('books')
-            .select(`
-            edition,
-            publisher,
-            updated_at,
-            series:book_series (
-                title,
-                author,
-                updated_at
-            )
-        `)
+        const { data: books, error: booksError } =
+            await supabase
+                .from('books')
+                .select(`
+                edition,
+                updated_at,
+                publisher_id,
+                publisher:publishers (
+                    name
+                ),
+                series:book_series (
+                    title,
+                    author,
+                    updated_at
+                )
+            `)
 
-        if (error) {
-            console.error('Error loading book suggestions:', error)
+        if (booksError) {
+            console.error(
+                'Error loading book suggestions:',
+                booksError
+            )
             return
         }
 
         const getSuggestions = (getValue) => {
             const latestByValue = new Map()
 
-            for (const book of data || []) {
+            for (const book of books || []) {
                 const value = getValue(book)
 
                 if (!value) continue
 
-                const bookDate = new Date(book.updated_at).getTime()
-                const seriesDate = new Date(
-                    book.series?.updated_at || 0
-                ).getTime()
+                const bookDate =
+                    new Date(book.updated_at).getTime()
 
-                const latestDate = Math.max(bookDate, seriesDate)
-                const existing = latestByValue.get(value)
+                const seriesDate =
+                    new Date(
+                        book.series?.updated_at || 0
+                    ).getTime()
 
-                if (!existing || latestDate > existing.date) {
+                const latestDate =
+                    Math.max(bookDate, seriesDate)
+
+                const existing =
+                    latestByValue.get(value)
+
+                if (
+                    !existing ||
+                    latestDate > existing.date
+                ) {
                     latestByValue.set(value, {
                         value,
                         date: latestDate,
@@ -109,22 +126,40 @@ export default function editBookForm({
 
             return [...latestByValue.values()]
                 .sort((a, b) => b.date - a.date)
-                .map((item) => item.value)
+                .map(item => item.value)
+        }
+
+        const {
+            data: publishers,
+            error: publishersError
+        } = await supabase
+            .from('publishers')
+            .select('name')
+            .order('name')
+
+        if (publishersError) {
+            console.error(
+                'Error loading publisher suggestions:',
+                publishersError
+            )
+            return
         }
 
         setSuggestions({
             title: getSuggestions(
-                (book) => book.series?.title
+                book => book.series?.title
             ),
+
             author: getSuggestions(
-                (book) => book.series?.author
+                book => book.series?.author
             ),
+
             edition: getSuggestions(
-                (book) => book.edition
+                book => book.edition
             ),
-            publisher: getSuggestions(
-                (book) => book.publisher
-            ),
+
+            publisher: (publishers || [])
+                .map(publisher => publisher.name),
         })
     }
 
@@ -250,35 +285,17 @@ export default function editBookForm({
         !book?.cover_image && !!book?.cover_image_url
 
     const handleISBNBookData = (data) => {
-        // ISBN
-        handleBookChange({
-            target: {
-                name: 'isbn',
-                value: data.isbn
-            }
-        })
-
-        // Publisher
-        if (data.publisher) {
+        // Current volume only
+        if (data.isbn) {
             handleBookChange({
                 target: {
-                    name: 'publisher',
-                    value: data.publisher
+                    name: 'isbn',
+                    value: data.isbn
                 }
             })
         }
 
-        // Release date
-        if (data.releaseDate) {
-            handleBookChange({
-                target: {
-                    name: 'release_date',
-                    value: data.releaseDate
-                }
-            })
-        }
-
-        // Title
+        // Series
         if (data.title) {
             handleSeriesChange({
                 target: {
@@ -288,7 +305,7 @@ export default function editBookForm({
             })
         }
 
-        // Author
+        // Series
         if (data.author) {
             handleSeriesChange({
                 target: {
@@ -298,9 +315,24 @@ export default function editBookForm({
             })
         }
 
-        // Volume
+        // Series
+        if (data.publisher) {
+            setPublisherName(data.publisher)
+        }
+
+        // Current volume only
+        if (data.releaseDate) {
+            handleBookChange({
+                target: {
+                    name: 'release_date',
+                    value: data.releaseDate
+                }
+            })
+        }
+
+        // Current volume only
         if (data.volume) {
-            handleVolumeChange({
+            handleBookChange({
                 target: {
                     name: 'volume',
                     value: data.volume
@@ -308,7 +340,7 @@ export default function editBookForm({
             })
         }
 
-        // Google Books cover
+        // Current volume only
         if (data.coverUrl) {
             handleBookChange({
                 target: {
@@ -407,7 +439,9 @@ export default function editBookForm({
                     <EditBookOptionalFields
                         book={book}
                         suggestions={suggestions}
-                        onISBNBookData={onISBNBookData}
+                        publisherName={publisherName}
+                        setPublisherName={setPublisherName}
+                        onISBNBookData={handleISBNBookData}
                         handleBookChange={handleBookChange}
                         ownsBook={ownsBook}
                         purchasedDate={purchasedDate}

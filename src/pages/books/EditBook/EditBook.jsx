@@ -23,6 +23,7 @@ export default function EditBook() {
     const [ownsBook, setOwnsBook] = useState(false)
     const [purchasedDate, setPurchasedDate] = useState('')
     const [purchasedPrice, setPurchasedPrice] = useState('')
+    const [publisherName, setPublisherName] = useState('')
 
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
@@ -30,19 +31,27 @@ export default function EditBook() {
 
     useEffect(() => {
         const getBook = async () => {
+            console.log('EditBook getBook started, id:', id)
             try {
+
                 // Get current book + series
-                const {
-                    data: currentBook,
-                    error: currentBookError
-                } = await supabase
+                const response = await supabase
                     .from('books')
                     .select(`
         *,
-        series:book_series(*)
+        series:book_series(*),
+        publisher:publishers(*)
     `)
                     .eq('id', id)
                     .single()
+
+                console.log('EditBook Supabase response:', response)
+
+                const currentBook = response.data
+                const currentBookError = response.error
+
+                console.log('EditBook currentBook:', currentBook)
+                console.log('EditBook currentBookError:', currentBookError)
 
                 if (currentBookError) {
                     throw currentBookError
@@ -50,7 +59,7 @@ export default function EditBook() {
 
                 setBook(currentBook)
                 setSeries(currentBook.series)
-
+                setPublisherName(currentBook.publisher?.name || '')
                 console.log('updated_by:', currentBook.updated_by)
 
                 if (currentBook.updated_by) {
@@ -227,23 +236,6 @@ export default function EditBook() {
         })
     }
 
-    const handleISBNBookData = (bookData) => {
-        setBook(prev => ({
-            ...prev,
-            isbn: bookData.isbn || prev.isbn,
-            publisher: bookData.publisher || prev.publisher,
-            release_date: bookData.releaseDate || prev.release_date,
-            cover_image_url: bookData.coverUrl || prev.cover_image_url,
-            volume: bookData.volume || prev.volume,
-        }))
-
-        setSeries(prev => ({
-            ...prev,
-            title: bookData.title || prev.title,
-            author: bookData.author || prev.author,
-        }))
-    }
-
     const handleVolumeChange = async (volume) => {
         setBook(volume)
         await getUserBook(volume.id)
@@ -335,6 +327,49 @@ export default function EditBook() {
             const oldCoverPath = book.cover_image || null
 
             let coverPath = book.cover_image || null
+
+            // Find or create publisher
+            let publisherId = null
+
+            const publisherNameValue = publisherName?.trim()
+
+            if (publisherNameValue) {
+                const {
+                    data: existingPublisher,
+                    error: publisherFindError
+                } = await supabase
+                    .from('publishers')
+                    .select('id')
+                    .eq('name', publisherNameValue)
+                    .maybeSingle()
+
+                if (publisherFindError) {
+                    throw publisherFindError
+                }
+
+                if (existingPublisher) {
+                    publisherId = existingPublisher.id
+                } else {
+                    const {
+                        data: newPublisher,
+                        error: publisherInsertError
+                    } = await supabase
+                        .from('publishers')
+                        .insert({
+                            name: publisherName,
+                            created_by: user.id,
+                            updated_by: user.id,
+                        })
+                        .select('id')
+                        .single()
+
+                    if (publisherInsertError) {
+                        throw publisherInsertError
+                    }
+
+                    publisherId = newPublisher.id
+                }
+            }
 
             if (cover) {
                 const fileExt = cover.name.split('.').pop()
@@ -546,9 +581,9 @@ export default function EditBook() {
             const bookUpdates = {
                 volume: book.volume,
                 edition: book.edition || '普通版',
-                publisher: book.publisher || null,
                 isbn: book.isbn || null,
                 release_date: book.release_date || null,
+                publisher_id: publisherId,
                 updated_by: user.id,
             }
 
@@ -589,6 +624,8 @@ export default function EditBook() {
                         .storage
                         .from('book-covers')
                         .remove([oldCoverPath])
+                        console.log('Delete old cover:', oldCoverPath)
+console.log('Delete old cover error:', deleteCoverError)
 
                     if (deleteCoverError) {
                         console.error(
@@ -841,6 +878,8 @@ export default function EditBook() {
                 >
                     <EditBookForm
                         updatedByUser={updatedByUser}
+                        publisherName={publisherName}
+                        setPublisherName={setPublisherName}
                         coverUpdatedByUser={coverUpdatedByUser}
                         setBatchVolumes={setBatchVolumes}
                         batchOwnership={batchOwnership}

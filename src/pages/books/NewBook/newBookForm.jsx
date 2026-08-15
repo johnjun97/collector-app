@@ -32,6 +32,8 @@ export default function NewBookForm({
 
     const [saving, setSaving] = useState(false)
     const [ownsBook, setOwnsBook] = useState(true)
+    const [batchMode, setBatchMode] = useState(false)
+    const [batchVolumes, setBatchVolumes] = useState(false)
 
     const [suggestions, setSuggestions] = useState({
         title: [],
@@ -72,11 +74,10 @@ export default function NewBookForm({
     }
 
     const loadSuggestions = async () => {
-        const { data, error } = await supabase
+        const { data: books, error: booksError } = await supabase
             .from('books')
             .select(`
             edition,
-            publisher,
             updated_at,
             series:book_series!inner (
                 title,
@@ -87,15 +88,15 @@ export default function NewBookForm({
         `)
             .eq('series.subcategory', form.subcategory)
 
-        if (error) {
-            console.error('Error loading book suggestions:', error)
+        if (booksError) {
+            console.error('Error loading book suggestions:', booksError)
             return
         }
 
         const getSuggestions = (getValue) => {
             const latestByValue = new Map()
 
-            for (const book of data || []) {
+            for (const book of books || []) {
                 const value = getValue(book)
 
                 if (!value) continue
@@ -118,24 +119,39 @@ export default function NewBookForm({
 
             return [...latestByValue.values()]
                 .sort((a, b) => b.date - a.date)
-                .map((item) => item.value)
+                .map(item => item.value)
+        }
+
+        // Load publisher names from publishers table
+        const { data: publishers, error: publishersError } =
+            await supabase
+                .from('publishers')
+                .select('name')
+                .order('name')
+
+        if (publishersError) {
+            console.error(
+                'Error loading publisher suggestions:',
+                publishersError
+            )
+            return
         }
 
         setSuggestions({
             title: getSuggestions(
-                (book) => book.series?.title
+                book => book.series?.title
             ),
 
             author: getSuggestions(
-                (book) => book.series?.author
+                book => book.series?.author
             ),
 
             edition: getSuggestions(
-                (book) => book.edition
+                book => book.edition
             ),
 
-            publisher: getSuggestions(
-                (book) => book.publisher
+            publisher: (publishers || []).map(
+                publisher => publisher.name
             ),
         })
     }
@@ -212,11 +228,30 @@ export default function NewBookForm({
             return
         }
 
-        const parsedVolumes = parseBatchVolumes(form.volume)
+        let parsedVolumes
 
-        if (!parsedVolumes || parsedVolumes.length === 0) {
-            alert('请输入有效的集数，例如：1 ,2 ,3 ,全 或 1-5 ,8 ,11-13')
-            return
+        if (batchMode) {
+            parsedVolumes = parseBatchVolumes(form.volume)
+
+            if (!parsedVolumes || parsedVolumes.length === 0) {
+                alert('请输入有效的批量集数，例如：1-5、8、11-13')
+                return
+            }
+        } else {
+            const volume = form.volume.trim()
+
+            if (!volume) {
+                alert('请输入集数')
+                return
+            }
+
+            // Single volume mode does not allow ranges
+            if (volume.includes('-')) {
+                alert('单集模式不能使用范围，例如 1-14。请勾选「批量集数」')
+                return
+            }
+
+            parsedVolumes = [volume]
         }
 
         setSaving(true)
@@ -225,7 +260,8 @@ export default function NewBookForm({
             await onSubmit(
                 form,
                 ownsBook,
-                parsedVolumes
+                parsedVolumes,
+                batchMode
             )
         } finally {
             setSaving(false)
@@ -264,21 +300,23 @@ export default function NewBookForm({
                 </select>
             </div>
 
-            <ISBNLookup
-                isbn={form.isbn}
-                onISBNChange={(value) =>
-                    setForm(prev => ({
-                        ...prev,
-                        isbn: value
-                    }))
-                }
-                onBookData={(data) =>
-                    setForm(prev => ({
-                        ...prev,
-                        ...data
-                    }))
-                }
-            />
+            {!batchMode && (
+                <ISBNLookup
+                    isbn={form.isbn}
+                    onISBNChange={(value) =>
+                        setForm(prev => ({
+                            ...prev,
+                            isbn: value
+                        }))
+                    }
+                    onBookData={(data) =>
+                        setForm(prev => ({
+                            ...prev,
+                            ...data
+                        }))
+                    }
+                />
+            )}
 
             {
                 form.coverUrl && (
@@ -310,17 +348,39 @@ export default function NewBookForm({
             />
 
             <div className="form-field">
-                <label htmlFor="volume">集数</label>
+                <label htmlFor="volume">
+                    集数
+                </label>
 
                 <input
                     id="volume"
                     name="volume"
                     type="text"
-                    placeholder="例如：1, 2, 3,全 或 1-5, 8, 11-13"
+                    placeholder={
+                        batchMode
+                            ? '例如：1-5, 8, 11-13'
+                            : '例如：1'
+                    }
                     value={form.volume}
                     onChange={handleChange}
                 />
+
+                <label className="checkbox-label">
+                    <input
+                        type="checkbox"
+                        checked={batchMode}
+                        onChange={(e) => {
+                            setBatchMode(e.target.checked)
+                            setForm(prev => ({
+                                ...prev,
+                                volume: ''
+                            }))
+                        }}
+                    />
+                    批量集数
+                </label>
             </div>
+
             <div className="ownership-field">
                 <label>
                     <input
@@ -337,6 +397,7 @@ export default function NewBookForm({
             </div>
 
             <details className="optional-fields">
+
                 <summary>其他资料（选填）</summary>
 
                 <SuggestionInput
@@ -369,63 +430,71 @@ export default function NewBookForm({
                     onChange={handleChange}
                 />
 
-                <div className="form-field">
-                    <label htmlFor="releaseDate">发售日期</label>
-                    <input
-                        id="releaseDate"
-                        name="releaseDate"
-                        type="date"
-                        value={form.releaseDate}
-                        onChange={handleChange}
-                    />
-                </div>
+                {!batchMode && (
+                    <div className="form-field">
+                        <label htmlFor="releaseDate">发售日期</label>
+                        <input
+                            id="releaseDate"
+                            name="releaseDate"
+                            type="date"
+                            value={form.releaseDate}
+                            onChange={handleChange}
+                        />
+                    </div>
+                )}
 
-                <div className="form-field">
-                    <label htmlFor="purchasedDate">购买日期</label>
-                    <input
-                        id="purchasedDate"
-                        name="purchasedDate"
-                        type="date"
-                        value={form.purchasedDate}
-                        onChange={handleChange}
-                    />
-                </div>
+                {!batchMode && (
+                    <div className="form-field">
+                        <label htmlFor="purchasedDate">购买日期</label>
+                        <input
+                            id="purchasedDate"
+                            name="purchasedDate"
+                            type="date"
+                            value={form.purchasedDate}
+                            onChange={handleChange}
+                        />
+                    </div>
+                )}
 
-                <div className="form-field">
-                    <label htmlFor="purchasedPrice">购买价格</label>
-                    <input
-                        id="purchasedPrice"
-                        name="purchasedPrice"
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        placeholder="请输入购买价格"
-                        value={form.purchasedPrice}
-                        onChange={handleChange}
-                    />
-                </div>
+                {!batchMode && (
+                    <div className="form-field">
+                        <label htmlFor="purchasedPrice">购买价格</label>
+                        <input
+                            id="purchasedPrice"
+                            name="purchasedPrice"
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            placeholder="请输入购买价格"
+                            value={form.purchasedPrice}
+                            onChange={handleChange}
+                        />
+                    </div>
+                )}
 
-                <div className="form-field">
-                    <label htmlFor="cover">封面
-                        <HelpTooltip>
-                            上传的封面将应用于本次新增的所有集数。
-                        </HelpTooltip>
-                    </label>
+                {!batchMode && (
+                    <div className="form-field">
+                        <label htmlFor="cover">封面
+                            <HelpTooltip>
+                                上传的封面将应用于本次新增的所有集数。
+                            </HelpTooltip>
+                        </label>
 
-                    <input
-                        id="cover"
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) =>
-                            setForm({
-                                ...form,
-                                cover: e.target.files?.[0] || null
-                            })
-                        }
-                    />
+                        <input
+                            id="cover"
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) =>
+                                setForm({
+                                    ...form,
+                                    cover: e.target.files?.[0] || null
+                                })
+                            }
+                        />
 
-                </div>
 
+                    </div>
+                )}
             </details>
 
             <div className="form-actions">
