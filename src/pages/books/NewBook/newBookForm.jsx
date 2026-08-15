@@ -51,7 +51,10 @@ export default function NewBookForm({
             volume: initialData.volume || '',
             edition: initialData.edition || '普通版',
             author: initialData.author || '',
-            publisher: initialData.publisher || '',
+            publisher:
+                typeof initialData.publisher === 'string'
+                    ? initialData.publisher
+                    : initialData.publisher?.name || '',
             isbn: initialData.isbn || '',
             releaseDate: initialData.release_date || '',
             purchasedDate: initialData.purchased_date || '',
@@ -353,9 +356,25 @@ export default function NewBookForm({
             />
 
             <div className="form-field">
-                <label htmlFor="volume">
-                    集数
-                </label>
+                <div className="volume-field-header">
+                    <label htmlFor="volume">
+                        集数
+                    </label>
+
+                    <button
+                        type="button"
+                        className={`batch-add-button ${batchMode ? 'active' : ''}`}
+                        onClick={() => {
+                            setBatchMode(prev => !prev)
+                            setForm(prev => ({
+                                ...prev,
+                                volume: ''
+                            }))
+                        }}
+                    >
+                        批量集数
+                    </button>
+                </div>
 
                 <input
                     id="volume"
@@ -369,21 +388,6 @@ export default function NewBookForm({
                     value={form.volume}
                     onChange={handleChange}
                 />
-
-                <label className="checkbox-label">
-                    <input
-                        type="checkbox"
-                        checked={batchMode}
-                        onChange={(e) => {
-                            setBatchMode(e.target.checked)
-                            setForm(prev => ({
-                                ...prev,
-                                volume: ''
-                            }))
-                        }}
-                    />
-                    批量集数
-                </label>
             </div>
 
             <div className="ownership-field">

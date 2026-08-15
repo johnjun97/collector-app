@@ -34,9 +34,21 @@ export default function SuggestionInput({
         }
     }, [])
 
-    const filteredSuggestions = suggestions.filter((item) =>
-        String(item).toLowerCase().includes(String(value ?? '').toLowerCase())
-    )
+    const inputValue =
+        typeof value === 'string'
+            ? value
+            : value?.name || ''
+
+    const filteredSuggestions = suggestions.filter((item) => {
+        const suggestionValue =
+            typeof item === 'string'
+                ? item
+                : item?.name || ''
+
+        return suggestionValue
+            .toLowerCase()
+            .includes(inputValue.toLowerCase())
+    })
 
     return (
         <div className="form-field" ref={inputRef}>
@@ -48,7 +60,7 @@ export default function SuggestionInput({
                     name={name}
                     type="text"
                     placeholder={placeholder}
-                    value={value}
+                    value={inputValue}
                     autoComplete="off"
                     onChange={onChange}
                     onFocus={() => setShowSuggestions(true)}
@@ -56,24 +68,31 @@ export default function SuggestionInput({
 
                 {showSuggestions && filteredSuggestions.length > 0 && (
                     <div className="series-suggestions">
-                        {filteredSuggestions.map((suggestion) => (
-                            <button
-                                key={suggestion}
-                                type="button"
-                                onClick={() => {
-                                    onChange({
-                                        target: {
-                                            name,
-                                            value: suggestion,
-                                        },
-                                    })
+                        {filteredSuggestions.map((suggestion) => {
+                            const selectedValue =
+                                typeof suggestion === 'string'
+                                    ? suggestion
+                                    : suggestion?.name || ''
 
-                                    setShowSuggestions(false)
-                                }}
-                            >
-                                {suggestion}
-                            </button>
-                        ))}
+                            return (
+                                <button
+                                    key={selectedValue}
+                                    type="button"
+                                    onClick={() => {
+                                        onChange({
+                                            target: {
+                                                name,
+                                                value: selectedValue,
+                                            },
+                                        })
+
+                                        setShowSuggestions(false)
+                                    }}
+                                >
+                                    {selectedValue}
+                                </button>
+                            )
+                        })}
                     </div>
                 )}
             </div>

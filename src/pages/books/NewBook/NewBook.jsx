@@ -68,6 +68,9 @@ export default function NewBook() {
             // Find or create publisher
             let publisherId = null
 
+            console.log('publisher value:', form.publisher)
+            console.log('publisher type:', typeof form.publisher)
+
             const publisherName = form.publisher?.trim()
 
             if (publisherName) {

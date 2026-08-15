@@ -47,11 +47,10 @@
 }
 
 .batch-add-button {
-    flex: 0 0 auto;
     width: auto;
-    padding: 10px 14px;
+    padding: 8px 16px;
     border: 1px solid #ccc;
-    border-radius: 6px;
+    border-radius: 8px;
     background: #fff;
     color: #333;
     font-size: 14px;
@@ -60,15 +59,15 @@
 }
 
 .batch-add-button:hover {
-    background: #f5f5f5;
-    border-color: #999;
+    background: #e8e8e8;
 }
 
 .batch-add-button.active {
-    background: #f0f0f0;
-    border-color: #999;
+    background: #e8f0fe;
+    color: #1a73e8;
+    border-color: #1a73e8;
+    font-weight: 600;
 }
-
 .batch-add-volumes {
     margin-top: 10px;
 }
@@ -126,6 +125,7 @@
 .new-book-form .series-suggestions {
     z-index: 1001;
 }
+
 .saving-overlay {
     position: fixed;
     inset: 0;

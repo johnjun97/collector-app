@@ -89,3 +89,33 @@
 .new-book-form-container {
     width: 100%;
 }
+
+.batch-add-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.batch-add-button {
+    flex: 0 0 auto;
+    width: auto;
+    min-width: 52px;
+    padding: 8px 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: #fff;
+    color: #333;
+    font-family: inherit;
+    font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.batch-add-button:hover {
+    background: #e8e8e8;
+}
+
+.batch-add-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
