@@ -9,7 +9,7 @@ export default function SuggestionInput({
     suggestions = [],
     onChange,
 }) {
-    
+
     const [showSuggestions, setShowSuggestions] = useState(false)
     const inputRef = useRef(null)
 
@@ -35,7 +35,7 @@ export default function SuggestionInput({
     }, [])
 
     const filteredSuggestions = suggestions.filter((item) =>
-        item.toLowerCase().includes(value.toLowerCase())
+        String(item).toLowerCase().includes(String(value ?? '').toLowerCase())
     )
 
     return (
