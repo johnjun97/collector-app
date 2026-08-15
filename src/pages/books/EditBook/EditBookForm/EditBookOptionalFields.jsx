@@ -163,36 +163,46 @@ export default function EditBookOptionalFields({
                     </div>
                 )}
 
-                <input
-                    id="cover"
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp"
-                    onChange={(e) =>
-                        setCover(e.target.files?.[0] || null)
-                    }
-                />
+           <div className="cover-actions">
+    <label
+        htmlFor="cover"
+        className="upload-cover-button"
+    >
+        选择新封面
+    </label>
 
-                {book.cover_image &&
-                    !cover &&
-                    !removeCover && (
-                        <button
-                            type="button"
-                            className="remove-cover-button"
-                            onClick={() => setRemoveCover(true)}
-                        >
-                            移除封面
-                        </button>
-                    )}
+    <input
+        id="cover"
+        className="cover-file-input"
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        onChange={(e) =>
+            setCover(e.target.files?.[0] || null)
+        }
+    />
 
-                {removeCover && (
-                    <button
-                        type="button"
-                        className="remove-cover-button"
-                        onClick={() => setRemoveCover(false)}
-                    >
-                        取消移除
-                    </button>
-                )}
+    {book.cover_image &&
+        !cover &&
+        !removeCover && (
+            <button
+                type="button"
+                className="remove-cover-button"
+                onClick={() => setRemoveCover(true)}
+            >
+                移除封面
+            </button>
+        )}
+
+    {removeCover && (
+        <button
+            type="button"
+            className="remove-cover-button"
+            onClick={() => setRemoveCover(false)}
+        >
+            取消移除
+        </button>
+    )}
+</div>
             </div>
         </details>
     )

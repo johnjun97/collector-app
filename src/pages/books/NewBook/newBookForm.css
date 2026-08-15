@@ -283,3 +283,56 @@
     background: #fef2f2;
     border-color: #fecaca;
 }
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.form-actions button {
+    width: auto;
+    min-width: 90px;
+    padding: 9px 20px;
+
+    border-radius: 6px;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+
+    cursor: pointer;
+    transition:
+        background 0.15s,
+        border-color 0.15s;
+}
+
+/* 取消 */
+.form-actions button[type="button"] {
+    border: 1px solid #ccc;
+    background: #fff;
+    color: #555;
+}
+
+.form-actions button[type="button"]:hover:not(:disabled) {
+    background: #f5f5f5;
+    border-color: #aaa;
+}
+
+/* 保存 */
+.form-actions button[type="submit"] {
+    border: 1px solid #1976d2;
+    background: #1976d2;
+    color: #fff;
+}
+
+.form-actions button[type="submit"]:hover:not(:disabled) {
+    background: #1565c0;
+    border-color: #1565c0;
+}
+
+.form-actions button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
