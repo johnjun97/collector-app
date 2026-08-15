@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { debugLog } from '../../lib/debug'
 import { BrowserMultiFormatReader } from '@zxing/browser'
 import { supabase } from '../../lib/supabaseClient'
 import OpenCC from 'opencc-js'
