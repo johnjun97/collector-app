@@ -620,12 +620,21 @@ export default function EditBook() {
                         checkCoverError
                     )
                 } else if (!stillUsed?.length) {
-                    const { error: deleteCoverError } = await supabase
+                    const {
+                        data: deleteCoverData,
+                        error: deleteCoverError
+                    } = await supabase
                         .storage
                         .from('book-covers')
                         .remove([oldCoverPath])
-                        console.log('Delete old cover:', oldCoverPath)
-console.log('Delete old cover error:', deleteCoverError)
+
+                    console.log('Delete old cover result:', {
+                        path: oldCoverPath,
+                        data: deleteCoverData,
+                        error: deleteCoverError
+                    })
+                    console.log('Delete old cover:', oldCoverPath)
+                    console.log('Delete old cover error:', deleteCoverError)
 
                     if (deleteCoverError) {
                         console.error(
