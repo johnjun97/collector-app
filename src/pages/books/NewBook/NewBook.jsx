@@ -19,7 +19,7 @@ export default function NewBook() {
         batchMode
     ) => {
 
-        console.log('handleSubmit called:', {
+        debugLog('handleSubmit called:', {
             form,
             ownsBook,
             parsedVolumes

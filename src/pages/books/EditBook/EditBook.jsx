@@ -31,7 +31,7 @@ export default function EditBook() {
 
     useEffect(() => {
         const getBook = async () => {
-            console.log('EditBook getBook started, id:', id)
+            debugLog('EditBook getBook started, id:', id)
             try {
 
                 // Get current book + series
@@ -45,13 +45,13 @@ export default function EditBook() {
                     .eq('id', id)
                     .single()
 
-                console.log('EditBook Supabase response:', response)
+                debugLog('EditBook Supabase response:', response)
 
                 const currentBook = response.data
                 const currentBookError = response.error
 
-                console.log('EditBook currentBook:', currentBook)
-                console.log('EditBook currentBookError:', currentBookError)
+                debugLog('EditBook currentBook:', currentBook)
+                debugLog('EditBook currentBookError:', currentBookError)
 
                 if (currentBookError) {
                     throw currentBookError
@@ -60,7 +60,7 @@ export default function EditBook() {
                 setBook(currentBook)
                 setSeries(currentBook.series)
                 setPublisherName(currentBook.publisher?.name || '')
-                console.log('updated_by:', currentBook.updated_by)
+                debugLog('updated_by:', currentBook.updated_by)
 
                 if (currentBook.updated_by) {
 
@@ -76,7 +76,7 @@ export default function EditBook() {
                     }
 
                     setUpdatedByUser(updatedUser)
-                    console.log('updatedByUser:', updatedUser)
+                    debugLog('updatedByUser:', updatedUser)
                 } else {
                     setUpdatedByUser(null)
                 }
@@ -628,13 +628,13 @@ export default function EditBook() {
                         .from('book-covers')
                         .remove([oldCoverPath])
 
-                    console.log('Delete old cover result:', {
+                    debugLog('Delete old cover result:', {
                         path: oldCoverPath,
                         data: deleteCoverData,
                         error: deleteCoverError
                     })
-                    console.log('Delete old cover:', oldCoverPath)
-                    console.log('Delete old cover error:', deleteCoverError)
+                    debugLog('Delete old cover:', oldCoverPath)
+                    debugLog('Delete old cover error:', deleteCoverError)
 
                     if (deleteCoverError) {
                         console.error(

@@ -327,7 +327,7 @@ export default function ISBNLookup({
                             const value =
                                 result.getText()
 
-                            console.log(
+                            debugLog(
                                 'ISBN barcode detected:',
                                 value
                             )
