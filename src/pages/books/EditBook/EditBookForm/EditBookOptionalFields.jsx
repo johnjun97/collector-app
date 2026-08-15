@@ -16,7 +16,9 @@ export default function EditBookOptionalFields({
     removeCover,
     setRemoveCover,
     currentCover,
-    isGoogleCover
+    isGoogleCover,
+    isCurrentVolumeCover,
+    currentCoverVolume
 }) {
     return (
         <details className="optional-fields">
@@ -115,11 +117,18 @@ export default function EditBookOptionalFields({
                         上传新封面将替换当前集数的封面。
                     </HelpTooltip>
 
-{isGoogleCover && (
-    <span className="cover-provided-by-google">
-        (Provided by Google API)
-    </span>
-)}
+                    {!isCurrentVolumeCover && currentCoverVolume && (
+                        <span>
+                            （当前封面来自第 {currentCoverVolume} 集）
+                        </span>
+                    )}
+
+
+                    {isGoogleCover && (
+                        <span className="cover-provided-by-google">
+                            (Provided by Google API)
+                        </span>
+                    )}
                     {coverUpdatedByUser && (
                         <span className="cover-updated-by">
                             更新by：

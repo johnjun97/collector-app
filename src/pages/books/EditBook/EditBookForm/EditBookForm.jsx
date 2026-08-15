@@ -131,16 +131,16 @@ export default function editBookForm({
     }, [])
     const getCurrentCover = () => {
         // Current volume has its own cover
-        if (book?.cover_image_url) {
-            return book.cover_image_url
-        }
-
         if (book?.cover_image) {
             const { data } = supabase.storage
                 .from('book-covers')
                 .getPublicUrl(book.cover_image)
 
             return data.publicUrl
+        }
+
+        if (book?.cover_image_url) {
+            return book.cover_image_url
         }
 
         // Find the latest volume with a cover
@@ -173,8 +173,79 @@ export default function editBookForm({
         return data.publicUrl
     }
 
-    const currentCover = getCurrentCover()
-    const isGoogleCover = !!book?.cover_image_url
+    const getCurrentCoverInfo = () => {
+        // Current volume has its own uploaded cover
+        if (book?.cover_image) {
+            const { data } = supabase.storage
+                .from('book-covers')
+                .getPublicUrl(book.cover_image)
+
+            return {
+                url: data.publicUrl,
+                volume: book.volume,
+                isCurrentVolume: true,
+            }
+        }
+
+        // Current volume has its own Google API cover
+        if (book?.cover_image_url) {
+            return {
+                url: book.cover_image_url,
+                volume: book.volume,
+                isCurrentVolume: true,
+            }
+        }
+
+        // Find the latest volume with a cover
+        const volumeWithCover = [...volumes]
+            .filter(
+                (volume) =>
+                    volume.cover_image ||
+                    volume.cover_image_url
+            )
+            .sort((a, b) => {
+                const aNum = Number(a.volume)
+                const bNum = Number(b.volume)
+
+                if (!isNaN(aNum) && !isNaN(bNum)) {
+                    return bNum - aNum
+                }
+
+                return String(b.volume).localeCompare(String(a.volume))
+            })[0]
+
+        if (!volumeWithCover) {
+            return {
+                url: null,
+                volume: null,
+                isCurrentVolume: false,
+            }
+        }
+
+        if (volumeWithCover.cover_image) {
+            const { data } = supabase.storage
+                .from('book-covers')
+                .getPublicUrl(volumeWithCover.cover_image)
+
+            return {
+                url: data.publicUrl,
+                volume: volumeWithCover.volume,
+                isCurrentVolume: false,
+            }
+        }
+
+        return {
+            url: volumeWithCover.cover_image_url,
+            volume: volumeWithCover.volume,
+            isCurrentVolume: false,
+        }
+    }
+
+    const currentCoverInfo = getCurrentCoverInfo()
+    const currentCover = currentCoverInfo.url
+
+    const isGoogleCover =
+        !book?.cover_image && !!book?.cover_image_url
 
     return (
         <form
@@ -276,7 +347,9 @@ export default function editBookForm({
                         removeCover={removeCover}
                         setRemoveCover={setRemoveCover}
                         currentCover={currentCover}
-                                            isGoogleCover={isGoogleCover}
+                        currentCoverVolume={currentCoverInfo.volume}
+                        isCurrentVolumeCover={currentCoverInfo.isCurrentVolume}
+                        isGoogleCover={isGoogleCover}
                     />
 
                     <div className="form-actions">
@@ -289,7 +362,7 @@ export default function editBookForm({
                         </button>
 
                     </div>
-                    
+
                 </>
             )
             }
