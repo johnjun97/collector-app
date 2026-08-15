@@ -238,7 +238,7 @@ export default function NewBookForm({
                 return
             }
         } else {
-            const volume = form.volume.trim()
+            let volume = form.volume.trim()
 
             if (!volume) {
                 alert('请输入集数')
@@ -249,6 +249,11 @@ export default function NewBookForm({
             if (volume.includes('-')) {
                 alert('单集模式不能使用范围，例如 1-14。请勾选「批量集数」')
                 return
+            }
+
+            // Normalize numeric volumes: 01 -> 1, 001 -> 1
+            if (/^\d+$/.test(volume)) {
+                volume = String(Number(volume))
             }
 
             parsedVolumes = [volume]
