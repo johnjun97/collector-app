@@ -31,10 +31,7 @@
 }
 
 .help-tooltip-content {
-    position: absolute;
-
-    right: 0;
-    top: calc(100% + 8px);
+    position: fixed;
 
     width: 260px;
     max-width: calc(100vw - 24px);
@@ -54,20 +51,18 @@
     overflow-wrap: break-word;
     word-break: break-word;
 
-    z-index: 999999;
+    z-index: 2147483647;
 }
 
 @media (max-width: 600px) {
     .help-tooltip-content {
-        position: fixed;
-
-        left: 12px;
+        left: 12px !important;
         right: 12px;
+
         bottom: 12px;
+        top: auto !important;
 
         width: auto;
         max-width: none;
-
-        z-index: 999999;
     }
 }

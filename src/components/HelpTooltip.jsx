@@ -1,8 +1,12 @@
-import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { useEffect, useRef, useState } from 'react'
 import './HelpTooltip.css'
 
 export default function HelpTooltip({ children }) {
     const [showTooltip, setShowTooltip] = useState(false)
+    const [tooltipPosition, setTooltipPosition] = useState({})
+
+    const buttonRef = useRef(null)
 
     const handlePointerUp = (e) => {
         e.preventDefault()
@@ -14,11 +18,61 @@ export default function HelpTooltip({ children }) {
     useEffect(() => {
         if (!showTooltip) return
 
-        const isMobile = window.matchMedia(
-            '(max-width: 600px)'
-        ).matches
+        const updatePosition = () => {
+            const button = buttonRef.current
 
-        if (!isMobile) return
+            if (!button) return
+
+            const rect = button.getBoundingClientRect()
+
+            const tooltipWidth = 260
+            const gap = 8
+            const margin = 12
+            const estimatedHeight = 100
+
+            let left = rect.left
+            let top = rect.bottom + gap
+
+            // Keep inside left/right edges
+            if (left + tooltipWidth > window.innerWidth - margin) {
+                left = window.innerWidth - tooltipWidth - margin
+            }
+
+            if (left < margin) {
+                left = margin
+            }
+
+            // If there isn't enough space below, show above
+            if (
+                top + estimatedHeight >
+                window.innerHeight - margin
+            ) {
+                top = rect.top - estimatedHeight - gap
+            }
+
+            if (top < margin) {
+                top = margin
+            }
+
+            setTooltipPosition({
+                left,
+                top,
+            })
+        }
+
+        updatePosition()
+
+        window.addEventListener('resize', updatePosition)
+        window.addEventListener('scroll', updatePosition)
+
+        return () => {
+            window.removeEventListener('resize', updatePosition)
+            window.removeEventListener('scroll', updatePosition)
+        }
+    }, [showTooltip])
+
+    useEffect(() => {
+        if (!showTooltip) return
 
         const timer = setTimeout(() => {
             setShowTooltip(false)
@@ -31,6 +85,7 @@ export default function HelpTooltip({ children }) {
         <>
             <span className="help-tooltip">
                 <button
+                    ref={buttonRef}
                     type="button"
                     className="help-tooltip-icon"
                     onPointerUp={handlePointerUp}
@@ -39,23 +94,16 @@ export default function HelpTooltip({ children }) {
                 </button>
             </span>
 
-            {showTooltip && (
-                <div
-                    style={{
-                        position: 'fixed',
-                        left: '12px',
-                        right: '12px',
-                        bottom: '12px',
-                        padding: '15px',
-                        background: '#333',
-                        color: '#fff',
-zIndex: 2147483647,
-                        borderRadius: '8px',
-                    }}
-                >
-                    {children}
-                </div>
-            )}
+            {showTooltip &&
+                createPortal(
+                    <div
+                        className="help-tooltip-content"
+                        style={tooltipPosition}
+                    >
+                        {children}
+                    </div>,
+                    document.body
+                )}
         </>
     )
 }
