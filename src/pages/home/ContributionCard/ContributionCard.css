@@ -2,6 +2,7 @@
   background: white;
   border-radius: 12px;
   padding: 24px;
+  margin-top: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
@@ -12,6 +13,7 @@
 .contribution-card-header h2 {
   margin: 0 0 6px;
   font-size: 20px;
+  white-space: nowrap;
 }
 
 .contribution-card-header span {
@@ -21,13 +23,7 @@
 
 .contribution-stats {
   display: flex;
-  gap: 32px;
-}
-
-.contribution-stat {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  gap: 16px;
 }
 
 .contribution-stat {
@@ -38,6 +34,12 @@
   border: 1px solid #e5e5e5;
   border-radius: 8px;
   min-width: 80px;
+  flex: 1;
+}
+
+.contribution-stat-value {
+  font-size: 20px;
+  font-weight: 600;
 }
 
 .contribution-stat-label {
@@ -45,6 +47,27 @@
   color: #666;
 }
 
-.contribution-card {
-  margin-top: 20px;
+@media (max-width: 600px) {
+
+  .contribution-card {
+    padding: 18px;
+  }
+
+  .contribution-stats {
+    gap: 8px;
+  }
+
+  .contribution-stat {
+    padding: 10px 8px;
+    min-width: 0;
+    text-align: center;
+  }
+
+  .contribution-stat-value {
+    font-size: 18px;
+  }
+
+  .contribution-stat-label {
+    font-size: 12px;
+  }
 }
