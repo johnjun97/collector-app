@@ -2,13 +2,13 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 import Navbar from '../../components/Navbar'
 import Loading from '../../components/Loading'
+import ContributionCard from './ContributionCard/ContributionCard'
 import './Home.css'
 
 export default function Home() {
 
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [contributionExpanded, setContributionExpanded] = useState(false)
 
   const [bookStats, setBookStats] = useState({
     total: 0,
@@ -16,11 +16,10 @@ export default function Home() {
   })
 
   const [contributionStats, setContributionStats] = useState({
-    createdBookSeries: 0,
-    updatedBookSeries: 0,
-    createdBooks: 0,
-    updatedBooks: 0,
-    uploadedCoverImage: 0
+    total: 0,
+    created: 0,
+    updated: 0,
+    deleted: 0
   })
 
   useEffect(() => {
@@ -109,53 +108,49 @@ export default function Home() {
         book => ownedBookIds.has(book.id)
       ).length
 
-      // 4. Get user's contribution counts
-      const [
-        { count: createdBookSeries },
-        { count: updatedBookSeries },
-        { count: createdBooks },
-        { count: updatedBooks },
-        { count: uploadedCoverImage }
-      ] = await Promise.all([
-        supabase
-          .from('book_series')
-          .select('id', { count: 'exact', head: true })
-          .eq('created_by', user.id),
-
-        supabase
-          .from('book_series')
-          .select('id', { count: 'exact', head: true })
-          .eq('updated_by', user.id),
-
-        supabase
-          .from('books')
-          .select('id', { count: 'exact', head: true })
-          .eq('created_by', user.id),
-
-        supabase
-          .from('books')
-          .select('id', { count: 'exact', head: true })
-          .eq('updated_by', user.id),
-
-        supabase
-          .from('books')
-          .select('id', { count: 'exact', head: true })
-          .eq('cover_image_updated_by', user.id)
-      ])
-
-      setContributionStats({
-        createdBookSeries: createdBookSeries ?? 0,
-        updatedBookSeries: updatedBookSeries ?? 0,
-        createdBooks: createdBooks ?? 0,
-        updatedBooks: updatedBooks ?? 0,
-        uploadedCoverImage: uploadedCoverImage ?? 0
-      })
-
-      // 5. Set ALL books statistics
+      // 4. Set book statistics
       setBookStats({
         total: totalCount,
         owned: ownedCount
       })
+
+      // 5. Get current user's contributions
+      const { data: contributions, error: contributionsError } =
+        await supabase
+          .from('contributions')
+          .select('action, points')
+          .eq('user_id', user.id)
+
+      if (contributionsError) {
+        console.error(
+          'Error loading contributions:',
+          contributionsError
+        )
+
+        setLoading(false)
+        return
+      }
+
+      const contributionStats = {
+        total: contributions.reduce(
+          (sum, contribution) => sum + contribution.points,
+          0
+        ),
+
+        created: contributions.filter(
+          (contribution) => contribution.action === 'create'
+        ).length,
+
+        updated: contributions.filter(
+          (contribution) => contribution.action === 'update'
+        ).length,
+
+        deleted: contributions.filter(
+          (contribution) => contribution.action === 'delete'
+        ).length
+      }
+
+      setContributionStats(contributionStats)
 
       setLoading(false)
     }
@@ -209,15 +204,16 @@ export default function Home() {
                 width: `${bookStats.total
                   ? (bookStats.owned / bookStats.total) * 100
                   : 0
-                  }%`
+                }%`
               }}
             />
           </div>
 
         </div>
-        
+
+        <ContributionCard stats={contributionStats} />
+
       </main>
     </>
   )
 }
-

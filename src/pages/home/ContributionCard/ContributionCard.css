@@ -1,0 +1,50 @@
+.contribution-card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.contribution-card-header {
+  margin-bottom: 20px;
+}
+
+.contribution-card-header h2 {
+  margin: 0 0 6px;
+  font-size: 20px;
+}
+
+.contribution-card-header span {
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.contribution-stats {
+  display: flex;
+  gap: 32px;
+}
+
+.contribution-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.contribution-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 20px;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  min-width: 80px;
+}
+
+.contribution-stat-label {
+  font-size: 14px;
+  color: #666;
+}
+
+.contribution-card {
+  margin-top: 20px;
+}
