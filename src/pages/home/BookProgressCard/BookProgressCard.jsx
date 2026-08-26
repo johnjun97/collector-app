@@ -1,13 +1,18 @@
 import './BookProgressCard.css'
+import { useNavigate } from 'react-router-dom'
 
 export default function BookProgressCard({ owned, total }) {
+  const navigate = useNavigate()
 
   const percentage = total
     ? (owned / total) * 100
     : 0
 
   return (
-    <div className="dashboard-card">
+<div
+  className="dashboard-card"
+  onClick={() => navigate('/books')}
+>
 
       <div className="dashboard-card-header">
         <div>
