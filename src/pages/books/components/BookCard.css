@@ -6,11 +6,8 @@
 }
 
 .book-card-cover {
-    display: block;
     width: 100%;
-    max-width: 500px;
-    height: auto;
-    max-height: 600px;
+    height: 100%;
     object-fit: contain;
     object-position: center;
     border-radius: 6px;
@@ -19,13 +16,14 @@
 
 .book-card-cover-container {
     position: relative;
-    display: inline-flex;
+    width: 500px;
+    height: 600px;
+    max-width: 100%;
+    margin: 12px auto;
+    display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    margin: 12px auto;
-    max-width: 500px;
-    max-height: 600px;
     border-radius: 6px;
 }
 
