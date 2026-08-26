@@ -9,12 +9,16 @@ export default function BookCard({
     expandAll
 }) {
 
-    const [copied, setCopied] = useState(false)
     const navigate = useNavigate()
     const [expanded, setExpanded] = useState(expandAll)
+    const [coverIndex, setCoverIndex] = useState(0)
+    const [coverDirection, setCoverDirection] = useState('next')
+
     useEffect(() => {
         setExpanded(expandAll)
     }, [expandAll])
+
+
 
     const sortedVolumes = [...book.allVolumes].sort((a, b) => {
         const aNum = Number(a.volume)
@@ -60,31 +64,51 @@ export default function BookCard({
         return String(b.volume).localeCompare(String(a.volume))
     })[0]
 
-const coverVolume = [...book.allVolumes]
-    .filter(
-        (volume) =>
-            volume.cover_image ||
-            volume.cover_image_url
-    )
-    .sort((a, b) => {
-        const aNum = Number(a.volume)
-        const bNum = Number(b.volume)
+    const coverVolumes = [...book.allVolumes]
+        .filter(
+            (volume) =>
+                volume.cover_image ||
+                volume.cover_image_url
+        )
+        .sort((a, b) => {
+            const aNum = Number(a.volume)
+            const bNum = Number(b.volume)
 
-        if (!isNaN(aNum) && !isNaN(bNum)) {
-            return bNum - aNum
+            if (!isNaN(aNum) && !isNaN(bNum)) {
+                return aNum - bNum
+            }
+
+            if (!isNaN(aNum)) return -1
+            if (!isNaN(bNum)) return 1
+
+            return String(a.volume).localeCompare(
+                String(b.volume)
+            )
+        })
+
+    useEffect(() => {
+        const latestOwnedCoverIndex = coverVolumes
+            .map((volume, index) => ({
+                volume,
+                index
+            }))
+            .filter(({ volume }) =>
+                book.ownedBookIds.has(volume.id)
+            )
+            .at(-1)?.index
+
+        if (latestOwnedCoverIndex !== undefined) {
+            setCoverIndex(latestOwnedCoverIndex)
         }
+    }, [book.allVolumes])
 
-        if (!isNaN(aNum)) return -1
-        if (!isNaN(bNum)) return 1
+    const coverVolume = coverVolumes[coverIndex]
 
-        return String(b.volume).localeCompare(String(a.volume))
-    })[0]
-
-const coverUrl = coverVolume?.cover_image
-    ? supabase.storage
-        .from('book-covers')
-        .getPublicUrl(coverVolume.cover_image).data.publicUrl
-    : coverVolume?.cover_image_url || null
+    const coverUrl = coverVolume?.cover_image
+        ? supabase.storage
+            .from('book-covers')
+            .getPublicUrl(coverVolume.cover_image).data.publicUrl
+        : coverVolume?.cover_image_url || null
 
 
     return (
@@ -94,16 +118,55 @@ const coverUrl = coverVolume?.cover_image
         >
 
             {expanded && coverUrl && (
-                <img
-                    className="book-card-cover"
-                    src={coverUrl}
-                    alt={`${book.title} 封面`}
-                    onClick={() => {
-                        if (coverVolume) {
-                            navigate(`/books/${coverVolume.id}/edit`)
-                        }
-                    }}
-                />
+                <div
+                    className="book-card-cover-container"
+                    onClick={(e) => e.stopPropagation()}
+                >
+
+                    {coverVolumes.length > 1 && (
+                        <button
+                            type="button"
+                            className="cover-nav-button cover-nav-prev"
+                            disabled={coverIndex === 0}
+                            onClick={() => {
+                                if (coverIndex === 0) return
+
+                                setCoverDirection('prev')
+                                setCoverIndex((current) => current - 1)
+                            }}
+                        >
+                            &lt;
+                        </button>
+                    )}
+
+                    <img
+                        className={`book-card-cover cover-slide-${coverDirection}`}
+                        src={coverUrl}
+                        alt={`${book.title} 封面`}
+                        onClick={() => {
+                            if (coverVolume) {
+                                navigate(`/books/${coverVolume.id}/edit`)
+                            }
+                        }}
+                    />
+
+                    {coverVolumes.length > 1 && (
+                        <button
+                            type="button"
+                            className="cover-nav-button cover-nav-next"
+                            disabled={coverIndex === coverVolumes.length - 1}
+                            onClick={() => {
+                                if (coverIndex === coverVolumes.length - 1) return
+
+                                setCoverDirection('next')
+                                setCoverIndex((current) => current + 1)
+                            }}
+                        >
+                            &gt;
+                        </button>
+                    )}
+
+                </div>
             )}
 
             <div className="book-card-header">
