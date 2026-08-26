@@ -85,9 +85,12 @@
 }
 
 @media (max-width: 768px) {
-  .navbar {
-    height: 60px;
-    padding: 0 16px;
+.navbar {
+  position: relative;
+  z-index: 1000;
+
+  height: 60px;
+  padding: 0 24px;
   }
 
   .navbar-left {
