@@ -14,8 +14,11 @@ nav,
 }
 
 @media (max-width: 768px) {
-  body {
-    user-select: none;
-    -webkit-user-select: none;
-  }
+    html,
+    body {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+        touch-action: pan-y;
+    }
 }
