@@ -13,12 +13,11 @@ export default function BookCard({
     const [expanded, setExpanded] = useState(expandAll)
     const [coverIndex, setCoverIndex] = useState(0)
     const [coverDirection, setCoverDirection] = useState('next')
+    const [touchStartX, setTouchStartX] = useState(null)
 
     useEffect(() => {
         setExpanded(expandAll)
     }, [expandAll])
-
-
 
     const sortedVolumes = [...book.allVolumes].sort((a, b) => {
         const aNum = Number(a.volume)
@@ -49,20 +48,6 @@ export default function BookCard({
             String(b.volume)
         )
     })
-
-    const latestVolume = [...book.allVolumes].sort((a, b) => {
-        const aNum = Number(a.volume)
-        const bNum = Number(b.volume)
-
-        if (!isNaN(aNum) && !isNaN(bNum)) {
-            return bNum - aNum
-        }
-
-        if (!isNaN(aNum)) return -1
-        if (!isNaN(bNum)) return 1
-
-        return String(b.volume).localeCompare(String(a.volume))
-    })[0]
 
     const coverVolumes = [...book.allVolumes]
         .filter(
@@ -107,9 +92,45 @@ export default function BookCard({
     const coverUrl = coverVolume?.cover_image
         ? supabase.storage
             .from('book-covers')
-            .getPublicUrl(coverVolume.cover_image).data.publicUrl
+            .getPublicUrl(coverVolume.cover_image)
+            .data.publicUrl
         : coverVolume?.cover_image_url || null
 
+    const handleTouchStart = (e) => {
+        setTouchStartX(e.touches[0].clientX)
+    }
+
+    const handleTouchEnd = (e) => {
+        if (touchStartX === null) return
+
+        const touchEndX = e.changedTouches[0].clientX
+        const distance = touchEndX - touchStartX
+
+        const swipeThreshold = 50
+
+        if (Math.abs(distance) >= swipeThreshold) {
+
+            // Swipe left = next cover
+            if (
+                distance < 0 &&
+                coverIndex < coverVolumes.length - 1
+            ) {
+                setCoverDirection('next')
+                setCoverIndex((current) => current + 1)
+            }
+
+            // Swipe right = previous cover
+            if (
+                distance > 0 &&
+                coverIndex > 0
+            ) {
+                setCoverDirection('prev')
+                setCoverIndex((current) => current - 1)
+            }
+        }
+
+        setTouchStartX(null)
+    }
 
     return (
         <div
@@ -121,6 +142,8 @@ export default function BookCard({
                 <div
                     className="book-card-cover-container"
                     onClick={(e) => e.stopPropagation()}
+                    onTouchStart={handleTouchStart}
+                    onTouchEnd={handleTouchEnd}
                 >
 
                     {coverVolumes.length > 1 && (
@@ -132,7 +155,9 @@ export default function BookCard({
                                 if (coverIndex === 0) return
 
                                 setCoverDirection('prev')
-                                setCoverIndex((current) => current - 1)
+                                setCoverIndex(
+                                    (current) => current - 1
+                                )
                             }}
                         >
                             &lt;
@@ -145,7 +170,9 @@ export default function BookCard({
                         alt={`${book.title} 封面`}
                         onClick={() => {
                             if (coverVolume) {
-                                navigate(`/books/${coverVolume.id}/edit`)
+                                navigate(
+                                    `/books/${coverVolume.id}/edit`
+                                )
                             }
                         }}
                     />
@@ -154,12 +181,22 @@ export default function BookCard({
                         <button
                             type="button"
                             className="cover-nav-button cover-nav-next"
-                            disabled={coverIndex === coverVolumes.length - 1}
+                            disabled={
+                                coverIndex ===
+                                coverVolumes.length - 1
+                            }
                             onClick={() => {
-                                if (coverIndex === coverVolumes.length - 1) return
+                                if (
+                                    coverIndex ===
+                                    coverVolumes.length - 1
+                                ) {
+                                    return
+                                }
 
                                 setCoverDirection('next')
-                                setCoverIndex((current) => current + 1)
+                                setCoverIndex(
+                                    (current) => current + 1
+                                )
                             }}
                         >
                             &gt;
@@ -173,31 +210,37 @@ export default function BookCard({
 
                 <div className="book-card-info">
 
-
                     <h2
                         className="book-card-title"
                         onClick={async (e) => {
                             e.stopPropagation()
 
                             try {
-                                await navigator.clipboard.writeText(book.title)
+                                await navigator.clipboard.writeText(
+                                    book.title
+                                )
+
                                 alert(`已复制：${book.title}`)
                             } catch (error) {
-                                console.error('Failed to copy title:', error)
+                                console.error(
+                                    'Failed to copy title:',
+                                    error
+                                )
                             }
                         }}
                         title="点击复制书名"
                     >
                         {book.title}
+
                         <span className="book-card-expand-icon">
                             {expanded ? '▼' : '▶'}
                         </span>
+
                         {book.subcategory && (
                             <span className="book-subcategory">
                                 [{book.subcategory}]
                             </span>
                         )}
-
                     </h2>
 
                     <p>
@@ -224,7 +267,8 @@ export default function BookCard({
 
                     {sortedVolumes.map((volume) => {
 
-                        const volumeValue = String(volume.volume)
+                        const volumeValue =
+                            String(volume.volume)
 
                         const owned =
                             book.ownedBookIds.has(volume.id)
@@ -232,7 +276,9 @@ export default function BookCard({
                         return (
                             <span
                                 key={volume.id}
-                                className={`volume-indicator ${owned ? 'owned' : ''}`}
+                                className={`volume-indicator ${
+                                    owned ? 'owned' : ''
+                                }`}
                                 onClick={(e) => {
                                     e.stopPropagation()
 
@@ -248,7 +294,9 @@ export default function BookCard({
                                 {volume.edition &&
                                     volume.edition !== '普通版' && (
                                         <span className="volume-edition">
-                                            &nbsp;({volume.edition})
+                                            &nbsp;(
+                                            {volume.edition}
+                                            )
                                         </span>
                                     )}
                             </span>

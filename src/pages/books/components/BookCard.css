@@ -16,15 +16,18 @@
 
 .book-card-cover-container {
     position: relative;
-    width: 500px;
-    height: 600px;
-    max-width: 100%;
+    width: min(500px, 90vw);
+    height: min(600px, 75vh);
     margin: 12px auto;
+
     display: flex;
     align-items: center;
     justify-content: center;
+
     overflow: hidden;
     border-radius: 6px;
+
+    touch-action: pan-y;
 }
 
 .cover-nav-button {
