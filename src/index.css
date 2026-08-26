@@ -12,3 +12,10 @@ nav,
     -webkit-user-select: none;
     touch-action: manipulation;
 }
+
+@media (max-width: 768px) {
+  body {
+    user-select: none;
+    -webkit-user-select: none;
+  }
+}
