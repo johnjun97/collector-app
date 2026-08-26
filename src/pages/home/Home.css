@@ -18,30 +18,7 @@
     color: #666;
 }
 
-.dashboard-card {
-    background: #fff;
-    border: 1px solid #e5e5e5;
-    border-radius: 16px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
-    overflow: hidden;
-}
 
-.dashboard-card-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 24px 28px;
-}
-
-.dashboard-card-header h2 {
-    margin: 0 0 6px;
-    font-size: 18px;
-}
-
-.dashboard-card-header span {
-    color: #666;
-    font-size: 14px;
-}
 
 .contribution-header {
     width: 100%;
@@ -95,16 +72,6 @@
     overflow: hidden;
 }
 
-.progress-bar {
-    height: 100%;
-    background: #22c55e;
-    border-radius: inherit;
-}
-
-.progress-animate {
-    animation: progress-fill 1s ease-out;
-}
-
 @keyframes progress-fill {
     from {
         transform: scaleX(0);
@@ -127,12 +94,7 @@
         font-size: 24px;
     }
 
-    .dashboard-card-header {
-        padding: 20px;
-    }
 
-    .progress-container {
-        margin-left: 20px;
-        margin-right: 20px;
-    }
+
+
 }

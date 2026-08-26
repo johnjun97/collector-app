@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabaseClient'
 import Navbar from '../../components/Navbar'
 import Loading from '../../components/Loading'
 import ContributionCard from './ContributionCard/ContributionCard'
+import BookProgressCard from './BookProgressCard/BookProgressCard'
 import './Home.css'
 
 export default function Home() {
@@ -179,37 +180,10 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="dashboard-card">
-
-          <div className="dashboard-card-header">
-            <div>
-              <h2>所有书籍</h2>
-
-              <span>
-                {bookStats.owned} / {bookStats.total} (
-                {bookStats.total
-                  ? Math.round(
-                    (bookStats.owned / bookStats.total) * 100
-                  )
-                  : 0
-                }%)
-              </span>
-            </div>
-          </div>
-
-          <div className="progress-container">
-            <div
-              className="progress-bar progress-animate"
-              style={{
-                width: `${bookStats.total
-                  ? (bookStats.owned / bookStats.total) * 100
-                  : 0
-                }%`
-              }}
-            />
-          </div>
-
-        </div>
+        <BookProgressCard
+          owned={bookStats.owned}
+          total={bookStats.total}
+        />
 
         <ContributionCard stats={contributionStats} />
 
