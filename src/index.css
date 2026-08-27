@@ -14,11 +14,22 @@ nav,
 }
 
 @media (max-width: 768px) {
+
     html,
     body {
         width: 100%;
         max-width: 100%;
         overflow-x: hidden;
         touch-action: pan-y;
+
+        -webkit-user-select: none;
+        user-select: none;
     }
+
+    input,
+    textarea {
+        -webkit-user-select: text;
+        user-select: text;
+    }
+
 }
