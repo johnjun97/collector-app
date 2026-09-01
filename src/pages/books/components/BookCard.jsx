@@ -71,6 +71,8 @@ export default function BookCard({
             )
         })
 
+    const [loadedCoverUrls, setLoadedCoverUrls] = useState(new Set())
+
     useEffect(() => {
         const latestOwnedCoverIndex = coverVolumes
             .map((volume, index) => ({
@@ -95,6 +97,33 @@ export default function BookCard({
             .getPublicUrl(coverVolume.cover_image)
             .data.publicUrl
         : coverVolume?.cover_image_url || null
+
+    useEffect(() => {
+        const urls = coverVolumes.map((volume) => {
+            if (volume.cover_image) {
+                return supabase.storage
+                    .from('book-covers')
+                    .getPublicUrl(volume.cover_image)
+                    .data.publicUrl
+            }
+
+            return volume.cover_image_url || null
+        }).filter(Boolean)
+
+        urls.forEach((url) => {
+            const img = new Image()
+
+            img.onload = () => {
+                setLoadedCoverUrls((current) => {
+                    const next = new Set(current)
+                    next.add(url)
+                    return next
+                })
+            }
+
+            img.src = url
+        })
+    }, [book.allVolumes])
 
     const handleTouchStart = (e) => {
         setTouchStartX(e.touches[0].clientX)
@@ -165,7 +194,10 @@ export default function BookCard({
                     )}
 
                     <img
-                        className={`book-card-cover cover-slide-${coverDirection}`}
+                        className={`book-card-cover ${loadedCoverUrls.has(coverUrl)
+                                ? `cover-slide-${coverDirection}`
+                                : ''
+                            }`}
                         src={coverUrl}
                         alt={`${book.title} 封面`}
                         onClick={() => {
@@ -276,9 +308,8 @@ export default function BookCard({
                         return (
                             <span
                                 key={volume.id}
-                                className={`volume-indicator ${
-                                    owned ? 'owned' : ''
-                                }`}
+                                className={`volume-indicator ${owned ? 'owned' : ''
+                                    }`}
                                 onClick={(e) => {
                                     e.stopPropagation()
 

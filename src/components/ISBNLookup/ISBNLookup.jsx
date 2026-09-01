@@ -64,7 +64,6 @@ export default function ISBNLookup({
             const data = await response.json()
 
             if (!data.items || data.items.length === 0) {
-                onISBNChange('')
                 setLookupMessage(
                     'Google Books: Books not found'
                 )
