@@ -14,6 +14,7 @@ export default function BookCard({
     const [coverIndex, setCoverIndex] = useState(0)
     const [coverDirection, setCoverDirection] = useState('next')
     const [touchStartX, setTouchStartX] = useState(null)
+    const [animateCover, setAnimateCover] = useState(false)
 
     useEffect(() => {
         setExpanded(expandAll)
@@ -98,23 +99,49 @@ export default function BookCard({
             .data.publicUrl
         : coverVolume?.cover_image_url || null
 
+    const navigateCover = (newIndex, direction) => {
+        const targetVolume = coverVolumes[newIndex]
+
+        if (!targetVolume) return
+
+        const targetUrl = targetVolume.cover_image
+            ? supabase.storage
+                .from('book-covers')
+                .getPublicUrl(targetVolume.cover_image)
+                .data.publicUrl
+            : targetVolume.cover_image_url
+
+        setAnimateCover(loadedCoverUrls.has(targetUrl))
+        setCoverDirection(direction)
+        setCoverIndex(newIndex)
+    }
+
     useEffect(() => {
-        const urls = coverVolumes.map((volume) => {
-            if (volume.cover_image) {
-                return supabase.storage
+        const indexesToPreload = [
+            coverIndex - 1,
+            coverIndex + 1
+        ]
+
+        indexesToPreload.forEach((index) => {
+            const volume = coverVolumes[index]
+
+            if (!volume) return
+
+            const url = volume.cover_image
+                ? supabase.storage
                     .from('book-covers')
                     .getPublicUrl(volume.cover_image)
                     .data.publicUrl
-            }
+                : volume.cover_image_url
 
-            return volume.cover_image_url || null
-        }).filter(Boolean)
+            if (!url) return
 
-        urls.forEach((url) => {
             const img = new Image()
 
             img.onload = () => {
                 setLoadedCoverUrls((current) => {
+                    if (current.has(url)) return current
+
                     const next = new Set(current)
                     next.add(url)
                     return next
@@ -123,7 +150,7 @@ export default function BookCard({
 
             img.src = url
         })
-    }, [book.allVolumes])
+    }, [coverIndex, book.allVolumes])
 
     const handleTouchStart = (e) => {
         setTouchStartX(e.touches[0].clientX)
@@ -144,8 +171,7 @@ export default function BookCard({
                 distance < 0 &&
                 coverIndex < coverVolumes.length - 1
             ) {
-                setCoverDirection('next')
-                setCoverIndex((current) => current + 1)
+                navigateCover(coverIndex + 1, 'next')
             }
 
             // Swipe right = previous cover
@@ -153,8 +179,7 @@ export default function BookCard({
                 distance > 0 &&
                 coverIndex > 0
             ) {
-                setCoverDirection('prev')
-                setCoverIndex((current) => current - 1)
+                navigateCover(coverIndex - 1, 'prev')
             }
         }
 
@@ -183,10 +208,7 @@ export default function BookCard({
                             onClick={() => {
                                 if (coverIndex === 0) return
 
-                                setCoverDirection('prev')
-                                setCoverIndex(
-                                    (current) => current - 1
-                                )
+                                navigateCover(coverIndex - 1, 'prev')
                             }}
                         >
                             &lt;
@@ -194,9 +216,9 @@ export default function BookCard({
                     )}
 
                     <img
-                        className={`book-card-cover ${loadedCoverUrls.has(coverUrl)
-                            ? `cover-slide-${coverDirection}`
-                            : ''
+                        className={`book-card-cover ${animateCover
+                                ? `cover-slide-${coverDirection}`
+                                : ''
                             }`}
                         src={coverUrl}
                         alt={`${book.title} 封面`}
@@ -225,10 +247,7 @@ export default function BookCard({
                                     return
                                 }
 
-                                setCoverDirection('next')
-                                setCoverIndex(
-                                    (current) => current + 1
-                                )
+                                navigateCover(coverIndex + 1, 'next')
                             }}
                         >
                             &gt;
