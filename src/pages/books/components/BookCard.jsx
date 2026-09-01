@@ -195,8 +195,8 @@ export default function BookCard({
 
                     <img
                         className={`book-card-cover ${loadedCoverUrls.has(coverUrl)
-                                ? `cover-slide-${coverDirection}`
-                                : ''
+                            ? `cover-slide-${coverDirection}`
+                            : ''
                             }`}
                         src={coverUrl}
                         alt={`${book.title} 封面`}
