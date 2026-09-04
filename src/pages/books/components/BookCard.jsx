@@ -9,6 +9,8 @@ export default function BookCard({
     expandAll
 }) {
 
+    console.log('BOOK CARD RENDER:', book.title)
+
     const navigate = useNavigate()
     const [expanded, setExpanded] = useState(expandAll)
     const [coverIndex, setCoverIndex] = useState(0)
@@ -111,20 +113,36 @@ export default function BookCard({
                 .data.publicUrl
             : targetVolume.cover_image_url
 
-        setAnimateCover(loadedCoverUrls.has(targetUrl))
+        setAnimateCover(false)
         setCoverDirection(direction)
         setCoverIndex(newIndex)
+
+        if (loadedCoverUrls.has(targetUrl)) {
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    setAnimateCover(true)
+                })
+            })
+        }
     }
 
     useEffect(() => {
         const indexesToPreload = [
+            coverIndex - 2,
             coverIndex - 1,
-            coverIndex + 1
+            coverIndex + 1,
+            coverIndex + 2
         ]
+
+        console.log(
+            'Current cover:',
+            coverIndex,
+            'Preloading indexes:',
+            indexesToPreload
+        )
 
         indexesToPreload.forEach((index) => {
             const volume = coverVolumes[index]
-
             if (!volume) return
 
             const url = volume.cover_image
@@ -136,9 +154,13 @@ export default function BookCard({
 
             if (!url) return
 
+            console.log('Preloading:', index, url)
+
             const img = new Image()
 
             img.onload = () => {
+                console.log('Preloaded successfully:', index, url)
+
                 setLoadedCoverUrls((current) => {
                     if (current.has(url)) return current
 
@@ -146,6 +168,10 @@ export default function BookCard({
                     next.add(url)
                     return next
                 })
+            }
+
+            img.onerror = () => {
+                console.log('Preload FAILED:', index, url)
             }
 
             img.src = url
