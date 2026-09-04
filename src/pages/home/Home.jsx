@@ -4,6 +4,7 @@ import Navbar from '../../components/Navbar'
 import Loading from '../../components/Loading'
 import ContributionCard from './ContributionCard/ContributionCard'
 import BookProgressCard from './BookProgressCard/BookProgressCard'
+import { getLevelInfo } from '../../utils/level'
 import './Home.css'
 
 export default function Home() {
@@ -164,6 +165,8 @@ export default function Home() {
     return <Loading text="Loading" />
   }
 
+  const levelInfo = getLevelInfo(contributionStats.total)
+
   return (
     <>
       <Navbar />
@@ -180,12 +183,15 @@ export default function Home() {
           </p>
         </div>
 
+        <ContributionCard
+          stats={contributionStats}
+          levelInfo={levelInfo}
+        />
+
         <BookProgressCard
           owned={bookStats.owned}
           total={bookStats.total}
         />
-
-        <ContributionCard stats={contributionStats} />
 
       </main>
     </>

@@ -17,8 +17,27 @@
 }
 
 .contribution-card-header span {
-  font-size: 28px;
+  font-size: 16px;
   font-weight: 600;
+}
+
+.contribution-progress {
+  margin-bottom: 20px;
+}
+
+.contribution-progress-bar {
+  width: 100%;
+  height: 10px;
+  background: #e5e5e5;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.contribution-progress-fill {
+  height: 100%;
+  background: #22c55e;
+  border-radius: 999px;
+  animation: progress-fill 1s ease-out;
 }
 
 .contribution-stats {
