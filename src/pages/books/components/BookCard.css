@@ -245,6 +245,41 @@
     font-size: 14px;
 }
 
+.book-completed-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 6px;
+    border: 1px solid #b7dfbd;
+    border-radius: 3px;
+    background: #f0faf2;
+    color: #247a35;
+    font-size: 11px;
+    font-weight: normal;
+    line-height: 1.4;
+    white-space: nowrap;
+}
+
+.book-completed-ribbon {
+    position: absolute;
+    top: 14px;
+    right: -34px;
+
+    width: 120px;
+    padding: 5px 0;
+
+    background: #3a9d5d;
+    color: white;
+
+    font-size: 12px;
+    font-weight: 500;
+    text-align: center;
+
+    transform: rotate(45deg);
+    z-index: 3;
+
+    pointer-events: none;
+}
+
 /* Mobile */
 @media (max-width: 600px) {
     .book-card {

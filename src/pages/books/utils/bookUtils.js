@@ -121,12 +121,13 @@ export function buildBooksBySeries(addedBooks, allBooks, seriesIds) {
                 )
             )
 
-            return {
-                id: series.id,
-                title: series.title,
-                author: series.author,
-                subcategory: series.subcategory,
-                cover_image: series.cover_image,
+return {
+    id: series.id,
+    title: series.title,
+    author: series.author,
+    subcategory: series.subcategory,
+    is_completed: series.is_completed,
+    cover_image: series.cover_image,
                 cover_image_url: series.cover_image_url,
                 allVolumes: visibleVolumes,
                 ownedBookIds,

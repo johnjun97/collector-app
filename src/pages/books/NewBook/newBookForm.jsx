@@ -18,6 +18,7 @@ export default function NewBookForm({
     const [form, setForm] = useState({
         subcategory: '漫画',
         title: '',
+        isCompleted: false,
         volume: '',
         edition: '普通版',
         author: '',
@@ -48,6 +49,7 @@ export default function NewBookForm({
         setForm({
             subcategory: initialData.subcategory || '漫画',
             title: initialData.title || '',
+            isCompleted: initialData.is_completed || false,
             volume: initialData.volume || '',
             edition: initialData.edition || '普通版',
             author: initialData.author || '',
@@ -354,6 +356,26 @@ export default function NewBookForm({
                 suggestions={suggestions.title}
                 onChange={handleChange}
             />
+
+            <div className="completed-field">
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={form.isCompleted}
+                        onChange={(e) =>
+                            setForm(prev => ({
+                                ...prev,
+                                isCompleted: e.target.checked
+                            }))
+                        }
+                    />
+                    已完结
+                </label>
+
+                <HelpTooltip>
+                    标记这个系列是否已经完结。
+                </HelpTooltip>
+            </div>
 
             <div className="form-field">
                 <div className="volume-field-header">

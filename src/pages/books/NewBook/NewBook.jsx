@@ -132,10 +132,11 @@ export default function NewBook() {
                 const { data: updatedSeries, error: seriesUpdateError } =
                     await supabase
                         .from('book_series')
-                        .update({
-                            updated_by: user.id,
-                            updated_at: new Date().toISOString(),
-                        })
+     .update({
+    is_completed: form.isCompleted,
+    updated_by: user.id,
+    updated_at: new Date().toISOString(),
+})
                         .eq('id', existingSeries.id)
                         .select()
                         .single()
@@ -149,13 +150,14 @@ export default function NewBook() {
                 const { data: newSeries, error: seriesInsertError } =
                     await supabase
                         .from('book_series')
-                        .insert({
-                            title,
-                            author: form.author.trim() || null,
-                            subcategory: form.subcategory || '漫画',
-                            created_by: user.id,
-                            updated_by: user.id,
-                        })
+                      .insert({
+    title,
+    author: form.author.trim() || null,
+    subcategory: form.subcategory || '漫画',
+    is_completed: form.isCompleted,
+    created_by: user.id,
+    updated_by: user.id,
+})
                         .select()
                         .single()
 

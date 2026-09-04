@@ -400,6 +400,28 @@ export default function editBookForm({
                 onChange={handleSeriesChange}
             />
 
+<div className="completed-field">
+    <label>
+        <input
+            type="checkbox"
+            checked={series.is_completed || false}
+            onChange={(e) =>
+                handleSeriesChange({
+                    target: {
+                        name: 'is_completed',
+                        value: e.target.checked
+                    }
+                })
+            }
+        />
+        已完结
+    </label>
+
+    <HelpTooltip>
+        标记这个系列是否已经完结。
+    </HelpTooltip>
+</div>
+
             <SuggestionInput
                 id="author"
                 name="author"

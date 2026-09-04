@@ -219,3 +219,26 @@
     opacity: 0.6;
     cursor: not-allowed;
 }
+
+.completed-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 2px;
+    margin-bottom: 8px;
+}
+
+.completed-field label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    cursor: pointer;
+}
+
+.completed-field input[type="checkbox"] {
+    width: 17px;
+    height: 17px;
+    margin: 0;
+    cursor: pointer;
+}

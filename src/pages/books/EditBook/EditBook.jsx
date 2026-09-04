@@ -569,6 +569,7 @@ export default function EditBook() {
                     title: series.title.trim(),
                     author: series.author || null,
                     subcategory: series.subcategory,
+                    is_completed: series.is_completed || false,
                     updated_by: user.id,
                 })
                 .eq('id', series.id)

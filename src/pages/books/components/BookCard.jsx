@@ -199,6 +199,11 @@ export default function BookCard({
                     onTouchStart={handleTouchStart}
                     onTouchEnd={handleTouchEnd}
                 >
+                    {book.is_completed && (
+                        <div className="book-completed-ribbon">
+                            已完结
+                        </div>
+                    )}
 
                     {coverVolumes.length > 1 && (
                         <button
@@ -217,8 +222,8 @@ export default function BookCard({
 
                     <img
                         className={`book-card-cover ${animateCover
-                                ? `cover-slide-${coverDirection}`
-                                : ''
+                            ? `cover-slide-${coverDirection}`
+                            : ''
                             }`}
                         src={coverUrl}
                         alt={`${book.title} 封面`}
@@ -290,6 +295,12 @@ export default function BookCard({
                         {book.subcategory && (
                             <span className="book-subcategory">
                                 [{book.subcategory}]
+                            </span>
+                        )}
+
+                        {book.is_completed && (
+                            <span className="book-completed-tag">
+                                已完结
                             </span>
                         )}
                     </h2>
