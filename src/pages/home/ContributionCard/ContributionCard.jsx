@@ -9,7 +9,7 @@ export default function ContributionCard({ stats, levelInfo }) {
                     <h2>Level {levelInfo.level}</h2>
 
                     <span>
-                        {levelInfo.nextLevelPoints - stats.total} EXP to next level  ({levelInfo.progress}%)
+                        {levelInfo.nextLevelPoints - stats.total} EXP to next level ({levelInfo.progress.toFixed(2)}%)
                     </span>
                 </div>
             </div>
