@@ -42,7 +42,7 @@ export default function Navbar({ section = '收藏' }) {
                     </button>
 
                     <button onClick={() => {
-                        navigate('/video')
+                        navigate('/videos')
                         setMenuOpen(false)
                     }}>
                         影音

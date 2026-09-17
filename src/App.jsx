@@ -56,7 +56,7 @@ export default function App() {
       <Route path="/books/:id/edit" element={<ProtectedRoute session={session}><EditBook /></ProtectedRoute>} />
 
       <Route path="/musics" element={<ProtectedRoute session={session}><ComingSoon section="音乐" /></ProtectedRoute>} />
-      <Route path="/video" element={<ProtectedRoute session={session}><ComingSoon section="影音" /></ProtectedRoute>} />
+      <Route path="/videos" element={<ProtectedRoute session={session}><ComingSoon section="影音" /></ProtectedRoute>} />
       <Route path="/games" element={<ProtectedRoute session={session}><ComingSoon section="游戏" /></ProtectedRoute>} />
       <Route path="/figures" element={<ProtectedRoute session={session}><ComingSoon section="模型" /></ProtectedRoute>} />
     </Routes>
