@@ -52,6 +52,15 @@ export default function ContributionCard({ stats, levelInfo }) {
                         Deleted
                     </span>
                 </div>
+
+                <div className="contribution-stat">
+                    <span className="contribution-stat-value">
+                        {stats.login}
+                    </span>
+                    <span className="contribution-stat-label">
+                        Daily Login
+                    </span>
+                </div>
             </div>
 
         </div>

@@ -14,6 +14,17 @@ export default function Login() {
 
   const [loading, setLoading] = useState(false)
 
+  const recordDailyLogin = async () => {
+    const { error } =
+      await supabase.rpc('record_daily_login')
+
+    if (error) {
+      console.error(
+        'Failed to record daily login:',
+        error
+      )
+    }
+  }
 
   // Check if user is already logged in || in recovery flow
   useEffect(() => {
@@ -21,6 +32,7 @@ export default function Login() {
       const { data } = await supabase.auth.getUser()
 
       if (data.user) {
+        await recordDailyLogin()
         navigate("/home")
       }
     }
@@ -29,7 +41,7 @@ export default function Login() {
   }, [])
 
   const handleLogin = async (e) => {
-    e.preventDefault() //stops the page from refreshing So React can handle login like call supabase, stay on same page, navigate manually
+    e.preventDefault()
 
     setLoading(true)
 
@@ -38,21 +50,24 @@ export default function Login() {
       password
     })
 
+    if (error) {
+      setLoading(false)
+      alert(error.message)
+      return
+    }
+
+    await recordDailyLogin()
+
     setLoading(false)
 
-    if (error) {
-      alert(error.message)
-    } else {
-      // alert('Login success')
-      navigate("/home")
-    }
+    navigate("/home")
   }
+
   return (
     <div className="login-container">
       <div className="login-form">
         <h1 className="login-title">Collector-App</h1>
 
-        {/* <div className="form-content"> */}
         {loading ? (
           <Loading text="Logging in" />
         ) : (
@@ -106,7 +121,7 @@ export default function Login() {
             Forgot Password
           </button>
 
-          <p >
+          <p>
             Don't have an account?{" "}
             <span onClick={() => navigate("/Register")}>
               Register
@@ -114,7 +129,7 @@ export default function Login() {
           </p>
         </div>
 
-      </div >
-    </div >
+      </div>
+    </div>
   )
 }

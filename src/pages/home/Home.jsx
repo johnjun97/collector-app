@@ -17,12 +17,13 @@ export default function Home() {
     owned: 0
   })
 
-  const [contributionStats, setContributionStats] = useState({
-    total: 0,
-    created: 0,
-    updated: 0,
-    deleted: 0
-  })
+const [contributionStats, setContributionStats] = useState({
+  total: 0,
+  created: 0,
+  updated: 0,
+  deleted: 0,
+  login: 0
+})
 
   useEffect(() => {
 
@@ -147,9 +148,13 @@ export default function Home() {
           (contribution) => contribution.action === 'update'
         ).length,
 
-        deleted: contributions.filter(
-          (contribution) => contribution.action === 'delete'
-        ).length
+deleted: contributions.filter(
+  (contribution) => contribution.action === 'delete'
+).length,
+
+login: contributions.filter(
+  (contribution) => contribution.action === 'login'
+).length
       }
 
       setContributionStats(contributionStats)
