@@ -759,27 +759,23 @@ export default function EditBook() {
                 <div className="edit-book-header">
                     <div className="edit-book-title">
                         <h1
-                            onClick={async () => {
-                                try {
-                                    const copyText =
-                                        `${series.title}${book.edition && book.edition !== '普通版'
-                                            ? ` (${book.edition})`
-                                            : ''
-                                        }`
+               onClick={() => {
+    const searchText =
+        `${series.title} - ${isNumericVolume
+            ? `第${book.volume}集`
+            : book.volume
+        }${book.edition && book.edition !== '普通版'
+            ? ` (${book.edition})`
+            : ''
+        }`
 
-                                    await navigator.clipboard.writeText(copyText)
-                                    alert(
-                                        `已复制：${series.title}${book.edition && book.edition !== '普通版'
-                                            ? ` (${book.edition})`
-                                            : ''
-                                        }`
-                                    )
-                                } catch (error) {
-                                    debugError('Error copying title:', error)
-                                }
-                            }}
-                            title="点击复制书名"
-                            style={{ cursor: 'pointer' }}
+    const googleImagesUrl =
+        `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(searchText)}`
+
+    window.open(googleImagesUrl, '_blank')
+}}
+title="点击在 Google 图片搜索"
+style={{ cursor: 'pointer' }}
                         >
                             {isNumericVolume
                                 ? `${series.title} - 第${book.volume}集${book.edition && book.edition !== '普通版' ? ` (${book.edition})` : ''}`

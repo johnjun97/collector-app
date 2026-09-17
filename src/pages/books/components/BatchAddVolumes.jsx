@@ -66,7 +66,7 @@ export default function BatchAddVolumes({
                         min="1"
                         value={fromVolume}
                         onChange={handleFromChange}
-                        placeholder="例如：1"
+                        placeholder="例如：1、2、全、上、下"
                     />
                 </div>
 
