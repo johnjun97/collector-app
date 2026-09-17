@@ -41,23 +41,7 @@ export default function editBookForm({
 
     const [showOwnershipBatchEdit, setShowOwnershipBatchEdit] =
         useState(false)
-
-    const [currentCoverUrl, setCurrentCoverUrl] = useState(null)
-
-    useEffect(() => {
-        if (!book?.cover_image) {
-            setCurrentCoverUrl(null)
-            return
-        }
-
-        const { data } = supabase
-            .storage
-            .from('book-covers')
-            .getPublicUrl(book.cover_image)
-
-        setCurrentCoverUrl(data.publicUrl)
-    }, [book?.cover_image])
-
+    const [isGoogleCover, setIsGoogleCover] = useState(false)
     const [suggestions, setSuggestions] = useState({
         title: [],
         edition: [],
@@ -281,9 +265,6 @@ export default function editBookForm({
     const currentCoverInfo = getCurrentCoverInfo()
     const currentCover = currentCoverInfo.url
 
-    const isGoogleCover =
-        !book?.cover_image && !!book?.cover_image_url
-
     const handleISBNBookData = (data) => {
         // Current volume only
         if (data.isbn) {
@@ -348,7 +329,14 @@ export default function editBookForm({
                     value: data.coverUrl
                 }
             })
+
+            setIsGoogleCover(true)
         }
+    }
+
+    const handleManualCoverUrlChange = (e) => {
+        setIsGoogleCover(false)
+        handleBookChange(e)
     }
 
     return (
@@ -400,27 +388,27 @@ export default function editBookForm({
                 onChange={handleSeriesChange}
             />
 
-<div className="completed-field">
-    <label>
-        <input
-            type="checkbox"
-            checked={series.is_completed || false}
-            onChange={(e) =>
-                handleSeriesChange({
-                    target: {
-                        name: 'is_completed',
-                        value: e.target.checked
-                    }
-                })
-            }
-        />
-        已完结
-    </label>
+            <div className="completed-field">
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={series.is_completed || false}
+                        onChange={(e) =>
+                            handleSeriesChange({
+                                target: {
+                                    name: 'is_completed',
+                                    value: e.target.checked
+                                }
+                            })
+                        }
+                    />
+                    已完结
+                </label>
 
-    <HelpTooltip>
-        标记这个系列是否已经完结。
-    </HelpTooltip>
-</div>
+                <HelpTooltip>
+                    标记这个系列是否已经完结。
+                </HelpTooltip>
+            </div>
 
             <SuggestionInput
                 id="author"
@@ -479,6 +467,7 @@ export default function editBookForm({
                         currentCoverVolume={currentCoverInfo.volume}
                         isCurrentVolumeCover={currentCoverInfo.isCurrentVolume}
                         isGoogleCover={isGoogleCover}
+                        handleManualCoverUrlChange={handleManualCoverUrlChange}
                     />
 
                     <div className="form-actions">

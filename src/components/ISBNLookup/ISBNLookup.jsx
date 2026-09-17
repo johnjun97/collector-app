@@ -213,7 +213,7 @@ export default function ISBNLookup({
                 releaseDate:
                     publishedDate,
 
-                coverUrl
+                ...(coverUrl ? { coverUrl } : {})
             }
 
             onBookData(bookData)

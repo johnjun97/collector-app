@@ -62,13 +62,14 @@ export default function NewBookForm({
             purchasedDate: initialData.purchased_date || '',
             purchasedPrice: initialData.purchased_price || '',
             cover: null,
-            coverUrl: initialData.cover_url || '',
+            coverUrl: initialData.cover_image_url || '',
         })
     }, [initialData])
 
     const handleChange = (e) => {
         const value =
-            e.target.name === 'subcategory'
+            e.target.name === 'subcategory' ||
+                e.target.name === 'coverUrl'
                 ? e.target.value
                 : converter(e.target.value)
 
@@ -328,24 +329,7 @@ export default function NewBookForm({
                 />
             )}
 
-            {
-                form.coverUrl && (
-                    <div className="form-field">
-                        <label>Google Books 封面</label>
 
-                        <img
-                            src={form.coverUrl}
-                            alt="Book cover"
-                            style={{
-                                width: '120px',
-                                height: 'auto',
-                                display: 'block',
-                                marginTop: '8px'
-                            }}
-                        />
-                    </div>
-                )
-            }
 
             <SuggestionInput
                 id="title"
@@ -504,27 +488,59 @@ export default function NewBookForm({
                 )}
 
                 {!batchMode && (
-                    <div className="form-field">
-                        <label htmlFor="cover">封面
-                            <HelpTooltip>
-                                上传的封面将应用于本次新增的所有集数。
-                            </HelpTooltip>
-                        </label>
+                    <>
+                        <div className="form-field">
+                            <label htmlFor="cover">
+                                上传封面
+                                <HelpTooltip>
+                                    上传的封面将应用于本次新增的所有集数。
+                                </HelpTooltip>
+                            </label>
 
-                        <input
-                            id="cover"
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) =>
-                                setForm({
-                                    ...form,
-                                    cover: e.target.files?.[0] || null
-                                })
-                            }
-                        />
+                            <input
+                                id="cover"
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) =>
+                                    setForm({
+                                        ...form,
+                                        cover: e.target.files?.[0] || null
+                                    })
+                                }
+                            />
+                        </div>
 
+                        <div className="form-field">
+                            <label htmlFor="coverUrl">
+                                网络封面 URL
+                            </label>
 
-                    </div>
+                            <input
+                                id="coverUrl"
+                                name="coverUrl"
+                                type="url"
+                                placeholder="例如：https://example.com/cover.jpg"
+                                value={form.coverUrl}
+                                onChange={handleChange}
+                            />
+
+                            {form.coverUrl && (
+                                <img
+                                    src={form.coverUrl}
+                                    alt="网络封面预览"
+                                    style={{
+                                        width: '120px',
+                                        height: 'auto',
+                                        display: 'block',
+                                        marginTop: '8px'
+                                    }}
+                                    onError={(e) => {
+                                        e.currentTarget.style.display = 'none'
+                                    }}
+                                />
+                            )}
+                        </div>
+                    </>
                 )}
             </details>
 

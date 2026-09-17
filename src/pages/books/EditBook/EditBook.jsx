@@ -579,14 +579,15 @@ export default function EditBook() {
             }
 
             // Update volume information
-            const bookUpdates = {
-                volume: book.volume,
-                edition: book.edition || '普通版',
-                isbn: book.isbn || null,
-                release_date: book.release_date || null,
-                publisher_id: publisherId,
-                updated_by: user.id,
-            }
+    const bookUpdates = {
+    volume: book.volume,
+    edition: book.edition || '普通版',
+    isbn: book.isbn || null,
+    release_date: book.release_date || null,
+    publisher_id: publisherId,
+    cover_image_url: book.cover_image_url || null,
+    updated_by: user.id,
+}
 
             if (cover) {
                 bookUpdates.cover_image = coverPath

@@ -20,8 +20,9 @@ export default function EditBookOptionalFields({
     removeCover,
     setRemoveCover,
     currentCover,
-    isGoogleCover,
-    isCurrentVolumeCover,
+isGoogleCover,
+handleManualCoverUrlChange,
+isCurrentVolumeCover,
     currentCoverVolume
 }) {
     return (
@@ -207,6 +208,22 @@ export default function EditBookOptionalFields({
                         </button>
                     )}
                 </div>
+            </div>
+
+            <div className="form-field">
+                <label htmlFor="cover_image_url">
+                    网络封面 URL
+                </label>
+
+                <input
+                    id="cover_image_url"
+                    name="cover_image_url"
+                    type="url"
+                    placeholder="例如：https://example.com/cover.jpg"
+                    value={book.cover_image_url || ''}
+                    onChange={handleManualCoverUrlChange}
+                />
+
             </div>
         </details>
     )
